@@ -5,6 +5,7 @@ description = "AI architectural audit for Python codebases"
 requires-python = ">=3.12"
 dependencies = [
     "anthropic>=0.40.0",
+    "openai>=1.50.0",
     "pydantic>=2.6",
     "click>=8.1",
     "rich>=13.7",

@@ -243,7 +243,7 @@ class PromptCache:
         messages: list[dict],
         model: str | None = None,
         max_tokens: int = 1500,
-        temperature: float = 0.5,
+        temperature: float | None = 0.5,
         tools: Sequence[dict] | None = None,
         tool_choice: dict | None = None,
     ) -> Any:
@@ -252,6 +252,10 @@ class PromptCache:
 
         Used by callers whose prompts don't fit the 10-cell prefix pattern —
         notably the per-DP judge and the Layer-3 report writer.
+
+        Opus 4.7 rejects `temperature` (it uses extended-thinking sampling).
+        Callers should pass `temperature=None` for Opus models; we also
+        defensively strip it on the way out for OPUS.
         """
         model = model or self.default_model
         sys_arg: list[dict] = (
@@ -261,15 +265,40 @@ class PromptCache:
         kwargs: dict[str, Any] = {
             "model": model,
             "max_tokens": max_tokens,
-            "temperature": temperature,
             "system": sys_arg,
             "messages": messages,
         }
+        if temperature is not None and model != OPUS:
+            kwargs["temperature"] = temperature
         if tools is not None:
             kwargs["tools"] = list(tools)
         if tool_choice is not None:
             kwargs["tool_choice"] = tool_choice
         return await self._send(kwargs)
+
+    # --- response-extraction helpers (backend-specific format lives here, not in callers) ---
+
+    def extract_text(self, msg: Any) -> str:
+        """Concatenate every text block in an Anthropic Message."""
+        parts: list[str] = []
+        for block in msg.content:
+            if getattr(block, "type", None) == "text":
+                parts.append(block.text)
+        return "\n".join(parts).strip()
+
+    def extract_tool_input(self, msg: Any, tool_name: str) -> dict:
+        """Pull a tool_use block's input dict from an Anthropic Message."""
+        for block in msg.content:
+            if getattr(block, "type", None) == "tool_use" and block.name == tool_name:
+                return dict(block.input)
+        raise RuntimeError(
+            f"model did not call tool {tool_name!r}; "
+            f"stop_reason={getattr(msg, 'stop_reason', '?')}"
+        )
+
+    @property
+    def backend_name(self) -> str:
+        return "anthropic"
 
     async def _send(self, kwargs: dict) -> Any:
         t0 = time.perf_counter()

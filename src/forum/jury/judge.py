@@ -174,8 +174,17 @@ async def run_judge(
     )
 
     verdict = _extract_tool_input(msg, "submit_verdict")
-    if verdict["verdict"] not in VERDICT_VALUES:
-        raise ValueError(f"judge returned out-of-enum verdict: {verdict['verdict']!r}")
+    # Sonnet sometimes emits "STRUCTURAL_DEBT" instead of "STRUCTURAL DEBT" —
+    # Anthropic's tool-use enum is advisory, not enforced server-side, so
+    # normalize lightly before validating.
+    raw = verdict["verdict"]
+    normalized = raw.replace("_", " ").strip().upper()
+    if normalized not in VERDICT_VALUES:
+        raise ValueError(
+            f"judge returned out-of-enum verdict: {raw!r} "
+            f"(normalized: {normalized!r}). Allowed: {VERDICT_VALUES}"
+        )
+    verdict["verdict"] = normalized
     verdict["model"] = model
     verdict["panel_size"] = len(cells)
     return verdict

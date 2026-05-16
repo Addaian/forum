@@ -16,11 +16,16 @@ from __future__ import annotations
 import asyncio
 import logging
 
+from typing import TYPE_CHECKING
+
 from ..cache.prompt_cache import HAIKU, PromptCache
 from ..types import CellVote, DecisionPoint, TribunalResult
 from .aggregate import confidence_weighted
 from .pairings import cell_temperature, pair_for, pairings
 from .single_cell import run_cell
+
+if TYPE_CHECKING:
+    from ..cache.wafer_cache import WaferCache
 
 log = logging.getLogger("forum.jury.parallel")
 
@@ -32,7 +37,7 @@ async def run_tribunal(
     codebase_summary: str = "",
     git_summary: str = "",
     model: str = HAIKU,
-    pc: PromptCache | None = None,
+    pc: "PromptCache | WaferCache | None" = None,
     max_turn_tokens: int = 600,
 ) -> TribunalResult:
     """Run `num_cells` debate cells in parallel on one decision point."""

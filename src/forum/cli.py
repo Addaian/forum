@@ -65,6 +65,12 @@ def main() -> None:
               help="Skip Layer 3 (markdown report).")
 @click.option("--only", "only_checkers", default=None,
               help="Comma-separated principle IDs to run (e.g. P1,P3).")
+@click.option("--cell-backend", "cell_backend",
+              type=click.Choice(["anthropic", "wafer"]), default="anthropic",
+              help="Inference backend for Layer-2 cells. 'anthropic' uses "
+              "Haiku 4.5 with KV-cache reuse; 'wafer' routes the 50 cells "
+              "through Wafer's Qwen3.5-397B-A17B (no prompt caching). "
+              "Judge and report always stay on Anthropic.")
 @click.option("--replay", "replay_dir", type=click.Path(exists=True, file_okay=False, path_type=Path),
               default=None, help="Replay a cached audit (no API calls). "
               "Mutually exclusive with REPO.")
@@ -72,7 +78,7 @@ def main() -> None:
 def audit(repo: Path | None, values_path: Path | None,
           value_overrides: tuple[str, ...], top_n: int, cache_dir: Path,
           skip_jury: bool, skip_report: bool, only_checkers: str | None,
-          replay_dir: Path | None, verbose: bool) -> None:
+          cell_backend: str, replay_dir: Path | None, verbose: bool) -> None:
     """Audit a Python repository and produce a markdown briefing.
 
     With --replay, re-emits a previously-cached audit (no API calls); used
@@ -144,6 +150,19 @@ def audit(repo: Path | None, values_path: Path | None,
         from .jury.judge import run_judge
         from .jury.speculative import run_tribunal_speculative
 
+        # Cell backend: Anthropic Haiku (cached) or Wafer Qwen3.5 (no cache).
+        # The judge always stays on Anthropic Sonnet — we reuse `judge_pc`
+        # below — because verdict synthesis is the hot quality bar.
+        if cell_backend == "wafer":
+            from .cache.wafer_cache import QWEN3, WaferCache
+            cell_pc = WaferCache(model=QWEN3)
+            console.print(f"[magenta]Cells →[/] Wafer ({QWEN3})  "
+                          f"[dim](judge + report stay on Anthropic)[/]")
+        else:
+            cell_pc = PromptCache(model=HAIKU)
+            console.print(f"[magenta]Cells →[/] Anthropic ({HAIKU})")
+        judge_pc = PromptCache()  # Sonnet judge, separate metrics
+
         # Build a one-paragraph codebase narrative for the cached system prefix.
         pkgs = sorted({d.locations[0].module.split(".")[0]
                        for d in bundle.decision_points if d.locations})
@@ -168,7 +187,6 @@ def audit(repo: Path | None, values_path: Path | None,
         top_dps = [dp_by_id[r["decision_point_id"]] for r in ranked
                    if r["decision_point_id"] in dp_by_id]
 
-        pc = PromptCache(model=HAIKU)
         verdicts: list[dict] = []
 
         async def _layer2() -> None:
@@ -179,7 +197,7 @@ def audit(repo: Path | None, values_path: Path | None,
                     num_cells=10,
                     codebase_summary=codebase_summary,
                     git_summary=git_summary,
-                    pc=pc,
+                    pc=cell_pc,
                 )
                 console.print(
                     f"  → {tribunal.aggregate_vote['cells_run']}/10 cells, "
@@ -187,7 +205,7 @@ def audit(repo: Path | None, values_path: Path | None,
                     f"margin={tribunal.aggregate_vote['margin']:.2f}"
                 )
                 judge_out = await run_judge(
-                    decision_point=dp, cells=tribunal.cells, pc=pc,
+                    decision_point=dp, cells=tribunal.cells, pc=judge_pc,
                 )
                 console.print(f"  ⚖  verdict: {verdict_markup(judge_out['verdict'])}"
                               f"{' [yellow](override)[/]' if judge_out.get('override') else ''}")
@@ -200,11 +218,16 @@ def audit(repo: Path | None, values_path: Path | None,
         (audit_dir / "verdicts.json").write_text(
             json.dumps(verdicts, indent=2), encoding="utf-8",
         )
-        s = pc.metrics.summary()
+        cell_s = cell_pc.metrics.summary()
+        judge_s = judge_pc.metrics.summary()
+        total_cost = cell_s["total_cost_usd"] + judge_s["total_cost_usd"]
         console.print(
-            f"[green]Layer 2[/]: {len(verdicts)} tribunals, "
-            f"cache_ratio={s['cache_read_ratio']:.1%} "
-            f"cost=${s['total_cost_usd']:.3f}"
+            f"[green]Layer 2[/]: {len(verdicts)} tribunals · "
+            f"cells({cell_pc.backend_name})="
+            f"cache_ratio={cell_s['cache_read_ratio']:.1%} "
+            f"${cell_s['total_cost_usd']:.3f} · "
+            f"judge(anthropic)=${judge_s['total_cost_usd']:.3f} · "
+            f"total ${total_cost:.3f}"
         )
 
     # --- Layer 3: Opus report writer ---
@@ -434,7 +457,7 @@ def cache_test(model: str | None, verbose: bool) -> None:
         "has been around several years and has accumulated structural "
         "decisions worth examining under principled scrutiny. "
     )
-    codebase_summary = paragraph * 20  # ~3.5K tokens — over Haiku's 2K cache floor
+    codebase_summary = paragraph * 40  # ~7K tokens — well over Haiku 4.5's ~4K cache floor
     git_summary = (
         "Recent activity: 312 commits over the last 12 months across "
         "21 contributors. Largest co-change pairs include routing.py with "

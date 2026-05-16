@@ -18,11 +18,16 @@ import asyncio
 import logging
 from typing import Awaitable, Callable
 
+from typing import TYPE_CHECKING
+
 from ..cache.prompt_cache import HAIKU, PromptCache
 from ..types import CellVote, DecisionPoint, TribunalResult
 from .aggregate import confidence_weighted, should_stop
 from .pairings import cell_temperature, pairings
 from .single_cell import run_cell
+
+if TYPE_CHECKING:
+    from ..cache.wafer_cache import WaferCache
 
 log = logging.getLogger("forum.jury.speculative")
 
@@ -34,40 +39,48 @@ async def run_tribunal_speculative(
     codebase_summary: str = "",
     git_summary: str = "",
     model: str = HAIKU,
-    pc: PromptCache | None = None,
+    pc: "PromptCache | WaferCache | None" = None,
     max_turn_tokens: int = 600,
     min_same_side: int = 6,
     min_avg_confidence: float = 0.7,
+    max_concurrent_cells: int = 3,
 ) -> TribunalResult:
     """Run up to `num_cells` cells; stop early once the verdict is clear.
 
     Returns a TribunalResult containing only the cells that actually voted
     before the stopping condition fired. Cancelled cells contribute nothing
     — their partial transcripts are discarded by design.
+
+    `max_concurrent_cells` caps how many cells run their turns in parallel.
+    Default 3 keeps the burst within Anthropic's default 50K ITPM rate
+    limit (each cell's cold turn 1 sends ~5K input tokens with the cached
+    preamble engaged). Increase if you have higher rate limits.
     """
     if num_cells < 1 or num_cells > 36:
         raise ValueError("num_cells must be in [1, 36]")
     pc = pc or PromptCache(model=model)
     pair_list = pairings(num_cells)
+    sem = asyncio.Semaphore(max(1, max_concurrent_cells))
 
-    log.info("Tribunal start (speculative): dp=%s cells_max=%d",
-             decision_point.id, num_cells)
+    log.info("Tribunal start (speculative): dp=%s cells_max=%d concurrency=%d",
+             decision_point.id, num_cells, max_concurrent_cells)
 
     async def _one(i: int) -> CellVote:
         red, blue = pair_list[i]
         temp = cell_temperature(i, num_cells=num_cells)
         log.debug("cell %d: red=%s blue=%s T=%.2f", i, red, blue, temp)
-        return await run_cell(
-            cell_id=i,
-            decision_point=decision_point,
-            red_persona_id=red,
-            blue_persona_id=blue,
-            temperature=temp,
-            codebase_summary=codebase_summary,
-            git_summary=git_summary,
-            pc=pc,
-            max_turn_tokens=max_turn_tokens,
-        )
+        async with sem:
+            return await run_cell(
+                cell_id=i,
+                decision_point=decision_point,
+                red_persona_id=red,
+                blue_persona_id=blue,
+                temperature=temp,
+                codebase_summary=codebase_summary,
+                git_summary=git_summary,
+                pc=pc,
+                max_turn_tokens=max_turn_tokens,
+            )
 
     tasks: set[asyncio.Task[CellVote]] = {
         asyncio.create_task(_one(i), name=f"cell-{i}") for i in range(num_cells)
