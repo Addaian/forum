@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Forum — Architectural Audit for FastAPI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Forum: an AI architectural audit calibrated to your engineering values. Live re-projection of the FastAPI audit under your value vector.">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="prompt">$</span> <span class="cmd">forum audit fastapi</span>
+  </div>
+  <div class="meta">
+    <a href="https://github.com/Addaian/forum" target="_blank">github.com/Addaian/forum</a>
+  </div>
+</header>
+
+<main>
+  <aside class="sidebar">
+    <section class="panel">
+      <h2>Team value vector</h2>
+      <p class="hint">Drag a slider. The verdict text never changes — the ranking, salient
+        dissents, and flip thresholds re-project live. Zero LLM calls.</p>
+
+      <div class="presets">
+        <button data-preset="baseline" class="preset-btn active">baseline</button>
+        <button data-preset="velocity" class="preset-btn">velocity-first</button>
+        <button data-preset="correctness" class="preset-btn">correctness-first</button>
+        <button data-preset="maintainability" class="preset-btn">maintainability-first</button>
+      </div>
+
+      <div id="sliders"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Re-projected ranking</h2>
+      <p class="hint">Composite = structural × (1 + 0.5 × value-affinity).
+        Watch the order shift with the sliders above.</p>
+      <ol id="ranking"></ol>
+    </section>
+
+    <section class="panel">
+      <h2>Audit summary</h2>
+      <ul class="stats">
+        <li>Repo: <code id="stat-repo">…</code></li>
+        <li>Commit: <code id="stat-commit">…</code></li>
+        <li>Modules: <code id="stat-modules">…</code></li>
+        <li>Decision points: <code id="stat-dps">…</code></li>
+        <li>Principles flagged: <code id="stat-principles">…</code></li>
+      </ul>
+    </section>
+  </aside>
+
+  <article class="report">
+    <section class="panel" id="tribunal-panel">
+      <h2>Live tribunal — top-1 decision point</h2>
+      <div id="tribunal"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Briefing (Opus 4.7)</h2>
+      <p class="hint">Single Opus pass. Verdict text preserved literally; vocabulary
+        and emphasis follow your value vector.</p>
+      <div id="report-md" class="markdown-body"></div>
+    </section>
+
+    <section class="panel collapsible">
+      <h2>Dependency graph (Layer 1)</h2>
+      <p class="hint">FastAPI's module-level import graph as detected by Forum's static
+        analysis. The 18-module SCC at the core is P1's cycle finding.</p>
+      <div id="graph-wrap"></div>
+    </section>
+  </article>
+</main>
+
+<footer>
+  <div>Forum · CLI-first AI architectural audit · Anthropic Haiku / Sonnet / Opus + Wafer Qwen3.5</div>
+  <div class="tracks">tracks: Tensormesh (cache reuse) · Most Uncommon (50-cell jury) · Wafer (Qwen3.5 cells)</div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

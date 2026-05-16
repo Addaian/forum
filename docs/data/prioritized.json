@@ -1,0 +1,57 @@
+{
+  "values": {
+    "maintainability": 1.0,
+    "simplicity": 1.2,
+    "correctness": 1.0,
+    "scalability": 1.0,
+    "velocity": 1.5,
+    "flexibility": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "d9318cf6a4",
+      "principle": "P3",
+      "subject": "Function fastapi.dependencies.utils.analyze_param has cyclomatic complexity 45",
+      "structural_score": 0.68,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.887,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "97d35f80d7",
+      "principle": "P3",
+      "subject": "Function fastapi.openapi.utils.get_openapi_path has cyclomatic complexity 44",
+      "structural_score": 0.68,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.887,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "18d38f4025",
+      "principle": "P3",
+      "subject": "Function fastapi.encoders.jsonable_encoder has cyclomatic complexity 35",
+      "structural_score": 0.615,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.8023,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "4587c93f89",
+      "principle": "P1",
+      "subject": "Dependency cycle across 18 modules: fastapi \u2192 _compat \u2192 v2 \u2192 applications\u2026",
+      "structural_score": 0.7,
+      "value_affinity_score": 0.2687,
+      "composite_score": 0.794,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "32987311bb",
+      "principle": "P4",
+      "subject": "Class fastapi.routing.APIRouter has low cohesion (LCOM \u2248 0.77)",
+      "structural_score": 0.6147,
+      "value_affinity_score": 0.3985,
+      "composite_score": 0.7372,
+      "rank": 5
+    }
+  ]
+}
