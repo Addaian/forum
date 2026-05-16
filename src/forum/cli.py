@@ -1,0 +1,485 @@
+"""Forum CLI entry point."""
+from __future__ import annotations
+
+import hashlib
+import logging
+import subprocess
+import sys
+from pathlib import Path
+
+import click
+from dotenv import load_dotenv
+from rich.console import Console
+from rich.logging import RichHandler
+
+console = Console(stderr=True)
+
+
+def _setup_logging(verbose: bool) -> None:
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler(console=console, rich_tracebacks=True,
+                              show_path=False, markup=True)],
+    )
+
+
+def _audit_hash(repo_path: Path, commit_sha: str) -> str:
+    """Stable 12-char hash for the audit dir."""
+    h = hashlib.sha256(f"{repo_path.resolve()}:{commit_sha}".encode()).hexdigest()
+    return h[:12]
+
+
+def _commit_sha(repo_path: Path) -> str:
+    if not (repo_path / ".git").exists():
+        return "no-git"
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo_path, text=True,
+        ).strip()
+    except subprocess.CalledProcessError:
+        return "unknown"
+
+
+@click.group()
+@click.version_option()
+def main() -> None:
+    """Forum — an AI architectural audit for Python codebases."""
+    load_dotenv()
+
+
+@main.command()
+@click.argument("repo", type=click.Path(file_okay=False, path_type=Path), required=False)
+@click.option("--values", "values_path", type=click.Path(exists=True, path_type=Path),
+              default=None, help="YAML file of value weights.")
+@click.option("--value", "value_overrides", multiple=True,
+              help="Single value override, e.g. --value velocity=1.8")
+@click.option("--top-n", "top_n", type=int, default=5,
+              help="Number of decision points to surface in Layer 1.5.")
+@click.option("--cache", "cache_dir", type=click.Path(path_type=Path),
+              default=Path("./audits"), help="Where to write audit artifacts.")
+@click.option("--skip-jury", is_flag=True, default=False,
+              help="Skip Layer 2 (jury deliberation).")
+@click.option("--skip-report", is_flag=True, default=False,
+              help="Skip Layer 3 (markdown report).")
+@click.option("--only", "only_checkers", default=None,
+              help="Comma-separated principle IDs to run (e.g. P1,P3).")
+@click.option("--replay", "replay_dir", type=click.Path(exists=True, file_okay=False, path_type=Path),
+              default=None, help="Replay a cached audit (no API calls). "
+              "Mutually exclusive with REPO.")
+@click.option("--verbose", is_flag=True, default=False)
+def audit(repo: Path | None, values_path: Path | None,
+          value_overrides: tuple[str, ...], top_n: int, cache_dir: Path,
+          skip_jury: bool, skip_report: bool, only_checkers: str | None,
+          replay_dir: Path | None, verbose: bool) -> None:
+    """Audit a Python repository and produce a markdown briefing.
+
+    With --replay, re-emits a previously-cached audit (no API calls); used
+    as the demo backstop when WiFi is iffy or budget is tight.
+    """
+    _setup_logging(verbose)
+
+    # Replay path — completely separate; never touches the SDK.
+    if replay_dir is not None:
+        if repo is not None:
+            console.print("[red]--replay is mutually exclusive with REPO.[/]")
+            sys.exit(2)
+        _replay_audit(replay_dir.resolve())
+        return
+
+    if repo is None:
+        console.print("[red]Must supply REPO (or use --replay <audit-dir>).[/]")
+        sys.exit(2)
+    if not repo.exists() or not repo.is_dir():
+        console.print(f"[red]REPO does not exist or is not a directory: {repo}[/]")
+        sys.exit(2)
+
+    log = logging.getLogger("forum")
+
+    repo = repo.resolve()
+    sha = _commit_sha(repo)
+    audit_dir = (cache_dir / _audit_hash(repo, sha)).resolve()
+    audit_dir.mkdir(parents=True, exist_ok=True)
+
+    console.rule(f"[bold]forum audit[/] {repo.name} @ {sha[:8]}")
+    console.print(f"Cache: [cyan]{audit_dir}[/]")
+
+    # --- Layer 1 ---
+    from ._polish import phase
+    from .evidence.runner import run as run_evidence
+    want = None
+    if only_checkers:
+        want = {p.strip().upper() for p in only_checkers.split(",")}
+    with phase(console, "Layer 1: deterministic evidence extraction"):
+        bundle = run_evidence(repo, audit_dir, run_checkers=want)
+    console.print(f"[green]Layer 1[/]: {len(bundle.decision_points)} decision points "
+                  f"across {len({d.principle for d in bundle.decision_points})} principles")
+
+    # --- Layer 1.5 ---
+    from .prioritize.score import rank, write_prioritized
+    from .values.loader import load_affinities, load_values
+    weights = load_values(values_path, value_overrides)
+    affinities = load_affinities()
+    ranked = rank(bundle, weights, affinities, top_n=top_n)
+    prioritized_path = write_prioritized(audit_dir, ranked, weights)
+    console.print(f"[green]Layer 1.5[/]: top {len(ranked)} → [cyan]{prioritized_path}[/]")
+    for r in ranked:
+        console.print(
+            f"  [bold]#{r['rank']}[/] {r['principle']} "
+            f"(comp={r['composite_score']:.3f}, struct={r['structural_score']:.3f}, "
+            f"val={r['value_affinity_score']:+.2f}) — {r['subject']}"
+        )
+
+    if skip_jury and skip_report:
+        return
+
+    # --- Layer 2: jury + judge ---
+    if not skip_jury:
+        import asyncio
+        import json
+
+        from ._polish import verdict_markup
+        from .cache.prompt_cache import HAIKU, PromptCache
+        from .jury.judge import run_judge
+        from .jury.speculative import run_tribunal_speculative
+
+        # Build a one-paragraph codebase narrative for the cached system prefix.
+        pkgs = sorted({d.locations[0].module.split(".")[0]
+                       for d in bundle.decision_points if d.locations})
+        principles = sorted({d.principle for d in bundle.decision_points})
+        codebase_summary = (
+            f"Repository: {repo.name}. "
+            f"Top-level package(s) analyzed: {', '.join(pkgs) or 'unknown'}. "
+            f"Modules: {bundle.graph_summary.get('num_modules', 0)}, "
+            f"internal edges: {bundle.graph_summary.get('num_edges', 0)}. "
+            f"{len(bundle.decision_points)} structural decision points were "
+            f"flagged across {len(principles)} principles "
+            f"({', '.join(principles)}) by deterministic Layer 1 analysis."
+        )
+        git_summary = (
+            f"Commit {bundle.commit_sha[:8]} on branch "
+            f"{bundle.git_summary.get('branch', 'unknown')}; "
+            f"{bundle.git_summary.get('recent_commits', 0)} commits in the last 12 months."
+        )
+
+        # Look up the full DecisionPoints for the top-N (prioritized has only summaries).
+        dp_by_id = {d.id: d for d in bundle.decision_points}
+        top_dps = [dp_by_id[r["decision_point_id"]] for r in ranked
+                   if r["decision_point_id"] in dp_by_id]
+
+        pc = PromptCache(model=HAIKU)
+        verdicts: list[dict] = []
+
+        async def _layer2() -> None:
+            for i, dp in enumerate(top_dps, start=1):
+                console.print(f"[blue]Tribunal {i}/{len(top_dps)}[/]: {dp.id} ({dp.principle}) — {dp.subject[:80]}")
+                tribunal = await run_tribunal_speculative(
+                    decision_point=dp,
+                    num_cells=10,
+                    codebase_summary=codebase_summary,
+                    git_summary=git_summary,
+                    pc=pc,
+                )
+                console.print(
+                    f"  → {tribunal.aggregate_vote['cells_run']}/10 cells, "
+                    f"winner={tribunal.aggregate_vote['winner']} "
+                    f"margin={tribunal.aggregate_vote['margin']:.2f}"
+                )
+                judge_out = await run_judge(
+                    decision_point=dp, cells=tribunal.cells, pc=pc,
+                )
+                console.print(f"  ⚖  verdict: {verdict_markup(judge_out['verdict'])}"
+                              f"{' [yellow](override)[/]' if judge_out.get('override') else ''}")
+                tr = tribunal.model_dump()
+                tr["judge"] = judge_out
+                verdicts.append(tr)
+
+        asyncio.run(_layer2())
+
+        (audit_dir / "verdicts.json").write_text(
+            json.dumps(verdicts, indent=2), encoding="utf-8",
+        )
+        s = pc.metrics.summary()
+        console.print(
+            f"[green]Layer 2[/]: {len(verdicts)} tribunals, "
+            f"cache_ratio={s['cache_read_ratio']:.1%} "
+            f"cost=${s['total_cost_usd']:.3f}"
+        )
+
+    # --- Layer 3: Opus report writer ---
+    if not skip_report:
+        import asyncio
+        import json
+
+        from ._polish import phase, render_report
+        from .cache.prompt_cache import OPUS, PromptCache
+        from .report.writer import write_report
+
+        verdicts_path = audit_dir / "verdicts.json"
+        if not verdicts_path.exists():
+            log.error("Cannot write report: %s is missing (Layer 2 was skipped).",
+                      verdicts_path)
+            return
+        verdicts_data = json.loads(verdicts_path.read_text())
+
+        report_pc = PromptCache(model=OPUS)
+        with phase(console, "Layer 3: Opus is writing the briefing"):
+            artifact = asyncio.run(write_report(
+                bundle=bundle,
+                prioritized=ranked,
+                verdicts=verdicts_data,
+                user_values=weights,
+                pc=report_pc,
+            ))
+
+        report_path = audit_dir / "report.md"
+        report_path.write_text(artifact.markdown, encoding="utf-8")
+
+        console.rule("[bold]Report[/]")
+        console.print(f"[green]Layer 3[/]: [cyan]{report_path}[/]")
+        console.print(f"  headline: {artifact.headline}")
+        console.print(f"  words: {artifact.stats['word_count']} "
+                      f"(target 1500–2000)")
+        console.print(f"  cost: ${artifact.stats['cost_usd']:.4f}  "
+                      f"latency: {artifact.stats['latency_s']:.1f}s")
+
+        render_report(console, artifact.markdown)
+
+
+def _replay_audit(audit_dir: Path) -> None:
+    """Re-emit a cached audit at demo pace, with zero LLM calls.
+
+    Reads evidence.json, prioritized.json, verdicts.json, report.md from
+    `audit_dir`; loops them back through the same animations and headers
+    as the live path. Designed to finish in well under 10s so it can
+    stand in for a live audit on stage when WiFi is iffy or budget is
+    tight (T10 demo backstop).
+    """
+    import json
+    import time
+
+    from ._polish import phase, render_report, verdict_markup
+    from .types import EvidenceBundle
+
+    evidence_path = audit_dir / "evidence.json"
+    prio_path = audit_dir / "prioritized.json"
+    verdicts_path = audit_dir / "verdicts.json"
+    report_path = audit_dir / "report.md"
+    for p in (evidence_path, prio_path, verdicts_path, report_path):
+        if not p.exists():
+            console.print(f"[red]Replay cache missing artifact:[/] {p}")
+            sys.exit(2)
+
+    bundle = EvidenceBundle.model_validate_json(evidence_path.read_text())
+    prio = json.loads(prio_path.read_text())
+    verdicts = json.loads(verdicts_path.read_text())
+    report_md = report_path.read_text()
+
+    repo_name = Path(bundle.repo).name
+    console.rule(f"[bold]forum audit[/] {repo_name} @ {bundle.commit_sha[:8]} "
+                 f"[dim](replay)[/]")
+    console.print(f"Cache: [cyan]{audit_dir}[/]")
+
+    # --- Layer 1 (animated) ---
+    with phase(console, "Layer 1: deterministic evidence extraction"):
+        time.sleep(0.6)
+    n_dps = len(bundle.decision_points)
+    n_pri = len({d.principle for d in bundle.decision_points})
+    console.print(f"[green]Layer 1[/]: {n_dps} decision points across {n_pri} principles")
+    time.sleep(0.2)
+
+    # --- Layer 1.5 ---
+    weights = prio.get("values", {})
+    ranked = prio.get("items", [])
+    console.print(f"[green]Layer 1.5[/]: top {len(ranked)} → [cyan]{prio_path}[/]")
+    for r in ranked:
+        console.print(
+            f"  [bold]#{r['rank']}[/] {r['principle']} "
+            f"(comp={r['composite_score']:.3f}, struct={r['structural_score']:.3f}, "
+            f"val={r['value_affinity_score']:+.2f}) — {r['subject']}"
+        )
+    time.sleep(0.3)
+
+    # --- Layer 2 (per-tribunal) ---
+    dp_by_id = {d.id: d for d in bundle.decision_points}
+    for i, tribunal in enumerate(verdicts, start=1):
+        dp_id = tribunal["decision_point_id"]
+        dp = dp_by_id.get(dp_id)
+        subject = (dp.subject if dp else dp_id)[:80]
+        principle = dp.principle if dp else "?"
+        console.print(f"[blue]Tribunal {i}/{len(verdicts)}[/]: "
+                      f"{dp_id} ({principle}) — {subject}")
+        agg = tribunal.get("aggregate_vote", {})
+        with phase(console, f"  10 cells deliberating, KV-cache reuse on the prefix"):
+            time.sleep(0.6)
+        console.print(
+            f"  → {agg.get('cells_run', '?')}/10 cells, "
+            f"winner={agg.get('winner', '?')} "
+            f"margin={agg.get('margin', 0):.2f}"
+        )
+        judge = tribunal.get("judge") or {}
+        v_text = judge.get("verdict", "(no verdict)")
+        console.print(f"  ⚖  verdict: {verdict_markup(v_text)}"
+                      f"{' [yellow](override)[/]' if judge.get('override') else ''}")
+        time.sleep(0.15)
+    console.print(f"[green]Layer 2[/]: {len(verdicts)} tribunals "
+                  f"[dim](cached — zero new tokens)[/]")
+
+    # --- Layer 3 ---
+    with phase(console, "Layer 3: Opus is writing the briefing"):
+        time.sleep(0.9)
+    headline = next((l.lstrip("# ").strip() for l in report_md.splitlines()
+                     if l.strip().startswith("# ")), "(no headline)")
+    word_count = len(report_md.split())
+    console.rule("[bold]Report[/]")
+    console.print(f"[green]Layer 3[/]: [cyan]{report_path}[/]")
+    console.print(f"  headline: {headline}")
+    console.print(f"  words: {word_count} (target 1500–2000)")
+    console.print(f"  [dim](cached — zero new tokens)[/]")
+
+    render_report(console, report_md)
+
+
+@main.command()
+@click.argument("audit_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
+@click.option("--values", "values_path", type=click.Path(exists=True, path_type=Path),
+              default=None, help="YAML file of NEW value weights to re-project under.")
+@click.option("--value", "value_overrides", multiple=True,
+              help="Single NEW value override, e.g. --value velocity=2.5 (repeatable).")
+@click.option("--output", "out_path", type=click.Path(path_type=Path), default=None,
+              help="Write the markdown probe to a file (default: stdout + <audit_dir>/whatif.md).")
+@click.option("--verbose", is_flag=True, default=False)
+def whatif(audit_dir: Path, values_path: Path | None,
+           value_overrides: tuple[str, ...], out_path: Path | None,
+           verbose: bool) -> None:
+    """Re-project a cached audit under alternate value weights. Zero LLM cost."""
+    import time
+
+    import json
+
+    from .values.loader import VALID_VALUES, load_values
+    from .whatif.probe import probe
+
+    _setup_logging(verbose)
+    audit_dir = audit_dir.resolve()
+
+    # Baseline weights come from prioritized.json (the audit's Layer 1.5 input).
+    # New weights start from the baseline and apply the user's --values /
+    # --value flags on top — so `--value velocity=2.5` changes velocity and
+    # leaves every other dimension as the original audit had it. Without
+    # this, undeclared dims would silently revert to load_values's all-1.0
+    # default, surprising the user.
+    prio_path = audit_dir / "prioritized.json"
+    if prio_path.exists():
+        baseline = json.loads(prio_path.read_text()).get("values") or {}
+    else:
+        baseline = {v: 1.0 for v in VALID_VALUES}
+    new_weights = dict(baseline)
+    if values_path is not None:
+        new_weights.update(load_values(values_path))
+    for ov in value_overrides:
+        if "=" not in ov:
+            continue
+        k, v = ov.split("=", 1)
+        k = k.strip()
+        if k in VALID_VALUES:
+            new_weights[k] = float(v)
+
+    t0 = time.perf_counter()
+    result = probe(audit_dir, new_weights=new_weights, baseline_weights=None)
+    dt = time.perf_counter() - t0
+
+    out = out_path or (audit_dir / "whatif.md")
+    out.write_text(result["markdown"], encoding="utf-8")
+
+    print(result["markdown"])
+    console.rule()
+    console.print(
+        f"[green]whatif[/]: {result['n_decision_points']} DPs, "
+        f"{result['n_with_shifted_dissent']} with shifted dissents — "
+        f"changed dims: {result['changed_dimensions'] or '(none)'} — "
+        f"{dt:.3f}s — [cyan]{out}[/]"
+    )
+
+
+@main.command("cache-test")
+@click.option("--model", default=None, help="Model id (default: Haiku).")
+@click.option("--verbose", is_flag=True, default=False)
+def cache_test(model: str | None, verbose: bool) -> None:
+    """Send two identical-prefix calls to Anthropic and report cache stats.
+
+    Verifies T5 achievement criteria 1, 2, 3, 4: warm call shows cache_read > 0,
+    cache_read_ratio ≥ 0.8 on the warm call, metrics aggregator returns a
+    populated dict, and the cost calculation is non-zero (sanity check
+    against Anthropic's posted prices).
+    """
+    import asyncio
+    from .cache.prompt_cache import HAIKU, PromptCache
+
+    _setup_logging(verbose)
+    model = model or HAIKU
+
+    # The cached prefix needs to be large enough to clear the model's cache
+    # minimum (Haiku ~2048 tokens). Pad with realistic codebase narrative.
+    paragraph = (
+        "This repository implements a high-performance Python web framework. "
+        "It exposes a routing layer, a dependency-injection system, OpenAPI "
+        "generation, parameter parsing, security primitives, and middleware. "
+        "Modules are organized into a `routing` core, a `dependencies` "
+        "package containing models and resolution utilities, a `params` "
+        "module describing query/path/body parameter shapes, an `encoders` "
+        "module that handles JSON serialization of Pydantic models, and an "
+        "`openapi` package responsible for schema rendering. The codebase "
+        "has been around several years and has accumulated structural "
+        "decisions worth examining under principled scrutiny. "
+    )
+    codebase_summary = paragraph * 20  # ~3.5K tokens — over Haiku's 2K cache floor
+    git_summary = (
+        "Recent activity: 312 commits over the last 12 months across "
+        "21 contributors. Largest co-change pairs include routing.py with "
+        "dependencies/utils.py and openapi/utils.py with applications.py. "
+        "The default branch is `main`. "
+    ) * 5
+    decision_evidence = (
+        "Decision under review: a strongly-connected component of 18 modules "
+        "rooted at `fastapi/routing.py`. Cycle members include "
+        "fastapi.dependencies.utils, fastapi.params, fastapi.encoders, and "
+        "fastapi.openapi.utils. The cycle has been stable for >2 years; "
+        "co-change frequency between cycle members is high. "
+    ) * 5
+
+    system_cached = f"<codebase_summary>\n{codebase_summary}\n</codebase_summary>\n\n<git_summary>\n{git_summary}\n</git_summary>"
+    user_cached = f"<decision_point_evidence>\n{decision_evidence}\n</decision_point_evidence>\n\n<principle_definition>\nP1 — Acyclic Dependencies (Robert C. Martin). Modules form a DAG.\n</principle_definition>"
+
+    async def _run() -> None:
+        pc = PromptCache(model=model)
+        for label, tail in [
+            ("COLD", "In one sentence, name the principle this cycle violates."),
+            ("WARM", "In one sentence, name the most concrete next step a senior engineer would take."),
+        ]:
+            await pc.call(
+                system_cached=system_cached,
+                user_cached=user_cached,
+                user_tail=tail,
+                max_tokens=80,
+                temperature=0.3,
+            )
+            r = pc.metrics.calls[-1]
+            ratio = r.cache_read_input_tokens / max(1, r.cache_read_input_tokens + r.input_tokens)
+            console.print(
+                f"[bold]{label}[/]: in={r.input_tokens} cw={r.cache_creation_input_tokens} "
+                f"cr={r.cache_read_input_tokens} out={r.output_tokens} "
+                f"ratio={ratio:.1%} {r.latency_s:.2f}s ${r.cost_usd:.5f}"
+            )
+
+        s = pc.metrics.summary()
+        console.rule("CacheMetrics summary")
+        for k, v in s.items():
+            console.print(f"  {k}: {v}")
+
+    asyncio.run(_run())
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

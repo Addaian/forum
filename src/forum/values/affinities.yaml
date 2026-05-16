@@ -1,0 +1,65 @@
+# Principle → value affinity table.
+#
+# Each entry in [-1.0, 1.0] answers: "if a team weighs <value> highly, how
+# much does fixing this <principle> serve that value?" +1 = very aligned,
+# 0 = neutral, -1 = actively opposed.
+#
+# Hand-curated v1 — biased toward the literature consensus, not learned.
+# Update freely as the demo evolves.
+
+affinities:
+  P1:   # Acyclic Dependencies
+    scalability:     0.6
+    maintainability: 0.8
+    velocity:       -0.6   # untangling cycles is expensive; ship-first teams may defer
+    correctness:     0.3
+    simplicity:      0.5
+    flexibility:     0.4
+
+  P2:   # Stable Dependencies
+    scalability:     0.4
+    maintainability: 0.7
+    velocity:       -0.5   # SDP discipline slows feature work
+    correctness:     0.1
+    simplicity:      0.3
+    flexibility:     0.7
+
+  P3:   # McCabe Complexity
+    scalability:     0.1
+    maintainability: 0.9   # the canonical maintainability signal
+    velocity:        0.6
+    correctness:     0.8
+    simplicity:      0.9
+    flexibility:     0.3
+
+  P4:   # Cohesion (LCOM)
+    scalability:     0.2
+    maintainability: 0.7
+    velocity:        0.1
+    correctness:     0.4
+    simplicity:      0.6
+    flexibility:     0.5
+
+  P5:   # Reachability (dead code)
+    scalability:     0.0
+    maintainability: 0.5
+    velocity:        0.4
+    correctness:     0.3
+    simplicity:      0.8
+    flexibility:     0.2
+
+  P6:   # Layering
+    scalability:     0.7
+    maintainability: 0.7
+    velocity:       -0.5   # strict layering creates ceremony
+    correctness:     0.3
+    simplicity:      0.4
+    flexibility:     0.7
+
+  P7:   # Common Closure
+    scalability:     0.5
+    maintainability: 0.6
+    velocity:        0.5
+    correctness:     0.2
+    simplicity:      0.4
+    flexibility:     0.4

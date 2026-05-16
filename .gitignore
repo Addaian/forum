@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+.venv/
+venv/
+.env
+.env.local
+
+dist/
+build/
+*.egg-info/
+
+audits/
+!audits/.gitkeep
+
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+
+# uv
+uv.lock

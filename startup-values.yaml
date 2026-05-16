@@ -1,0 +1,8 @@
+# Seed-stage startup weights. Bias toward shipping and simplicity over flexibility.
+values:
+  scalability:     1.0
+  maintainability: 1.0
+  velocity:        1.8
+  correctness:     1.0
+  simplicity:      1.5
+  flexibility:     0.6

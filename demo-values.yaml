@@ -1,0 +1,8 @@
+# Neutral-ish demo weights. Used as the default values vector.
+values:
+  scalability:     1.0
+  maintainability: 1.0
+  velocity:        1.5
+  correctness:     1.0
+  simplicity:      1.2
+  flexibility:     1.0
