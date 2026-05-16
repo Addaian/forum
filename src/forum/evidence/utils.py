@@ -11,8 +11,8 @@ SKIP_DIRS = {
     ".git", ".venv", "venv", "env", "__pycache__", ".pytest_cache",
     ".ruff_cache", ".mypy_cache", "node_modules", "dist", "build",
     "site-packages", ".tox", ".eggs",
-    # FastAPI-specific noise
-    "tests", "docs", "docs_src", "scripts",
+    # Demo/example/test/doc dirs — almost always noise for an architecture audit.
+    "tests", "docs", "docs_src", "scripts", "examples", "example",
 }
 
 

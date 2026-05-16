@@ -74,6 +74,8 @@ const AFFINITIES = {
 // ---- State ----
 
 const state = {
+  manifest: null,
+  activeSlug: null,
   evidence: null,
   prioritized: null,
   verdicts: null,
@@ -82,15 +84,28 @@ const state = {
   dpById: {},
 };
 
-// ---- Init ----
+// ---- Init: load manifest, then default audit ----
 
 async function init() {
+  state.manifest = await fetch("data/manifest.json").then(r => r.json());
+  renderSwitcher();
+  await loadAudit(state.manifest.default);
+}
+
+async function loadAudit(slug) {
+  const entry = state.manifest.audits.find(a => a.slug === slug);
+  if (!entry) return;
+  state.activeSlug = slug;
+  document.getElementById("brand-target").textContent = entry.label;
+  markSwitcherActive(slug);
+
+  const base = `data/${slug}`;
   const [evidence, prioritized, verdicts, reportMd, graphSvg] = await Promise.all([
-    fetch("data/evidence.json").then(r => r.json()),
-    fetch("data/prioritized.json").then(r => r.json()),
-    fetch("data/verdicts.json").then(r => r.json()),
-    fetch("data/report.md").then(r => r.text()),
-    fetch("data/graph.svg").then(r => r.text()),
+    fetch(`${base}/evidence.json`).then(r => r.json()),
+    fetch(`${base}/prioritized.json`).then(r => r.json()),
+    fetch(`${base}/verdicts.json`).then(r => r.json()),
+    fetch(`${base}/report.md`).then(r => r.text()),
+    fetch(`${base}/graph.svg`).then(r => r.text()),
   ]);
   state.evidence = evidence;
   state.prioritized = prioritized;
@@ -100,12 +115,37 @@ async function init() {
   state.dpById = Object.fromEntries(evidence.decision_points.map(d => [d.id, d]));
   PRESETS.baseline = { ...prioritized.values };
 
+  lastRanking = null;          // reset rank-diff baseline when switching audits
   renderStats();
-  renderSliders();
+  renderSliders();             // re-renders with fresh baseline values
   renderReport(reportMd);
   renderGraph(graphSvg);
   refresh();
   wirePresets();
+  markPresetActive(document.querySelector('.preset-btn[data-preset="baseline"]'));
+}
+
+function renderSwitcher() {
+  const root = document.getElementById("audit-switcher");
+  root.innerHTML = "";
+  for (const entry of state.manifest.audits) {
+    const btn = document.createElement("button");
+    btn.className = "swatch";
+    btn.dataset.slug = entry.slug;
+    btn.innerHTML = `${entry.label}<span class="ver">${entry.version}</span>`;
+    btn.title = `${entry.source} @ ${entry.commit} — ${entry.note}`;
+    btn.addEventListener("click", () => {
+      if (state.activeSlug === entry.slug) return;
+      loadAudit(entry.slug);
+    });
+    root.appendChild(btn);
+  }
+}
+
+function markSwitcherActive(slug) {
+  document.querySelectorAll("#audit-switcher .swatch").forEach(b =>
+    b.classList.toggle("active", b.dataset.slug === slug)
+  );
 }
 
 function renderStats() {

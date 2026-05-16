@@ -1,0 +1,21 @@
+{
+  "default": "fastapi",
+  "audits": [
+    {
+      "slug": "fastapi",
+      "label": "fastapi",
+      "version": "0.136.1",
+      "source": "github.com/fastapi/fastapi",
+      "commit": "ecace740",
+      "note": "Web framework; 48 modules, 110 internal edges. Top-1 audited."
+    },
+    {
+      "slug": "flask",
+      "label": "flask",
+      "version": "3.2.0.dev",
+      "source": "github.com/pallets/flask",
+      "commit": "9fcd34c9",
+      "note": "Web framework; 23 modules, ~95 internal edges. Top-1 audited."
+    }
+  ]
+}

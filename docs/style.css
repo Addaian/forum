@@ -86,7 +86,36 @@ h2 {
 
 .brand .prompt { color: var(--accent); }
 .brand .cmd { color: var(--fg-bright); font-weight: 600; }
+.brand #brand-target { color: var(--accent-2); font-weight: 600; }
 .meta { color: var(--fg-dim); font-size: 12px; }
+
+.audit-switcher {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.audit-switcher .swatch {
+  background: var(--bg-panel-2);
+  color: var(--fg-dim);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 14px;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.audit-switcher .swatch:last-child { border-right: 0; }
+.audit-switcher .swatch:hover { color: var(--fg-bright); }
+.audit-switcher .swatch.active {
+  background: var(--bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+.audit-switcher .swatch .ver { color: var(--fg-dim); font-size: 10px; margin-left: 6px; }
+.audit-switcher .swatch.active .ver { color: var(--fg); }
 
 /* --- Main layout: sidebar + report --- */
 
