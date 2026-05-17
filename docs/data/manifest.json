@@ -27,6 +27,15 @@
       "source": "github.com/redis/redis",
       "commit": "fafc4725",
       "note": "C in-memory data store; 150 modules, 396 #include edges. Top-1 audited. Judge OVERRIDE: panel said debt, judge said JUSTIFIED VIOLATION."
+    },
+    {
+      "slug": "pentesting",
+      "label": "pentesting",
+      "version": "dev",
+      "language": "python",
+      "source": "github.com/Addaian/pentesting",
+      "commit": "60571606",
+      "note": "Python pentest-agent framework; 116 modules, 338 internal edges. Top-3 audited. Mixed verdicts: 2 STRUCTURAL DEBT + 1 JUSTIFIED VIOLATION (judge override)."
     }
   ]
 }

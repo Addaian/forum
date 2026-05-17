@@ -265,12 +265,23 @@ function refreshRanking() {
 }
 
 function refreshTribunal() {
-  const tribunal = state.verdicts[0];
-  if (!tribunal) {
-    document.getElementById("tribunal").innerHTML =
-      `<p class="hint">No tribunal data on disk. Run <code>forum audit /tmp/forum-demo-repo --top-n 5</code> and re-deploy.</p>`;
+  const root = document.getElementById("tribunal");
+  const headingEl = document.querySelector("#tribunal-panel h2");
+  if (!state.verdicts || state.verdicts.length === 0) {
+    if (headingEl) headingEl.textContent = "Live tribunals";
+    root.innerHTML = `<p class="hint">No tribunal data on disk for this audit. Run
+      <code>forum audit &lt;path&gt; --top-n 3</code> and re-deploy.</p>`;
     return;
   }
+  if (headingEl) {
+    headingEl.textContent = state.verdicts.length === 1
+      ? "Live tribunal — top-1 decision point"
+      : `Live tribunals — top ${state.verdicts.length} decision points`;
+  }
+  root.innerHTML = state.verdicts.map((t, i) => renderOneTribunal(t, i + 1)).join("");
+}
+
+function renderOneTribunal(tribunal, rank) {
   const dp = state.dpById[tribunal.decision_point_id];
   const cells = tribunal.cells || [];
   const judge = tribunal.judge || {};
@@ -278,7 +289,6 @@ function refreshTribunal() {
   const aggNew = reweightedAggregate(cells, state.currentWeights);
   const wouldFlip = aggNew.winner && aggOrig.winner && aggNew.winner !== aggOrig.winner;
 
-  // Per-cell salience ratio
   const cellsWithRatio = cells.map(c => {
     const b = salience(c.value_lens, state.baselineWeights);
     const n = salience(c.value_lens, state.currentWeights);
@@ -288,47 +298,54 @@ function refreshTribunal() {
   cellsWithRatio.sort((a, b) => b.ratio - a.ratio);
 
   const verdictKey = (judge.verdict || "").replace(/ /g, "-");
+  const overrideTag = judge.override
+    ? `<span class="override-tag">override</span>`
+    : "";
 
-  document.getElementById("tribunal").innerHTML = `
-    <div class="tribunal-head">
-      <div>
-        <div><b>${escapeHtml(dp?.subject || tribunal.decision_point_id)}</b></div>
-        <div class="aggregate">
-          original panel: <b>${aggOrig.n_debt ?? 0}d</b> /
-          <b>${aggOrig.n_justified ?? 0}j</b>
-          (margin ${(aggOrig.margin ?? 0).toFixed(2)},
-          method ${aggOrig.method || "unweighted"})
-          ${aggOrig.cells_cancelled ? ` · ${aggOrig.cells_cancelled} cancelled by speculative stop` : ""}
+  return `
+    <div class="tribunal">
+      <div class="tribunal-head">
+        <div>
+          <div class="tribunal-rank">Tribunal #${rank}${state.verdicts.length > 1 ? ` of ${state.verdicts.length}` : ""}</div>
+          <div><b>${escapeHtml(dp?.subject || tribunal.decision_point_id)}</b></div>
+          <div class="aggregate">
+            original panel: <b>${aggOrig.n_debt ?? 0}d</b> /
+            <b>${aggOrig.n_justified ?? 0}j</b>
+            (margin ${(aggOrig.margin ?? 0).toFixed(2)},
+            method ${aggOrig.method || "unweighted"})
+            ${aggOrig.cells_cancelled ? ` · ${aggOrig.cells_cancelled} cancelled by speculative stop` : ""}
+            ${aggOrig.cells_failed ? ` · ${aggOrig.cells_failed} failed` : ""}
+          </div>
         </div>
+        <span class="verdict-tag verdict-${verdictKey}">${escapeHtml(judge.verdict || "—")}${overrideTag}</span>
       </div>
-      <span class="verdict-tag verdict-${verdictKey}">${escapeHtml(judge.verdict || "—")}</span>
-    </div>
 
-    <div class="aggregate">
-      <b>Re-projected aggregate</b> under your weights:
-      winner=<b>${aggNew.winner ?? "—"}</b>
-      (debt-score ${aggNew.debt.toFixed(2)}, justified-score ${aggNew.just.toFixed(2)},
-      margin ${aggNew.margin.toFixed(2)})
-      ${wouldFlip
-        ? `<span class="delta down">— <b>would have flipped</b> under your weights</span>`
-        : `<span class="delta">— verdict text is preserved literally; only emphasis shifts</span>`}
-    </div>
+      <div class="aggregate">
+        <b>Re-projected aggregate</b> under your weights:
+        winner=<b>${aggNew.winner ?? "—"}</b>
+        (debt-score ${aggNew.debt.toFixed(2)}, justified-score ${aggNew.just.toFixed(2)},
+        margin ${aggNew.margin.toFixed(2)})
+        ${wouldFlip
+          ? `<span class="delta down">— <b>would have flipped</b> under your weights</span>`
+          : `<span class="delta">— verdict text is preserved literally; only emphasis shifts</span>`}
+      </div>
 
-    <div class="tribunal-cells">
-      ${cellsWithRatio.map(renderCell).join("")}
-    </div>
+      <div class="tribunal-cells">
+        ${cellsWithRatio.map(renderCell).join("")}
+      </div>
 
-    <div class="judge-block">
-      <h3>Judge reasoning (Anthropic Sonnet 4.6)</h3>
-      <div class="body">${escapeHtml(judge.reasoning || "(none)")}</div>
-    </div>
-    <div class="judge-block">
-      <h3>Strongest dissent</h3>
-      <div class="body">${escapeHtml(judge.dissent_summary || "(none)")}</div>
-    </div>
-    <div class="judge-block">
-      <h3>Recommended action</h3>
-      <div class="body">${escapeHtml(judge.recommended_action || "(none)")}</div>
+      <div class="judge-block">
+        <h3>Judge reasoning${judge.override ? " (override)" : ""} (Anthropic Sonnet 4.6)</h3>
+        <div class="body">${escapeHtml(judge.reasoning || "(none)")}</div>
+      </div>
+      <div class="judge-block">
+        <h3>Strongest dissent</h3>
+        <div class="body">${escapeHtml(judge.dissent_summary || "(none)")}</div>
+      </div>
+      <div class="judge-block">
+        <h3>Recommended action</h3>
+        <div class="body">${escapeHtml(judge.recommended_action || "(none)")}</div>
+      </div>
     </div>
   `;
 }
