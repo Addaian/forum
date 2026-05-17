@@ -35,7 +35,16 @@
       "language": "python",
       "source": "github.com/Addaian/pentesting",
       "commit": "60571606",
-      "note": "Python pentest-agent framework; 116 modules. Top-3 audited. All 3 verdicts: JUSTIFIED VIOLATION via judge OVERRIDE — the LCOM=1.00 findings are dataclass/facade patterns where the metric misleads, and the judge said so."
+      "note": "Python pentest-agent framework; 116 modules. Top-3 audited. All 3 verdicts: JUSTIFIED VIOLATION via judge OVERRIDE \u2014 the LCOM=1.00 findings are dataclass/facade patterns where the metric misleads, and the judge said so."
+    },
+    {
+      "slug": "shadowbroker",
+      "label": "shadowbroker",
+      "version": "live",
+      "language": "python",
+      "source": "github.com/BigBodyCobain/Shadowbroker",
+      "commit": "25a98a98",
+      "note": "Live-audited from github.com/BigBodyCobain/Shadowbroker \u2014 226 modules."
     }
   ]
 }

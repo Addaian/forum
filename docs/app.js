@@ -222,7 +222,10 @@ function compositeScore(dp, weights) {
 
 async function init() {
   try {
-    const res = await fetch("data/manifest.json");
+    // cache:"no-store" — when the live-audit backend appends a new entry,
+    // the browser's default HTTP cache otherwise serves the stale version
+    // on the next page load and the new audit silently disappears.
+    const res = await fetch("data/manifest.json", { cache: "no-store" });
     if (!res.ok) throw new Error(`manifest.json ${res.status}`);
     state.manifest = await res.json();
   } catch (e) {
@@ -366,6 +369,10 @@ function markAuditActive(slug) {
 }
 
 function renderFooterStatus(entry) {
+  // Footer was removed; null-guard so we don't blow up if the element ever
+  // returns. Layer-status summary now derivable from view headers instead.
+  const el = document.getElementById("footer-layers");
+  if (!el) return;
   const numDps = state.evidence.decision_points.length;
   const numTrib = state.verdicts.length;
   const reportWords = state.reportMd
@@ -376,9 +383,10 @@ function renderFooterStatus(entry) {
 }
 
 function wireClock() {
+  const el = document.getElementById("footer-clock");
+  if (!el) return;
   const tick = () => {
-    const t = new Date().toISOString().slice(11, 19) + " UTC";
-    document.getElementById("footer-clock").textContent = t;
+    el.textContent = new Date().toISOString().slice(11, 19) + " UTC";
   };
   tick();
   setInterval(tick, 1000);

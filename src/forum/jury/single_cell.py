@@ -1,13 +1,16 @@
 """One debate cell: two personas read the evidence and argue from their
 respective values; a neutral observer extracts a vote at the end.
 
-Each cell is a self-contained set of Haiku/Qwen calls:
+Each cell is a self-contained set of 3 Haiku/Qwen calls:
 
     1. Persona A opens                    ← persona A reads the evidence
     2. Persona B responds                 ← persona B reads the evidence
-    3. Persona A reacts to B              ← engages B's specific claims
-    4. Persona B closes                   ← engages A's reaction
-    5. Vote extraction (tool-use only)    ← neutral observer
+    3. Vote extraction (tool-use only)    ← neutral observer
+
+(Previous design had 5 calls per cell with rebut + close turns. We cut
+those: speculative-stopping data showed the bulk of the verdict signal
+was already established by the end of turn 2, and the rebut/close phases
+mostly added wall-clock and tokens without changing vote outcomes.)
 
 Neither persona is locked to "debt" or "justified" — each argues for
 whichever side their value reads in the evidence. When both personas
@@ -361,23 +364,18 @@ and breaking it would impose a migration cost my value cares about"
 is engagement. "The cycle does not exist" is incoherent and will lose
 the cell.
 
-Strong rebuttals address the other persona's strongest specific claim,
-not their weakest. If the other persona cited a specific cost, engage
-that cost (refute it through your lens, contextualize it, weigh it
-against what your value sees). If they cited an ergonomic or
-historical defence, engage that defence (show why your value still
-reads the evidence the way it does). Rebuttals that change the
-subject signal a weak case.
-
-Closings should compress the debate into the single most decisive
-fact from your side. A good closing reads like a one-paragraph
-brief a senior engineer could hand to a colleague: this is what
-the evidence shows, this is what it means, this is what to do.
+Because there are only two turns (your opening and the other persona's),
+each opening must pack the full argument into one pass. Don't save
+material for a rebut — there is no rebut. State your strongest specific
+claim, cite the evidence, and make your reading explicit. A good
+opening reads like a one-paragraph brief a senior engineer could hand
+to a colleague: this is what the evidence shows, this is what it means
+to my value, this is what I'd do.
 
 # What a strong cell vote looks like
 
-After the four debate turns, a neutral observer (still you, but
-stepping out of the persona) renders the cell's structured vote via
+After the two openings, a neutral observer (still you, but stepping
+out of the persona) renders the cell's structured vote via
 the `submit_vote` tool. The vote has four required fields.
 `position` is "debt" when the debate's stronger arguments (from
 either persona) read this evidence as harmful or worth refactoring,
@@ -496,8 +494,9 @@ grounded in the evidence.
 
 Your assigned persona is named in the user-message tail of turn 1
 along with that persona's "champions", "angered_by", and
-"pattern_match_for" fields. Speak from that perspective for the
-full four turns.
+"pattern_match_for" fields. You speak once (your opening) — the other
+persona then speaks once — then a neutral observer renders the cell
+vote. Two turns of substance, then the vote.
 
 # Why Forum exists (philosophy you can assume)
 
@@ -567,7 +566,7 @@ async def run_cell(
     pc: "PromptCache | WaferCache | None" = None,
     max_turn_tokens: int = 600,
 ) -> CellVote:
-    """Run one full debate cell (4 turns + vote) and return the structured vote."""
+    """Run one debate cell (2-turn exchange + vote) and return the structured vote."""
     pc = pc or PromptCache(model=HAIKU)
     red = get("red", red_persona_id)
     blue = get("blue", blue_persona_id)
@@ -614,59 +613,12 @@ async def run_cell(
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Blue persona response prompt]"})
     transcript.append({"role": "assistant", "speaker": f"blue:{blue.id}", "text": blue_open})
 
-    # --- Turn 3: Persona A reacts to B's reading ---
-    red_rebut_prompt = (
-        f"You are still **{red.name}**. The other persona has given their reading. "
-        f"React to their strongest specific claim through your value's lens — "
-        f"either push back on it, or acknowledge where they have a point. "
-        f"Stay under 400 tokens. Cite at least one specific file path or metric."
-    )
-    turns_so_far += [
-        {"role": "assistant", "text": blue_open},
-        {"role": "user", "text": red_rebut_prompt},
-    ]
-    fevents.TURN_CTX.set({"turn": 2, "speaker": f"red:{red.id}", "label": "rebut"})
-    fevents.emit("turn_start")
-    msg = await pc.call_multiturn(
-        system_cached=system_cached,
-        user_cached_prefix=user_cached,
-        turns=turns_so_far,
-        temperature=temperature,
-        max_tokens=max_turn_tokens,
-    )
-    red_rebut = pc.extract_text(msg)
-    fevents.emit("turn_end", text=red_rebut)
-    transcript.append({"role": "user", "speaker": "moderator", "text": "[Red rebuttal prompt]"})
-    transcript.append({"role": "assistant", "speaker": f"red:{red.id}", "text": red_rebut})
-
-    # --- Turn 4: Persona B closes ---
-    blue_close_prompt = (
-        f"You are still **{blue.name}**. Close the debate. Address the other "
-        f"persona's reaction directly and give your final reading through your "
-        f"value's lens. Stay under 400 tokens. Cite at least one specific file "
-        f"path or metric."
-    )
-    turns_so_far += [
-        {"role": "assistant", "text": red_rebut},
-        {"role": "user", "text": blue_close_prompt},
-    ]
-    fevents.TURN_CTX.set({"turn": 3, "speaker": f"blue:{blue.id}", "label": "close"})
-    fevents.emit("turn_start")
-    msg = await pc.call_multiturn(
-        system_cached=system_cached,
-        user_cached_prefix=user_cached,
-        turns=turns_so_far,
-        temperature=temperature,
-        max_tokens=max_turn_tokens,
-    )
-    blue_close = pc.extract_text(msg)
-    fevents.emit("turn_end", text=blue_close)
-    transcript.append({"role": "user", "speaker": "moderator", "text": "[Blue closing prompt]"})
-    transcript.append({"role": "assistant", "speaker": f"blue:{blue.id}", "text": blue_close})
-
-    # --- Turn 5: Vote extraction (neutral observer, tool-use only) ---
+    # --- Turn 3: Vote extraction (neutral observer, tool-use only) ---
+    # 2-turn exchange + vote: A opens, B responds, observer votes.
+    # Dropping the rebut+close halves the debate cost without losing
+    # the persona-diversity signal.
     vote_prompt = (
-        "The debate is closed. Step out of any persona and act as a neutral "
+        "The exchange is closed. Step out of any persona and act as a neutral "
         "observer. Use the `submit_vote` tool to record what the CELL "
         "concluded — do not produce any free-form text.\n\n"
         "If both personas converged on the same reading, that's the vote — "
@@ -678,10 +630,10 @@ async def run_cell(
         "be nonzero."
     )
     turns_so_far += [
-        {"role": "assistant", "text": blue_close},
+        {"role": "assistant", "text": blue_open},
         {"role": "user", "text": vote_prompt},
     ]
-    fevents.TURN_CTX.set({"turn": 4, "speaker": "vote", "label": "vote"})
+    fevents.TURN_CTX.set({"turn": 2, "speaker": "vote", "label": "vote"})
     fevents.emit("turn_start")
     vote_msg = await pc.call_multiturn(
         system_cached=system_cached,
