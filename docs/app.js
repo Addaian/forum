@@ -6,13 +6,11 @@
  * port of `src/forum/whatif/probe.py` math. Zero LLM calls; the page is
  * static-hostable on GitHub Pages.
  *
- * Dependency graph uses 3d-force-graph (Three.js + WebGL) with bloom
- * post-processing for a neon glow effect.
+ * Dependency graph uses Cytoscape.js with dagre layout for clear
+ * hierarchical visualization of module relationships.
  */
 
-// 3d-force-graph loaded via <script> tag in index.html (UMD global: ForceGraph3D)
-// Import Three.js for custom node labels (sprites).
-import * as THREE_REF from "https://esm.sh/three@0.175.0";
+// Cytoscape.js + dagre layout loaded via <script> tags in index.html
 
 const VALUES = [
   "scalability",
@@ -211,7 +209,7 @@ const state = {
   verdicts: [],
   reportMd: "",
   graphJson: null,
-  forceGraph: null,
+  cyGraph: null,
   baselineWeights: null,
   currentWeights: null,
   dpById: {},
@@ -811,10 +809,9 @@ function renderEvidence() {
 }
 
 // =====================================================================
-// Dependency graph (3d-force-graph + Three.js bloom)
+// Dependency graph (Cytoscape.js + dagre layout)
 // =====================================================================
 
-// Softer pastel palette — glows better on dark backgrounds than full saturation.
 const PKG_COLORS = [
   "#7dd3fc", // sky-300
   "#fde047", // yellow-300
@@ -831,9 +828,9 @@ function renderDependencyGraph() {
   if (!container) return;
 
   // Tear down any previous instance.
-  if (state.forceGraph) {
-    state.forceGraph._destructor && state.forceGraph._destructor();
-    state.forceGraph = null;
+  if (state.cyGraph) {
+    state.cyGraph.destroy();
+    state.cyGraph = null;
   }
   container.innerHTML = "";
 
@@ -843,9 +840,8 @@ function renderDependencyGraph() {
     return;
   }
 
-  const Graph3D = window.ForceGraph3D;
-  if (!Graph3D) {
-    container.innerHTML = `<div style="padding:24px;color:#919094;text-align:center">3d-force-graph library not loaded.</div>`;
+  if (!window.cytoscape) {
+    container.innerHTML = `<div style="padding:24px;color:#919094;text-align:center">Cytoscape.js library not loaded.</div>`;
     return;
   }
 
@@ -860,190 +856,186 @@ function renderDependencyGraph() {
     fanIn.set(e.target, (fanIn.get(e.target) || 0) + 1);
   const maxFanIn = Math.max(1, ...fanIn.values());
 
-  // Build adjacency for hover highlighting.
-  const neighbors = new Map();
-  for (const e of data.edges) {
-    if (!neighbors.has(e.source)) neighbors.set(e.source, new Set());
-    if (!neighbors.has(e.target)) neighbors.set(e.target, new Set());
-    neighbors.get(e.source).add(e.target);
-    neighbors.get(e.target).add(e.source);
-  }
-
   // Identify modules with errors (decision points from evidence).
   const errorModules = new Set();
   if (state.evidence?.decision_points) {
     for (const dp of state.evidence.decision_points) {
       if (dp.subject) errorModules.add(dp.subject);
       if (dp.evidence?.module) errorModules.add(dp.evidence.module);
-      // Also match by partial qualname (e.g. "fastapi.routing" matches DP subject containing it)
       for (const n of data.nodes) {
         if (dp.subject && dp.subject.includes(n.id)) errorModules.add(n.id);
       }
     }
   }
 
-  const nodes = data.nodes.map((n) => ({
-    id: n.id,
-    label: n.label || n.id,
-    pkg: n.pkg,
-    color: errorModules.has(n.id) ? "#ef4444" : colorFor(n.pkg),
-    hasError: errorModules.has(n.id),
-    val: 1.5 + ((fanIn.get(n.id) || 0) / maxFanIn) * 6,
-  }));
-  const links = data.edges.map((e) => ({
-    source: e.source,
-    target: e.target,
-  }));
+  // Determine which nodes are packages (have children) vs leaf files.
+  const allIds = new Set(data.nodes.map((n) => n.id));
+  const isPackage = (id) =>
+    data.nodes.some(
+      (other) => other.id !== id && other.id.startsWith(id + "."),
+    );
 
-  // Track hover state for highlighting.
-  let hoveredNode = null;
-
-  const graph = Graph3D({ controlType: "orbit" })(container)
-    .graphData({ nodes, links })
-    .backgroundColor("#000000")
-    .showNavInfo(false)
-
-    // --- Nodes ---
-    .nodeLabel(
-      (n) =>
-        `<div style="color:${n.color};font-family:JetBrains Mono,monospace;font-size:11px;line-height:1.4;padding:4px 8px;background:#1a1a22;border:1px solid ${n.color}44;border-radius:3px">
-        <div style="font-weight:700">${n.label}</div>
-        <div style="font-size:9px;opacity:0.6">${n.id}</div>
-        <div style="font-size:9px;opacity:0.5;margin-top:2px">${fanIn.get(n.id) || 0} dependents · pkg: ${n.pkg}</div>
-      </div>`,
-    )
-    .nodeColor((n) => {
-      if (!hoveredNode) return n.color;
-      if (n.id === hoveredNode) return n.color;
-      const nh = neighbors.get(hoveredNode);
-      if (nh && nh.has(n.id)) return n.color;
-      return "#1a1a22";
-    })
-    .nodeVal((n) => n.val)
-    .nodeOpacity(0.9)
-    .nodeResolution(16)
-    .nodeThreeObject((n) => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const fontSize = 40;
-      const fontStr = `bold ${fontSize}px JetBrains Mono, monospace`;
-      ctx.font = fontStr;
-      const textWidth = ctx.measureText(n.label).width;
-      canvas.width = Math.ceil(textWidth + 24);
-      canvas.height = fontSize + 12;
-      ctx.font = fontStr;
-      ctx.fillStyle = n.color;
-      ctx.textBaseline = "middle";
-      ctx.textAlign = "center";
-      ctx.fillText(n.label, canvas.width / 2, canvas.height / 2);
-
-      const texture = new THREE_REF.CanvasTexture(canvas);
-      texture.minFilter = THREE_REF.LinearFilter;
-      const spriteMat = new THREE_REF.SpriteMaterial({
-        map: texture,
-        transparent: true,
-        opacity: 0.8,
-        depthWrite: false,
-      });
-      const sprite = new THREE_REF.Sprite(spriteMat);
-      const scale = canvas.width / canvas.height;
-      sprite.scale.set(scale * 5, 5, 1);
-      const radius = Math.cbrt(n.val) * 2;
-      sprite.position.set(0, radius + 3, 0);
-      return sprite;
-    })
-    .nodeThreeObjectExtend(true)
-
-    // --- Links ---
-    .linkColor((link) => {
-      const src =
-        typeof link.source === "object" ? link.source : { id: link.source };
-      const srcColor = colorFor(nodes.find((n) => n.id === src.id)?.pkg || "");
-      if (!hoveredNode) return srcColor + "44";
-      if (
-        src.id === hoveredNode ||
-        (typeof link.target === "object" ? link.target.id : link.target) ===
-          hoveredNode
-      ) {
-        return srcColor + "dd";
-      }
-      return "#1a1a2208";
-    })
-    .linkWidth((link) => {
-      if (!hoveredNode) return 0.6;
-      const srcId =
-        typeof link.source === "object" ? link.source.id : link.source;
-      const tgtId =
-        typeof link.target === "object" ? link.target.id : link.target;
-      return srcId === hoveredNode || tgtId === hoveredNode ? 1.8 : 0.1;
-    })
-    .linkOpacity(0.8)
-    .linkCurvature(0.15)
-    .linkCurveRotation(0.5)
-    .linkDirectionalParticles((link) => {
-      if (!hoveredNode) return 0;
-      const srcId =
-        typeof link.source === "object" ? link.source.id : link.source;
-      const tgtId =
-        typeof link.target === "object" ? link.target.id : link.target;
-      return srcId === hoveredNode || tgtId === hoveredNode ? 4 : 0;
-    })
-    .linkDirectionalParticleWidth(1.0)
-    .linkDirectionalParticleSpeed(0.008)
-    .linkDirectionalParticleColor((link) => {
-      const src =
-        typeof link.source === "object" ? link.source : { id: link.source };
-      return colorFor(nodes.find((n) => n.id === src.id)?.pkg || "");
-    })
-    .linkDirectionalArrowLength(3.5)
-    .linkDirectionalArrowRelPos(1)
-    .linkDirectionalArrowColor((link) => {
-      const src =
-        typeof link.source === "object" ? link.source : { id: link.source };
-      return colorFor(nodes.find((n) => n.id === src.id)?.pkg || "") + "60";
-    })
-
-    // --- Physics (spread out the cluster) ---
-    .d3AlphaDecay(0.01)
-    .d3VelocityDecay(0.2)
-    .warmupTicks(150)
-    .cooldownTicks(400)
-
-    // --- Hover interactions ---
-    .onNodeHover((node) => {
-      hoveredNode = node ? node.id : null;
-      container.style.cursor = node ? "pointer" : "grab";
-    })
-    .onNodeClick((node) => {
-      showNodeFindings(node.id);
+  // Build cytoscape elements.
+  const elements = [];
+  for (const n of data.nodes) {
+    const fi = fanIn.get(n.id) || 0;
+    const isPkg = isPackage(n.id);
+    elements.push({
+      data: {
+        id: n.id,
+        label: (isPkg ? "📦 " : "") + (n.label || n.id),
+        pkg: n.pkg,
+        color: errorModules.has(n.id) ? "#ef4444" : colorFor(n.pkg),
+        hasError: errorModules.has(n.id),
+        isPackage: isPkg,
+        size: isPkg ? 140 + (fi / maxFanIn) * 100 : 90 + (fi / maxFanIn) * 80,
+        fanIn: fi,
+      },
     });
+  }
+  for (const e of data.edges) {
+    elements.push({
+      data: {
+        id: e.source + "->" + e.target,
+        source: e.source,
+        target: e.target,
+        color: colorFor(data.nodes.find((n) => n.id === e.source)?.pkg || ""),
+      },
+    });
+  }
 
-  // Increase repulsion so nodes spread out more.
-  graph.d3Force("charge").strength(-120).distanceMax(300);
-  graph.d3Force("link").distance(40);
-
-  // Once the layout stabilises, pin every node so physics stops moving them.
-  let initialPinDone = false;
-  graph.onEngineStop(() => {
-    if (!initialPinDone) {
-      initialPinDone = true;
-      nodes.forEach((n) => {
-        n.fx = n.x;
-        n.fy = n.y;
-        n.fz = n.z;
-      });
-    }
+  const cy = cytoscape({
+    container,
+    elements,
+    style: [
+      {
+        selector: "node",
+        style: {
+          "background-color": "data(color)",
+          label: "data(label)",
+          color: "data(color)",
+          "font-size": "28px",
+          "font-family": "JetBrains Mono, monospace",
+          "font-weight": "bold",
+          "text-valign": "bottom",
+          "text-margin-y": 10,
+          width: "data(size)",
+          height: "data(size)",
+          "border-width": 3,
+          "border-color": "data(color)",
+          "border-opacity": 0.8,
+          "background-opacity": 0.3,
+          "text-outline-width": 3,
+          "text-outline-color": "#0e0e0e",
+          "text-outline-opacity": 1,
+        },
+      },
+      {
+        selector: "node[?isPackage]",
+        style: {
+          shape: "round-rectangle",
+          "border-width": 4,
+          "border-style": "double",
+          "background-opacity": 0.35,
+          "font-size": "32px",
+        },
+      },
+      {
+        selector: "node[?hasError]",
+        style: {
+          "border-width": 3,
+          "background-opacity": 0.3,
+          "border-style": "solid",
+        },
+      },
+      {
+        selector: "edge",
+        style: {
+          width: 1,
+          "line-color": "data(color)",
+          "line-opacity": 0.3,
+          "target-arrow-color": "data(color)",
+          "target-arrow-shape": "triangle",
+          "arrow-scale": 0.8,
+          "curve-style": "bezier",
+        },
+      },
+      {
+        selector: "node.hover",
+        style: {
+          "background-opacity": 0.5,
+          "border-width": 4,
+          "font-size": "32px",
+        },
+      },
+      {
+        selector: "node.neighbor",
+        style: {
+          "background-opacity": 0.3,
+          "border-width": 2,
+        },
+      },
+      {
+        selector: "node.dimmed",
+        style: {
+          opacity: 0.15,
+          "text-opacity": 0.1,
+        },
+      },
+      {
+        selector: "edge.highlighted",
+        style: {
+          width: 2.5,
+          "line-opacity": 0.8,
+          "target-arrow-color": "data(color)",
+        },
+      },
+      {
+        selector: "edge.dimmed",
+        style: {
+          opacity: 0.05,
+        },
+      },
+    ],
+    layout: {
+      name: "dagre",
+      rankDir: "TB",
+      nodeSep: 50,
+      rankSep: 80,
+      edgeSep: 20,
+      animate: false,
+    },
+    minZoom: 0.2,
+    maxZoom: 3,
+    wheelSensitivity: 0.3,
   });
 
-  // Reduce orbit sensitivity and add damping for smoother camera movement.
-  const controls = graph.controls();
-  controls.rotateSpeed = 0.4;
-  controls.zoomSpeed = 0.6;
-  controls.panSpeed = 0.4;
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.15;
+  // Hover interactions.
+  cy.on("mouseover", "node", (e) => {
+    const node = e.target;
+    const neighborhood = node.neighborhood();
+    cy.elements().addClass("dimmed");
+    node.removeClass("dimmed").addClass("hover");
+    neighborhood.nodes().removeClass("dimmed").addClass("neighbor");
+    neighborhood.edges().removeClass("dimmed").addClass("highlighted");
+    node.connectedEdges().removeClass("dimmed").addClass("highlighted");
+    container.style.cursor = "pointer";
+  });
 
-  state.forceGraph = graph;
+  cy.on("mouseout", "node", () => {
+    cy.elements().removeClass("dimmed hover neighbor highlighted");
+    container.style.cursor = "grab";
+  });
+
+  // Click to show findings.
+  cy.on("tap", "node", (e) => {
+    showNodeFindings(e.target.id());
+  });
+
+  // Fit with padding after layout.
+  cy.fit(undefined, 40);
+
+  state.cyGraph = cy;
 
   // Wire close button for findings panel.
   const closeBtn = document.getElementById("node-findings-close");
