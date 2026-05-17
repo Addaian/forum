@@ -1088,27 +1088,74 @@ function renderJury() {
     totalCells += cells.length;
     if (judge.override) overrides += 1;
 
-    // ---- Tribunal header ----
+    // ---- Finding header ----
+    const principleName = PRINCIPLE_LABELS[dp?.principle] || dp?.principle || "?";
     const header = document.createElement("div");
-    header.className = "mb-3 mt-6 first:mt-0";
+    header.className = "mb-3 mt-8 first:mt-0";
     header.innerHTML = `
-      <div class="flex items-baseline justify-between flex-wrap gap-2 pb-3 border-b border-outline-variant">
-        <div>
-          <span class="font-label-caps text-label-caps text-primary">TRIBUNAL #${tribIdx + 1}</span>
-          <span class="font-code-sm text-on-surface-variant ml-2">${dp?.principle ?? "?"}</span>
+      <div class="pb-3 border-b border-outline-variant">
+        <div class="flex items-center gap-3 mb-1">
+          <span class="font-label-caps text-label-caps text-primary">FINDING ${tribIdx + 1} of ${state.verdicts.length}</span>
+          <span class="text-[11px] text-on-surface-variant opacity-70">
+            ${escapeHtml(principleName)} <span class="opacity-60">(${dp?.principle ?? "?"})</span>
+          </span>
         </div>
-        <div class="text-right">
-          <div class="font-code-md text-on-surface">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
+        <div class="font-body-lg text-on-surface leading-tight">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
+        <div class="text-[11px] text-on-surface-variant opacity-70 mt-2">
+          Below: 10 debate pairs argued from their own value perspectives. Each card is one pairing.
         </div>
       </div>`;
     root.appendChild(header);
 
-    // ---- Cells grid ----
-    const grid = document.createElement("div");
-    grid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-2";
-    grid.dataset.tribunalId = trib.decision_point_id;
-    cells.forEach((c) => grid.appendChild(renderCellCard(c)));
-    root.appendChild(grid);
+    // ---- Cells grid: majority first, then a divider, then dissenters ----
+    // Group by vote so the user can see at a glance who pushed back.
+    const nDebt = cells.filter(c => c.position === "debt").length;
+    const nJust = cells.filter(c => c.position === "justified").length;
+    const majority = nDebt >= nJust ? "debt" : "justified";
+    const majCells = cells.filter(c => c.position === majority);
+    const disCells = cells.filter(c => c.position !== majority);
+    // Within each group, sort by confidence descending — strongest argument first.
+    majCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+    disCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+
+    const majorityLabel = majority === "debt" ? "PROBLEM" : "FINE";
+    const dissentLabel  = majority === "debt" ? "FINE"    : "PROBLEM";
+    const majorityColor = majority === "debt" ? "#fb923c" : "#4ade80";
+    const dissentColor  = majority === "debt" ? "#4ade80" : "#fb923c";
+
+    // Section: majority group
+    const majHeader = document.createElement("div");
+    majHeader.className = "mb-2 mt-1 flex items-center gap-2 text-[11px]";
+    majHeader.innerHTML = `
+      <span class="inline-block w-2 h-2 rounded-full" style="background:${majorityColor}"></span>
+      <span class="font-label-caps text-[10px] tracking-widest" style="color:${majorityColor}">${majCells.length} pair${majCells.length === 1 ? "" : "s"} said ${majorityLabel}</span>
+      <span class="text-on-surface-variant opacity-60">— the majority reading</span>
+    `;
+    root.appendChild(majHeader);
+
+    const majGrid = document.createElement("div");
+    majGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-2";
+    majGrid.dataset.tribunalId = trib.decision_point_id;
+    majCells.forEach((c) => majGrid.appendChild(renderCellCard(c, { isDissent: false })));
+    root.appendChild(majGrid);
+
+    // Section: dissenters
+    if (disCells.length > 0) {
+      const disHeader = document.createElement("div");
+      disHeader.className = "mt-4 mb-2 flex items-center gap-2 text-[11px]";
+      disHeader.innerHTML = `
+        <span class="inline-block w-2 h-2 rounded-full" style="background:${dissentColor}"></span>
+        <span class="font-label-caps text-[10px] tracking-widest" style="color:${dissentColor}">↯ ${disCells.length} pair${disCells.length === 1 ? "" : "s"} pushed back — said ${dissentLabel}</span>
+        <span class="text-on-surface-variant opacity-60">— their values read the evidence differently. The judge weighed these too.</span>
+      `;
+      root.appendChild(disHeader);
+
+      const disGrid = document.createElement("div");
+      disGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-2";
+      disGrid.dataset.tribunalId = trib.decision_point_id;
+      disCells.forEach((c) => disGrid.appendChild(renderCellCard(c, { isDissent: true })));
+      root.appendChild(disGrid);
+    }
 
     // ---- Aggregate line (re-projected under current weights) ----
     const aggLine = document.createElement("div");
@@ -1131,17 +1178,15 @@ function renderJury() {
 // Maps persona id → display name + the single value it cares about.
 // Used to label cell cards now that personas are monomaniacal and
 // neither persona is locked to a side.
+// Persona display = the value it cares about, full stop. The persona ID
+// (simplifier / shipper / etc.) stays for code/data compatibility.
 const PERSONA_INFO = {
-  simplifier: { name: "The Simplifier", value: "simplicity", color: "#a78bfa" },
-  shipper: { name: "The Shipper", value: "velocity", color: "#fb923c" },
-  maintainer: {
-    name: "The Maintainer",
-    value: "maintainability",
-    color: "#5dd6ff",
-  },
-  verifier: { name: "The Verifier", value: "correctness", color: "#4ade80" },
-  scaler: { name: "The Scaler", value: "scalability", color: "#f472b6" },
-  adapter: { name: "The Adapter", value: "flexibility", color: "#facc15" },
+  simplifier: { name: "Simplicity",      value: "simplicity",      color: "#a78bfa" },
+  shipper:    { name: "Velocity",        value: "velocity",        color: "#fb923c" },
+  maintainer: { name: "Maintainability", value: "maintainability", color: "#5dd6ff" },
+  verifier:   { name: "Correctness",     value: "correctness",     color: "#4ade80" },
+  scaler:     { name: "Scalability",     value: "scalability",     color: "#f472b6" },
+  adapter:    { name: "Flexibility",     value: "flexibility",     color: "#facc15" },
 };
 
 function personaPill(personaId) {
@@ -1150,15 +1195,17 @@ function personaPill(personaId) {
     value: "?",
     color: "#919094",
   };
-  return `<span class="inline-flex items-baseline gap-1.5 px-2 py-0.5 border rounded-sm"
+  // Name is the value (e.g., "Velocity"); a colored dot reinforces it.
+  return `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 border rounded-sm"
                 style="color:${info.color};border-color:${info.color};background:${info.color}14;"
-                title="Cares only about ${info.value}.">
+                title="${escapeHtml(info.name)} — only cares about ${escapeHtml(info.value)}, indifferent to the other 5 values.">
+            <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${info.color}"></span>
             <span class="font-code-sm text-[11px] font-bold">${escapeHtml(info.name)}</span>
-            <span class="text-[9px] opacity-70">${info.value}</span>
           </span>`;
 }
 
-function renderCellCard(c) {
+function renderCellCard(c, opts = {}) {
+  const { isDissent = false } = opts;
   // New model: two personas debate, the CELL votes. Vote color reflects the
   // cell's conclusion (debt=orange, justified=green) — NOT the persona's
   // "side" since neither persona has a side anymore.
@@ -1187,43 +1234,67 @@ function renderCellCard(c) {
     : "How much your current priorities overlap with the values this cell's argument rests on. 1.00× = baseline.";
 
   const card = document.createElement("div");
+  // Dissenters get a stronger border in their vote-color to make the
+  // "this pair pushed back" signal pop against the surrounding majority.
+  const dissentRing = isDissent ? ` ring-2 ring-offset-0` : "";
   card.className =
-    "bg-surface-container border border-outline-variant" +
-    (salient ? " ring-1 ring-yellow-400/40" : "");
+    "bg-surface-container border border-outline-variant relative" +
+    (salient ? " ring-1 ring-yellow-400/40" : "") + dissentRing;
+  if (isDissent) {
+    card.style.boxShadow = `0 0 0 1px ${voteColor}55`;
+  }
+  // Use the persona pair as the headline. Each persona's display name IS
+  // the value it cares about (e.g. "Simplicity vs Velocity") — paired with
+  // a colored dot for instant visual recognition.
+  const aInfo = PERSONA_INFO[personaAId] || { name: personaAId, value: "?", color: "#919094" };
+  const bInfo = PERSONA_INFO[personaBId] || { name: personaBId, value: "?", color: "#919094" };
+  const dot   = (color) => `<span class="inline-block w-2.5 h-2.5 rounded-full align-middle" style="background:${color}"></span>`;
+
+  const dissentRibbon = isDissent
+    ? `<div class="absolute top-0 right-0 font-label-caps text-[8px] px-1.5 py-0.5 tracking-widest"
+            style="color:${voteColor};background:${voteColor}22;border-bottom-left-radius:3px;"
+            title="This pair disagreed with the majority — pushed back from their value's perspective.">↯ PUSHED BACK</div>`
+    : "";
+
   card.innerHTML = `
+    ${dissentRibbon}
     <div class="h-1 w-full" style="background:${voteColor}"></div>
     <div class="p-4">
       <div class="flex justify-between items-start mb-3 gap-3">
-        <div>
-          <h3 class="font-code-md text-on-surface font-bold mb-1">Cell ${c.cell_id}</h3>
-          <div class="flex items-center gap-1.5 flex-wrap text-[10px]">
-            ${personaPill(personaAId)}
-            <span class="text-on-surface-variant opacity-60">vs</span>
-            ${personaPill(personaBId)}
+        <div class="min-w-0">
+          <div class="font-headline-sm text-on-surface leading-tight"
+               title="Debate ${c.cell_id + 1} of 10. Each persona cares about exactly one engineering value and argues from that perspective.">
+            <span title="${escapeHtml(aInfo.name)} — cares only about ${escapeHtml(aInfo.value)}">
+              ${dot(aInfo.color)} <span style="color:${aInfo.color}">${escapeHtml(aInfo.name)}</span>
+            </span>
+            <span class="text-on-surface-variant opacity-60 font-normal text-[14px] mx-1">vs</span>
+            <span title="${escapeHtml(bInfo.name)} — cares only about ${escapeHtml(bInfo.value)}">
+              ${dot(bInfo.color)} <span style="color:${bInfo.color}">${escapeHtml(bInfo.name)}</span>
+            </span>
           </div>
         </div>
-        <div class="flex flex-col items-end gap-0.5">
+        <div class="flex flex-col items-end gap-0.5 flex-shrink-0">
           <span class="font-label-caps text-[9px] px-2 py-0.5 border whitespace-nowrap"
                 style="color:${voteColor};border-color:${voteColor};background:${voteColor}1a"
                 title="${escapeHtml(voteExplainer)}">
-            VOTE: ${voteIsDebt ? "DEBT" : "JUSTIFIED"}
+            ${voteIsDebt ? "PROBLEM" : "FINE"}
           </span>
           <span class="text-[9px] text-on-surface-variant opacity-70 italic">${voteShort}</span>
         </div>
       </div>
       <!-- Confidence bar -->
-      <div class="flex items-center gap-2 mb-3 bg-surface-container-high p-2 border border-outline-variant/30" title="How sure this cell was of its vote (0% = toss-up, 100% = decisive)">
+      <div class="flex items-center gap-2 mb-3 bg-surface-container-high p-2 border border-outline-variant/30" title="How sure this pair was of their conclusion (0% = toss-up, 100% = decisive)">
         <div class="flex-1 h-1.5 bg-surface-variant relative overflow-hidden">
           <div class="absolute left-0 top-0 h-full" style="width:${confidencePct}%;background:${voteColor}"></div>
         </div>
         <span class="font-code-sm text-[10px]" style="color:${voteColor}">${confidencePct}% sure</span>
       </div>
-      <div class="font-code-sm text-[11px] text-on-surface leading-relaxed italic">
+      <div class="text-[12px] text-on-surface leading-relaxed italic">
         "${escapeHtml(c.key_argument || "(no argument)")}"
       </div>
-      <div class="mt-3 pt-2 border-t border-outline-variant/30 text-[10px] font-code-sm text-on-surface-variant flex items-center justify-between"
+      <div class="mt-3 pt-2 border-t border-outline-variant/30 text-[10px] text-on-surface-variant flex items-center justify-between"
            title="${escapeHtml(salienceTitle)}">
-        <span>matches your priorities</span>
+        <span>your priorities care about this</span>
         <span class="${salient ? "text-yellow-400 font-bold" : ""}">${ratioStr}${salient ? " — emphasized" : ""}</span>
       </div>
     </div>`;
@@ -1234,27 +1305,13 @@ function renderJudgeCard(trib, tribIdx, dp) {
   const judge = trib.judge || {};
   const v = String(judge.verdict || "—").toUpperCase();
   const vKey = v.replace(/ /g, "-");
-<<<<<<< HEAD
-  const verdictExplainer =
-    {
-      HEALTHY: "Decision is sound — no action needed.",
-      "JUSTIFIED VIOLATION":
-        "Yes it violates the principle, but the violation is defensible.",
-      "STRUCTURAL DEBT": "Real debt with observable cost. Refactor warranted.",
-      CRITICAL: "Actively causing or about to cause production impact. Urgent.",
-      DRIFTED: "Design was sound; code has drifted away. Restore it.",
-      CONTESTED:
-        "Panel split too hard to call — a human architect should weigh in.",
-    }[v] || "";
-=======
   const verdictExplainer = VERDICT_PLAIN[v] || "";
->>>>>>> aae44fa (changes)
 
   const card = document.createElement("div");
   card.className = `bg-surface-container-low border border-outline-variant p-4`;
   card.innerHTML = `
     <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
-      <span class="font-label-caps text-[10px] text-on-tertiary-container">FINDING #${tribIdx + 1}${judge.override ? " · JUDGE OVERRODE PANEL" : ""}</span>
+      <span class="font-label-caps text-[10px] text-on-tertiary-container">FINDING ${tribIdx + 1}${judge.override ? " · JUDGE OVERRODE THE PAIRS" : ""}</span>
       <span class="font-code-sm font-bold verdict-${vKey} verdict-bg-${vKey} px-2 py-0.5"
             title="${escapeHtml(verdictExplainer)}">${escapeHtml(v)}</span>
     </div>
@@ -1286,13 +1343,27 @@ function renderJuryAggregates() {
     const orig = trib.aggregate_vote || {};
     const proj = reweightedAggregate(cells, state.currentWeights);
     const wouldFlip = proj.winner && orig.winner && proj.winner !== orig.winner;
+    const dCount = orig.n_debt ?? 0;
+    const jCount = orig.n_justified ?? 0;
+    const projShort =
+      proj.winner === "debt"      ? "would lean PROBLEM" :
+      proj.winner === "justified" ? "would lean FINE"    : "—";
     line.innerHTML = `
-      <span class="text-on-surface-variant">Actual panel:</span>
-      <b class="text-on-surface">${orig.n_debt ?? 0} voted DEBT · ${orig.n_justified ?? 0} voted JUSTIFIED</b>
-      &nbsp;·&nbsp;
-      <span class="text-on-surface-variant">If we'd weighted by your priorities:</span>
-      <b style="color:${proj.winner === "debt" ? "#fb923c" : "#4ade80"}">${proj.winner === "debt" ? "would lean DEBT" : proj.winner === "justified" ? "would lean JUSTIFIED" : "—"}</b>
-      ${wouldFlip ? `<span class="ml-2 text-yellow-400 font-bold">— PANEL VOTE WOULD HAVE FLIPPED</span>` : `<span class="ml-2 opacity-60">— matches the actual panel direction (the verdict label never changes regardless)</span>`}
+      <div class="bg-surface-container-low border border-outline-variant/40 p-3 rounded">
+        <div class="mb-1">
+          <span class="text-on-surface-variant">What the 10 pairs decided:</span>
+          <b class="text-[#fb923c]">${dCount} said PROBLEM</b>
+          ·
+          <b class="text-[#4ade80]">${jCount} said FINE</b>
+        </div>
+        <div>
+          <span class="text-on-surface-variant">If we re-counted using your priority sliders:</span>
+          <b style="color:${proj.winner === "debt" ? "#fb923c" : "#4ade80"}">${projShort}</b>
+          ${wouldFlip
+            ? `<span class="ml-2 text-yellow-400 font-bold">— the majority side would flip</span>`
+            : `<span class="ml-2 opacity-60">— same majority as actual (the judge's verdict label never changes either way)</span>`}
+        </div>
+      </div>
     `;
   });
 }
@@ -1407,15 +1478,10 @@ function renderBriefingBody() {
   // Wrap literal verdict labels in colored chips.
   html = html.replace(
     /<strong>\s*Verdict:\s*([A-Z][A-Z ]+[A-Z])\s*<\/strong>/g,
-<<<<<<< HEAD
-    (_, v) =>
-      `<span class="verdict-tag verdict-${v.replace(/ /g, "-")} verdict-bg-${v.replace(/ /g, "-")}">${v}</span>`,
-=======
     (_, v) => {
       const plain = VERDICT_PLAIN[v] || "";
       return `<span class="verdict-tag verdict-${v.replace(/ /g, "-")} verdict-bg-${v.replace(/ /g, "-")}" title="${plain.replace(/"/g, "&quot;")}">${v}</span>`;
-    }
->>>>>>> aae44fa (changes)
+    },
   );
   document.getElementById("brief-markdown").innerHTML = html;
 }
@@ -1441,27 +1507,16 @@ function renderBriefingVerbatims() {
     const block = document.createElement("div");
     block.className = "bg-surface-container-low p-6 my-4";
     block.style.borderLeft = "4px solid";
-<<<<<<< HEAD
     block.style.borderLeftColor =
-      {
+      ({
         HEALTHY: "#4ade80",
         "JUSTIFIED VIOLATION": "#facc15",
         "STRUCTURAL DEBT": "#fb923c",
         CRITICAL: "#ef4444",
         DRIFTED: "#c084fc",
         CONTESTED: "#67e8f9",
-      }[v] || "#c8c6c7";
-=======
-    block.style.borderLeftColor = ({
-      "HEALTHY": "#4ade80",
-      "JUSTIFIED VIOLATION": "#facc15",
-      "STRUCTURAL DEBT": "#fb923c",
-      "CRITICAL": "#ef4444",
-      "DRIFTED": "#c084fc",
-      "CONTESTED": "#67e8f9",
-    })[v] || "#c8c6c7";
+      })[v] || "#c8c6c7";
     const plain = VERDICT_PLAIN[v] || "";
->>>>>>> aae44fa (changes)
     block.innerHTML = `
       <div class="flex items-center gap-2 mb-2 flex-wrap">
         <span class="font-label-caps text-label-caps verdict-bg-${vKey} verdict-${vKey} px-2 py-1"
