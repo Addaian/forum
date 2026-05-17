@@ -1287,85 +1287,143 @@ function renderJury() {
     totalCells += cells.length;
     if (judge.override) overrides += 1;
 
-    // ---- Finding header ----
     const principleName =
       PRINCIPLE_LABELS[dp?.principle] || dp?.principle || "?";
-    const header = document.createElement("div");
-    header.className = "mb-3 mt-8 first:mt-0";
-    header.innerHTML = `
-      <div class="pb-3 border-b border-outline-variant">
-        <div class="flex items-center gap-3 mb-1">
-          <span class="font-label-caps text-label-caps text-primary">FINDING ${tribIdx + 1} of ${state.verdicts.length}</span>
-          <span class="text-[11px] text-on-surface-variant opacity-70">
-            ${escapeHtml(principleName)} <span class="opacity-60">(${dp?.principle ?? "?"})</span>
-          </span>
-        </div>
-        <div class="font-body-lg text-on-surface leading-tight">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
-        <div class="text-[11px] text-on-surface-variant opacity-70 mt-2">
-          Below: 15 debate pairs argued from their own value perspectives. Each card is one pairing.
-        </div>
-      </div>`;
-    root.appendChild(header);
-
-    // ---- Cells grid: majority first, then a divider, then dissenters ----
-    // Group by vote so the user can see at a glance who pushed back.
+    // Summary view — compact card per finding
     const nDebt = cells.filter((c) => c.position === "debt").length;
     const nJust = cells.filter((c) => c.position === "justified").length;
     const majority = nDebt >= nJust ? "debt" : "justified";
-    const majCells = cells.filter((c) => c.position === majority);
-    const disCells = cells.filter((c) => c.position !== majority);
-    // Within each group, sort by confidence descending — strongest argument first.
-    majCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
-    disCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
-
     const majorityLabel = majority === "debt" ? "PROBLEM" : "FINE";
-    const dissentLabel = majority === "debt" ? "FINE" : "PROBLEM";
     const majorityColor = majority === "debt" ? "#fb923c" : "#4ade80";
     const dissentColor = majority === "debt" ? "#4ade80" : "#fb923c";
+    const avgConf = cells.length
+      ? Math.round(
+          (cells.reduce((s, c) => s + (c.confidence || 0), 0) / cells.length) *
+            100,
+        )
+      : 0;
+    const v = String(judge.verdict || "—").toUpperCase();
+    const vKey = v.replace(/ /g, "-");
 
-    // Section: majority group
-    const majHeader = document.createElement("div");
-    majHeader.className = "mb-2 mt-1 flex items-center gap-2 text-[11px]";
-    majHeader.innerHTML = `
-      <span class="inline-block w-2 h-2 rounded-full" style="background:${majorityColor}"></span>
-      <span class="font-label-caps text-[10px] tracking-widest" style="color:${majorityColor}">${majCells.length} pair${majCells.length === 1 ? "" : "s"} said ${majorityLabel}</span>
-      <span class="text-on-surface-variant opacity-60">— the majority reading</span>
+    // ---- Compact summary card ----
+    const section = document.createElement("div");
+    section.className =
+      "mb-4 mt-6 first:mt-0 bg-surface-container border border-outline-variant";
+
+    // Vote dots: one dot per cell, colored by position
+    const dots = cells
+      .map((c) => {
+        const color = c.position === "debt" ? "#fb923c" : "#4ade80";
+        const pA = PERSONA_INFO[c.red_persona]?.name || c.red_persona;
+        const pB = PERSONA_INFO[c.blue_persona]?.name || c.blue_persona;
+        return `<span class="inline-block w-3 h-3 rounded-full" style="background:${color}" title="Cell ${c.cell_id + 1}: ${pA} vs ${pB} → ${c.position} (${Math.round((c.confidence || 0) * 100)}%)"></span>`;
+      })
+      .join("");
+
+    // Best argument from each side
+    const majCells = cells.filter((c) => c.position === majority);
+    const disCells = cells.filter((c) => c.position !== majority);
+    majCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+    disCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+    const bestMaj = majCells[0];
+    const bestDis = disCells[0];
+
+    section.innerHTML = `
+      <div class="p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <span class="font-label-caps text-label-caps text-primary">FINDING ${tribIdx + 1}</span>
+            <span class="text-[11px] text-on-surface-variant opacity-70 ml-2">${escapeHtml(principleName)} (${dp?.principle ?? "?"})</span>
+          </div>
+          <span class="font-code-sm font-bold verdict-${vKey} verdict-bg-${vKey} px-2 py-0.5">${escapeHtml(v)}</span>
+        </div>
+        <div class="font-body-lg text-on-surface leading-tight mb-3">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
+
+        <!-- Vote split strip -->
+        <div class="flex items-center gap-3 mb-3">
+          <div class="flex gap-1">${dots}</div>
+          <span class="text-[11px]"><span style="color:${majorityColor}" class="font-bold">${majority === "debt" ? nDebt : nJust} ${majorityLabel}</span> <span class="text-on-surface-variant opacity-60">·</span> <span style="color:${dissentColor}">${majority === "debt" ? nJust : nDebt} dissent</span></span>
+          <span class="text-[10px] text-on-surface-variant opacity-60">· avg ${avgConf}% confident</span>
+          ${judge.override ? '<span class="text-[10px] text-yellow-400 font-bold">· JUDGE OVERRODE</span>' : ""}
+        </div>
+
+        <!-- Best arguments from each side -->
+        ${
+          bestMaj
+            ? `<div class="text-[12px] text-on-surface leading-relaxed mb-2">
+          <span class="font-label-caps text-[9px]" style="color:${majorityColor}">STRONGEST ${majorityLabel}</span>
+          <span class="italic text-on-surface-variant ml-1">"${escapeHtml(bestMaj.key_argument || "")}"</span>
+        </div>`
+            : ""
+        }
+        ${
+          bestDis
+            ? `<div class="text-[12px] text-on-surface leading-relaxed mb-2">
+          <span class="font-label-caps text-[9px]" style="color:${dissentColor}">STRONGEST DISSENT</span>
+          <span class="italic text-on-surface-variant ml-1">"${escapeHtml(bestDis.key_argument || "")}"</span>
+        </div>`
+            : ""
+        }
+
+        <!-- Judge reasoning -->
+        <div class="mt-3 pt-3 border-t border-outline-variant/30 text-[12px] text-on-surface leading-relaxed">
+          <span class="font-label-caps text-[9px] text-primary">JUDGE</span>
+          <span class="ml-1">${escapeHtml(judge.reasoning || "(no reasoning)")}</span>
+        </div>
+      </div>
+
+      <!-- Expand toggle -->
+      <button class="jury-expand-btn w-full py-2 border-t border-outline-variant text-[11px] text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps tracking-wider">
+        SHOW ALL ${cells.length} DEBATE CARDS
+      </button>
+      <div class="jury-expand-body hidden p-4 pt-0 border-t border-outline-variant/30"></div>
     `;
-    root.appendChild(majHeader);
+    root.appendChild(section);
 
-    const majGrid = document.createElement("div");
-    majGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-2";
-    majGrid.dataset.tribunalId = trib.decision_point_id;
-    majCells.forEach((c) =>
-      majGrid.appendChild(renderCellCard(c, { isDissent: false })),
-    );
-    root.appendChild(majGrid);
-
-    // Section: dissenters
-    if (disCells.length > 0) {
-      const disHeader = document.createElement("div");
-      disHeader.className = "mt-4 mb-2 flex items-center gap-2 text-[11px]";
-      disHeader.innerHTML = `
-        <span class="inline-block w-2 h-2 rounded-full" style="background:${dissentColor}"></span>
-        <span class="font-label-caps text-[10px] tracking-widest" style="color:${dissentColor}">↯ ${disCells.length} pair${disCells.length === 1 ? "" : "s"} pushed back — said ${dissentLabel}</span>
-        <span class="text-on-surface-variant opacity-60">— their values read the evidence differently. The judge weighed these too.</span>
-      `;
-      root.appendChild(disHeader);
-
-      const disGrid = document.createElement("div");
-      disGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-2";
-      disGrid.dataset.tribunalId = trib.decision_point_id;
-      disCells.forEach((c) =>
-        disGrid.appendChild(renderCellCard(c, { isDissent: true })),
-      );
-      root.appendChild(disGrid);
-    }
+    // Wire expand toggle
+    const expandBtn = section.querySelector(".jury-expand-btn");
+    const expandBody = section.querySelector(".jury-expand-body");
+    expandBtn.addEventListener("click", () => {
+      const open = !expandBody.classList.contains("hidden");
+      expandBody.classList.toggle("hidden");
+      expandBtn.textContent = open
+        ? `SHOW ALL ${cells.length} DEBATE CARDS`
+        : "HIDE DEBATE CARDS";
+      if (!open && !expandBody.hasChildNodes()) {
+        // Render cards on first expand
+        const majHeader = document.createElement("div");
+        majHeader.className = "mb-2 mt-3 flex items-center gap-2 text-[11px]";
+        majHeader.innerHTML = `<span class="inline-block w-2 h-2 rounded-full" style="background:${majorityColor}"></span>
+          <span class="font-label-caps text-[10px]" style="color:${majorityColor}">${majCells.length} said ${majorityLabel}</span>`;
+        expandBody.appendChild(majHeader);
+        const majGrid = document.createElement("div");
+        majGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-3";
+        majCells.forEach((c) =>
+          majGrid.appendChild(renderCellCard(c, { isDissent: false })),
+        );
+        expandBody.appendChild(majGrid);
+        if (disCells.length > 0) {
+          const disHeader = document.createElement("div");
+          disHeader.className = "mt-3 mb-2 flex items-center gap-2 text-[11px]";
+          disHeader.innerHTML = `<span class="inline-block w-2 h-2 rounded-full" style="background:${dissentColor}"></span>
+            <span class="font-label-caps text-[10px]" style="color:${dissentColor}">↯ ${disCells.length} dissented — said ${majority === "debt" ? "FINE" : "PROBLEM"}</span>`;
+          expandBody.appendChild(disHeader);
+          const disGrid = document.createElement("div");
+          disGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3";
+          disCells.forEach((c) =>
+            disGrid.appendChild(renderCellCard(c, { isDissent: true })),
+          );
+          expandBody.appendChild(disGrid);
+        }
+      }
+    });
 
     // ---- Aggregate line (re-projected under current weights) ----
     const aggLine = document.createElement("div");
-    aggLine.className = "mb-6 text-[11px] font-code-sm text-on-surface-variant";
+    aggLine.className =
+      "mb-2 text-[11px] font-code-sm text-on-surface-variant px-4 pb-2";
     aggLine.dataset.aggregateFor = trib.decision_point_id;
-    root.appendChild(aggLine);
+    section.appendChild(aggLine);
 
     // ---- Judge card in right panel ----
     judgeRoot.appendChild(renderJudgeCard(trib, tribIdx, dp));
