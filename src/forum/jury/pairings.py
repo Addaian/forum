@@ -1,47 +1,46 @@
-"""Deterministic Red×Blue cell pairings for a tribunal.
+"""Deterministic persona pairings for a tribunal.
 
-The plan locks two specific assignments — cell 0 = (Modularity Hawk,
-Chesterton Preservationist) and cell 1 = (Scale Skeptic, Pragmatic
-Defender) — so both red and blue orderings are fixed below in the order
-that satisfies those constraints. The first 10 cells walk a
-round-robin diagonal across the 36 possible pairings such that every
-Red and every Blue appears at least once, and no pair repeats inside
-the 10-cell window. Reproducibility is the whole point: two runs with
-identical inputs must yield identical pairings.
+Six monomaniacal personas, paired in 10 hand-picked tension matchups.
+Each pair brings together two values that naturally pull in different
+directions, so the debate surfaces real trade-offs instead of monoculture.
+
+Constraints (the plan locks these so the demo is reproducible):
+  - Cell 0 always pairs (Simplifier, Shipper) — the classic
+    minimalism-vs-ship tension.
+  - Cell 1 always pairs (Maintainer, Shipper) — long-term care vs
+    short-term ship.
+  - Cells 2..9 walk through the remaining 8 highest-tension pairs in
+    a fixed order.
+
+Two runs with identical inputs MUST yield identical pairings.
 """
 from __future__ import annotations
 
-RED_ORDER: tuple[str, ...] = (
-    "modularity_hawk",
-    "scale_skeptic",
-    "correctness_zealot",
-    "simplicity_purist",
-    "dependency_minimalist",
-    "legacy_cassandra",
+PERSONA_POOL: tuple[str, ...] = (
+    "simplifier", "shipper", "maintainer", "verifier", "scaler", "adapter",
 )
 
-BLUE_ORDER: tuple[str, ...] = (
-    "chesterton_preservationist",
-    "pragmatic_defender",
-    "empirical_skeptic",
-    "migration_realist",
-    "ergonomics_advocate",
-    "context_historian",
+# Hand-picked tension pairs. 10 of the 15 possible unordered pairs (6C2=15).
+# Skipped pairs (low tension, redundant): (maintainer,verifier),
+# (maintainer,scaler), (adapter,scaler), (adapter,shipper), (verifier,scaler).
+PAIRINGS: tuple[tuple[str, str], ...] = (
+    ("simplifier",  "shipper"),     # minimalism vs ship-now
+    ("maintainer",  "shipper"),     # long-term care vs short-term ship
+    ("verifier",    "shipper"),     # test-all-paths vs ship-and-patch
+    ("scaler",      "shipper"),     # 10× headroom vs 1× delivery
+    ("simplifier",  "adapter"),     # one uniform shape vs configurable
+    ("maintainer",  "adapter"),     # one canonical seam vs many swappable
+    ("verifier",    "adapter"),     # lock down vs allow flex
+    ("simplifier",  "maintainer"),  # minimalism vs explicit cohesion
+    ("scaler",      "simplifier"),  # extract for scale vs uniform shape
+    ("scaler",      "verifier"),    # extract for scale vs hold the seams
 )
 
 
 def pair_for(cell_index: int) -> tuple[str, str]:
-    """Return the (red_id, blue_id) for `cell_index`.
-
-    Cells 0..5: diagonal (red[i], blue[i]).
-    Cells 6..10: shifted diagonal (red[i], blue[i+1]).
-    Extends safely beyond 10 by continuing the shift.
-    """
-    n = len(RED_ORDER)  # = 6
-    shift = cell_index // n
-    r = cell_index % n
-    b = (r + shift) % n
-    return (RED_ORDER[r], BLUE_ORDER[b])
+    """Return the (persona_a, persona_b) for `cell_index`. Wraps modulo
+    PAIRINGS length so num_cells > 10 simply repeats pairs."""
+    return PAIRINGS[cell_index % len(PAIRINGS)]
 
 
 def pairings(num_cells: int) -> list[tuple[str, str]]:
@@ -55,3 +54,10 @@ def cell_temperature(cell_index: int, num_cells: int = 10,
         return lo
     t = cell_index / (num_cells - 1)
     return round(lo + t * (hi - lo), 4)
+
+
+# Backward-compat names that other modules may have imported.
+# RED_ORDER and BLUE_ORDER no longer have a meaningful split; both
+# resolve to PERSONA_POOL so legacy imports don't crash.
+RED_ORDER = PERSONA_POOL
+BLUE_ORDER = PERSONA_POOL

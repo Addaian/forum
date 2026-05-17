@@ -16,6 +16,7 @@ from itertools import combinations
 from pathlib import Path
 
 from ..types import CodeLocation, DecisionPoint
+from .languages import Language
 from .utils import RepoIndex, rel_path, stable_id
 
 CO_CHANGE_THRESHOLD = 5
@@ -23,9 +24,10 @@ DAYS = 365
 MAX_DECISIONS = 5
 
 
-def _package_of(file_str: str, index: RepoIndex) -> str | None:
+def _package_of(file_str: str, index: RepoIndex,
+                extensions: tuple[str, ...]) -> str | None:
     """Resolve a (possibly-relative) path string back to its top-level package."""
-    if not file_str.endswith(".py"):
+    if not file_str.endswith(extensions):
         return None
     try:
         p = (index.repo_root / file_str).resolve()
@@ -40,11 +42,13 @@ def _package_of(file_str: str, index: RepoIndex) -> str | None:
     return None
 
 
-def check(index: RepoIndex) -> list[DecisionPoint]:
+def check(index: RepoIndex, language: Language | None = None) -> list[DecisionPoint]:
     try:
         from pydriller import Repository
     except ImportError:
         return []
+
+    extensions = language.extensions if language else (".py",)
 
     since = datetime.now(timezone.utc) - timedelta(days=DAYS)
     pair_counts: Counter[tuple[str, str]] = Counter()
@@ -55,9 +59,9 @@ def check(index: RepoIndex) -> list[DecisionPoint]:
             commits_seen += 1
             pkgs_touched: set[str] = set()
             for mod in commit.modified_files:
-                if not mod.new_path or not mod.new_path.endswith(".py"):
+                if not mod.new_path or not mod.new_path.endswith(extensions):
                     continue
-                pkg = _package_of(mod.new_path, index)
+                pkg = _package_of(mod.new_path, index, extensions)
                 if pkg:
                     pkgs_touched.add(pkg)
             if len(pkgs_touched) < 2:

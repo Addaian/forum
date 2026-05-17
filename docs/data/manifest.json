@@ -5,17 +5,37 @@
       "slug": "fastapi",
       "label": "fastapi",
       "version": "0.136.1",
+      "language": "python",
       "source": "github.com/fastapi/fastapi",
       "commit": "ecace740",
-      "note": "Web framework; 48 modules, 110 internal edges. Top-1 audited."
+      "note": "Python web framework; 48 modules, 110 internal edges. Top-1 audited. Verdict: STRUCTURAL DEBT on the 18-module routing cycle."
     },
     {
       "slug": "flask",
       "label": "flask",
       "version": "3.2.0.dev",
+      "language": "python",
       "source": "github.com/pallets/flask",
       "commit": "9fcd34c9",
-      "note": "Web framework; 23 modules, ~95 internal edges. Top-1 audited."
+      "note": "Python web framework; 23 modules. Top-1 audited. Verdict: STRUCTURAL DEBT on the 20-module core cycle."
+    },
+    {
+      "slug": "redis",
+      "label": "redis",
+      "version": "8.0+",
+      "language": "c",
+      "source": "github.com/redis/redis",
+      "commit": "fafc4725",
+      "note": "C in-memory data store; 150 modules, 396 #include edges. Top-1 audited. Verdict: STRUCTURAL DEBT on the 27-module C-core cycle."
+    },
+    {
+      "slug": "pentesting",
+      "label": "pentesting",
+      "version": "dev",
+      "language": "python",
+      "source": "github.com/Addaian/pentesting",
+      "commit": "60571606",
+      "note": "Python pentest-agent framework; 116 modules. Top-3 audited. All 3 verdicts: JUSTIFIED VIOLATION via judge OVERRIDE — the LCOM=1.00 findings are dataclass/facade patterns where the metric misleads, and the judge said so."
     }
   ]
 }

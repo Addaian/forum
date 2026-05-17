@@ -1,4 +1,4 @@
-"""Load and validate red/blue persona pools."""
+"""Load and look up monomaniacal value personas from personas.yaml."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,25 +12,21 @@ import yaml
 class Persona:
     id: str
     name: str
-    side: Literal["red", "blue"]
     champions: str
     angered_by: str
     pattern_match_for: list[str]
     value_affinities: dict[str, float]
 
 
-def _load_pool(filename: str, expected_side: str) -> dict[str, Persona]:
+def load_personas() -> dict[str, Persona]:
+    """All 6 monomaniacal value personas, keyed by id."""
     pkg = resources.files("forum.personas")
-    raw = yaml.safe_load((pkg / filename).read_text(encoding="utf-8"))
+    raw = yaml.safe_load((pkg / "personas.yaml").read_text(encoding="utf-8"))
     out: dict[str, Persona] = {}
     for pid, data in raw.items():
-        side = data["side"]
-        if side != expected_side:
-            raise ValueError(f"{pid}: expected side {expected_side!r}, got {side!r}")
         out[pid] = Persona(
             id=pid,
             name=data["name"],
-            side=side,
             champions=data["champions"].strip(),
             angered_by=data["angered_by"].strip(),
             pattern_match_for=list(data.get("pattern_match_for", [])),
@@ -39,17 +35,32 @@ def _load_pool(filename: str, expected_side: str) -> dict[str, Persona]:
     return out
 
 
+def get(persona_id_or_side, pid: str | None = None) -> Persona:
+    """Look up a persona by id.
+
+    Backwards-compatible: also accepts (side, id) — the `side` argument
+    from the old red/blue pool API is ignored. New code should call
+    `get(persona_id)`.
+    """
+    if pid is None:
+        # New API: get(persona_id)
+        pid = persona_id_or_side
+    # Old API: get(side, id) — side is ignored; both pools are merged now.
+    pool = load_personas()
+    if pid not in pool:
+        raise KeyError(
+            f"unknown persona id {pid!r}. Available: {sorted(pool)}."
+        )
+    return pool[pid]
+
+
+# --- Backward-compat shims for old callers that explicitly imported
+# `load_red_pool` / `load_blue_pool`. They now return the full pool
+# either way (every persona is reachable from any code path). ---
+
 def load_red_pool() -> dict[str, Persona]:
-    return _load_pool("red_pool.yaml", "red")
+    return load_personas()
 
 
 def load_blue_pool() -> dict[str, Persona]:
-    return _load_pool("blue_pool.yaml", "blue")
-
-
-def get(side: Literal["red", "blue"], pid: str) -> Persona:
-    pool = load_red_pool() if side == "red" else load_blue_pool()
-    if pid not in pool:
-        raise KeyError(f"unknown {side} persona: {pid!r}. "
-                       f"available: {sorted(pool)}")
-    return pool[pid]
+    return load_personas()

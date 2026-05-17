@@ -4,18 +4,18 @@
     "cells": [
       {
         "cell_id": 0,
-        "red_persona": "modularity_hawk",
-        "blue_persona": "chesterton_preservationist",
+        "red_persona": "simplifier",
+        "blue_persona": "shipper",
         "position": "debt",
-        "confidence": 0.85,
-        "key_argument": "A 20-module strongly connected component with blast_radius 1.0 means no module can be extracted, tested, or evolved independently - the definition of structural debt.",
+        "confidence": 0.7,
+        "key_argument": "The 20-module strongly connected component with 88 internal edges creates genuine structural complexity that makes the codebase harder to reason about, exemplified by the specific cycle between wrappers and debughelpers.\n",
         "value_lens": {
-          "scalability": 0.3,
-          "maintainability": 0.9,
-          "velocity": 0.2,
-          "correctness": 0.4,
-          "simplicity": 0.6,
-          "flexibility": 0.8
+          "scalability": 0.2,
+          "maintainability": 0.5,
+          "velocity": 0.3,
+          "correctness": 0.1,
+          "simplicity": 0.9,
+          "flexibility": 0.2
         },
         "transcript": [
           {
@@ -25,7 +25,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:modularity_hawk",
+            "speaker": "red:simplifier",
             "text": ""
           },
           {
@@ -35,7 +35,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:chesterton_preservationist",
+            "speaker": "blue:shipper",
             "text": ""
           },
           {
@@ -45,7 +45,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:modularity_hawk",
+            "speaker": "red:simplifier",
             "text": ""
           },
           {
@@ -55,7 +55,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:chesterton_preservationist",
+            "speaker": "blue:shipper",
             "text": ""
           },
           {
@@ -66,24 +66,24 @@
           {
             "role": "assistant",
             "speaker": "vote",
-            "text": "{\"position\": \"debt\", \"confidence\": 0.85, \"key_argument\": \"A 20-module strongly connected component with blast_radius 1.0 means no module can be extracted, tested, or evolved independently - the definition of structural debt.\", \"value_lens\": {\"scalability\": 0.3, \"maintainability\": 0.9, \"velocity\": 0.2, \"correctness\": 0.4, \"simplicity\": 0.6, \"flexibility\": 0.8}}"
+            "text": "{\"position\": \"debt\\n\", \"confidence\": \"0.7\\n\", \"key_argument\": \"The 20-module strongly connected component with 88 internal edges creates genuine structural complexity that makes the codebase harder to reason about, exemplified by the specific cycle between wrappers and debughelpers.\\n\", \"value_lens\": \"{\\\"scalability\\\": 0.2, \\\"maintainability\\\": 0.5, \\\"velocity\\\": 0.3, \\\"correctness\\\": 0.1, \\\"simplicity\\\": 0.9, \\\"flexibility\\\": 0.2}\\n\"}"
           }
         ]
       },
       {
         "cell_id": 1,
-        "red_persona": "scale_skeptic",
-        "blue_persona": "pragmatic_defender",
+        "red_persona": "maintainer",
+        "blue_persona": "shipper",
         "position": "debt",
         "confidence": 0.65,
-        "key_argument": "A 20-module strongly connected component with blast_radius=1.0 prevents independent extraction and testing of any single module, creating a fundamental barrier to evolution regardless of current stability.",
+        "key_argument": "The flask.wrappers \u2194 flask.debughelpers cycle edge blocks testing isolation and forces any change to ripple across all 20 modules in the SCC (blast_radius: 1.0).\n</parameter",
         "value_lens": {
-          "scalability": 0.7,
-          "maintainability": 0.9,
-          "velocity": 0.3,
-          "correctness": 0.2,
-          "simplicity": 0.5,
-          "flexibility": 0.8
+          "scalability": 0.0,
+          "maintainability": 0.0,
+          "velocity": 0.0,
+          "correctness": 0.0,
+          "simplicity": 0.0,
+          "flexibility": 0.0
         },
         "transcript": [
           {
@@ -93,7 +93,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:scale_skeptic",
+            "speaker": "red:maintainer",
             "text": ""
           },
           {
@@ -103,7 +103,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:pragmatic_defender",
+            "speaker": "blue:shipper",
             "text": ""
           },
           {
@@ -113,7 +113,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:scale_skeptic",
+            "speaker": "red:maintainer",
             "text": ""
           },
           {
@@ -123,7 +123,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:pragmatic_defender",
+            "speaker": "blue:shipper",
             "text": ""
           },
           {
@@ -134,91 +134,23 @@
           {
             "role": "assistant",
             "speaker": "vote",
-            "text": "{\"position\": \"debt\", \"confidence\": 0.65, \"key_argument\": \"A 20-module strongly connected component with blast_radius=1.0 prevents independent extraction and testing of any single module, creating a fundamental barrier to evolution regardless of current stability.\", \"value_lens\": {\"scalability\": 0.7, \"maintainability\": 0.9, \"velocity\": 0.3, \"correctness\": 0.2, \"simplicity\": 0.5, \"flexibility\": 0.8}}"
+            "text": "{\"position\": \"debt\\n</parameter\", \"confidence\": \"0.65\\n</parameter\", \"key_argument\": \"The flask.wrappers \\u2194 flask.debughelpers cycle edge blocks testing isolation and forces any change to ripple across all 20 modules in the SCC (blast_radius: 1.0).\\n</parameter\", \"value_lens\": \"{\\\"scalability\\\": 0.1, \\\"maintainability\\\": 0.8, \\\"velocity\\\": 0.2, \\\"correctness\\\": 0.4, \\\"simplicity\\\": 0.1, \\\"flexibility\\\": 0.3}\\n</parameter\"}"
           }
         ]
       },
       {
         "cell_id": 2,
-        "red_persona": "correctness_zealot",
-        "blue_persona": "empirical_skeptic",
-        "position": "debt",
-        "confidence": 0.75,
-        "key_argument": "A 20-module strongly connected component with 88 internal edges and blast_radius=1.0 means no module in Flask's core can be tested, extracted, or evolved independently\u2014the cost is latent but structural.",
-        "value_lens": {
-          "scalability": 0.3,
-          "maintainability": 0.9,
-          "velocity": 0.2,
-          "correctness": 0.8,
-          "simplicity": 0.6,
-          "flexibility": 0.4
-        },
-        "transcript": [
-          {
-            "role": "user",
-            "speaker": "moderator",
-            "text": "[Red persona opening prompt]"
-          },
-          {
-            "role": "assistant",
-            "speaker": "red:correctness_zealot",
-            "text": ""
-          },
-          {
-            "role": "user",
-            "speaker": "moderator",
-            "text": "[Blue persona response prompt]"
-          },
-          {
-            "role": "assistant",
-            "speaker": "blue:empirical_skeptic",
-            "text": ""
-          },
-          {
-            "role": "user",
-            "speaker": "moderator",
-            "text": "[Red rebuttal prompt]"
-          },
-          {
-            "role": "assistant",
-            "speaker": "red:correctness_zealot",
-            "text": ""
-          },
-          {
-            "role": "user",
-            "speaker": "moderator",
-            "text": "[Blue closing prompt]"
-          },
-          {
-            "role": "assistant",
-            "speaker": "blue:empirical_skeptic",
-            "text": ""
-          },
-          {
-            "role": "user",
-            "speaker": "moderator",
-            "text": "[Vote extraction prompt]"
-          },
-          {
-            "role": "assistant",
-            "speaker": "vote",
-            "text": "{\"position\": \"debt\", \"confidence\": 0.75, \"key_argument\": \"A 20-module strongly connected component with 88 internal edges and blast_radius=1.0 means no module in Flask's core can be tested, extracted, or evolved independently\\u2014the cost is latent but structural.\", \"value_lens\": {\"scalability\": 0.3, \"maintainability\": 0.9, \"velocity\": 0.2, \"correctness\": 0.8, \"simplicity\": 0.6, \"flexibility\": 0.4}}"
-          }
-        ]
-      },
-      {
-        "cell_id": 3,
-        "red_persona": "simplicity_purist",
-        "blue_persona": "migration_realist",
+        "red_persona": "verifier",
+        "blue_persona": "shipper",
         "position": "debt",
         "confidence": 0.7,
-        "key_argument": "A 20-module strongly connected component with 88 internal edges makes independent evolution of any module impossible, which is the exact harm P1 exists to prevent.",
+        "key_argument": "The 20-module strongly-connected component with bidirectional edges between flask.wrappers and flask.debughelpers creates a correctness risk by making exhaustive testing and boundary reasoning impossible across the entire cycle.\n",
         "value_lens": {
           "scalability": 0.3,
-          "maintainability": 0.9,
-          "velocity": 0.2,
-          "correctness": 0.4,
-          "simplicity": 0.8,
+          "maintainability": 0.6,
+          "velocity": 0.0,
+          "correctness": 0.8,
+          "simplicity": 0.2,
           "flexibility": 0.1
         },
         "transcript": [
@@ -229,7 +161,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:simplicity_purist",
+            "speaker": "red:verifier",
             "text": ""
           },
           {
@@ -239,7 +171,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:migration_realist",
+            "speaker": "blue:shipper",
             "text": ""
           },
           {
@@ -249,7 +181,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:simplicity_purist",
+            "speaker": "red:verifier",
             "text": ""
           },
           {
@@ -259,7 +191,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:migration_realist",
+            "speaker": "blue:shipper",
             "text": ""
           },
           {
@@ -270,24 +202,92 @@
           {
             "role": "assistant",
             "speaker": "vote",
-            "text": "{\"position\": \"debt\", \"confidence\": 0.7, \"key_argument\": \"A 20-module strongly connected component with 88 internal edges makes independent evolution of any module impossible, which is the exact harm P1 exists to prevent.\", \"value_lens\": {\"scalability\": 0.3, \"maintainability\": 0.9, \"velocity\": 0.2, \"correctness\": 0.4, \"simplicity\": 0.8, \"flexibility\": 0.1}}"
+            "text": "{\"position\": \"debt\\n\", \"confidence\": \"0.7\\n\", \"key_argument\": \"The 20-module strongly-connected component with bidirectional edges between flask.wrappers and flask.debughelpers creates a correctness risk by making exhaustive testing and boundary reasoning impossible across the entire cycle.\\n\", \"value_lens\": \"{\\\"scalability\\\": 0.3, \\\"maintainability\\\": 0.6, \\\"velocity\\\": 0.0, \\\"correctness\\\": 0.8, \\\"simplicity\\\": 0.2, \\\"flexibility\\\": 0.1}\\n\"}"
+          }
+        ]
+      },
+      {
+        "cell_id": 3,
+        "red_persona": "scaler",
+        "blue_persona": "shipper",
+        "position": "debt",
+        "confidence": 0.7,
+        "key_argument": "The 20-module SCC with blast_radius 1.0 makes independent extraction and testing impossible, which compounds as a coordination tax under team growth.\n",
+        "value_lens": {
+          "scalability": 0.9,
+          "maintainability": 0.4,
+          "velocity": 0.3,
+          "correctness": 0.1,
+          "simplicity": 0.1,
+          "flexibility": 0.5
+        },
+        "transcript": [
+          {
+            "role": "user",
+            "speaker": "moderator",
+            "text": "[Red persona opening prompt]"
+          },
+          {
+            "role": "assistant",
+            "speaker": "red:scaler",
+            "text": ""
+          },
+          {
+            "role": "user",
+            "speaker": "moderator",
+            "text": "[Blue persona response prompt]"
+          },
+          {
+            "role": "assistant",
+            "speaker": "blue:shipper",
+            "text": ""
+          },
+          {
+            "role": "user",
+            "speaker": "moderator",
+            "text": "[Red rebuttal prompt]"
+          },
+          {
+            "role": "assistant",
+            "speaker": "red:scaler",
+            "text": ""
+          },
+          {
+            "role": "user",
+            "speaker": "moderator",
+            "text": "[Blue closing prompt]"
+          },
+          {
+            "role": "assistant",
+            "speaker": "blue:shipper",
+            "text": ""
+          },
+          {
+            "role": "user",
+            "speaker": "moderator",
+            "text": "[Vote extraction prompt]"
+          },
+          {
+            "role": "assistant",
+            "speaker": "vote",
+            "text": "{\"position\": \"debt\\n\", \"confidence\": \"0.7\\n\", \"key_argument\": \"The 20-module SCC with blast_radius 1.0 makes independent extraction and testing impossible, which compounds as a coordination tax under team growth.\\n\", \"value_lens\": \"{\\\"scalability\\\": 0.9, \\\"maintainability\\\": 0.4, \\\"velocity\\\": 0.3, \\\"correctness\\\": 0.1, \\\"simplicity\\\": 0.1, \\\"flexibility\\\": 0.5}\\n\"}"
           }
         ]
       },
       {
         "cell_id": 4,
-        "red_persona": "dependency_minimalist",
-        "blue_persona": "ergonomics_advocate",
+        "red_persona": "simplifier",
+        "blue_persona": "adapter",
         "position": "debt",
-        "confidence": 0.65,
-        "key_argument": "A 20-module strongly connected component with 88 internal edges and blast_radius=1.0 prevents any subsystem from being extracted, tested, or evolved independently, which is structural debt regardless of ergonomic benefits.",
+        "confidence": 0.9,
+        "key_argument": "The 20-module strongly connected component with 88 internal edges means no module can be understood, tested, or extracted independently\u2014this is maximum coupling that serves neither simplicity nor flexibility.\n",
         "value_lens": {
-          "scalability": 0.3,
+          "scalability": 0.5,
           "maintainability": 0.8,
-          "velocity": 0.2,
-          "correctness": 0.4,
-          "simplicity": 0.7,
-          "flexibility": 0.6
+          "velocity": 0.3,
+          "correctness": 0.3,
+          "simplicity": 0.9,
+          "flexibility": 0.9
         },
         "transcript": [
           {
@@ -297,7 +297,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:dependency_minimalist",
+            "speaker": "red:simplifier",
             "text": ""
           },
           {
@@ -307,7 +307,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:ergonomics_advocate",
+            "speaker": "blue:adapter",
             "text": ""
           },
           {
@@ -317,7 +317,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:dependency_minimalist",
+            "speaker": "red:simplifier",
             "text": ""
           },
           {
@@ -327,7 +327,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:ergonomics_advocate",
+            "speaker": "blue:adapter",
             "text": ""
           },
           {
@@ -338,24 +338,24 @@
           {
             "role": "assistant",
             "speaker": "vote",
-            "text": "{\"position\": \"debt\", \"confidence\": 0.65, \"key_argument\": \"A 20-module strongly connected component with 88 internal edges and blast_radius=1.0 prevents any subsystem from being extracted, tested, or evolved independently, which is structural debt regardless of ergonomic benefits.\", \"value_lens\": {\"scalability\": 0.3, \"maintainability\": 0.8, \"velocity\": 0.2, \"correctness\": 0.4, \"simplicity\": 0.7, \"flexibility\": 0.6}}"
+            "text": "{\"position\": \"debt\\n\", \"confidence\": \"0.9\\n\", \"key_argument\": \"The 20-module strongly connected component with 88 internal edges means no module can be understood, tested, or extracted independently\\u2014this is maximum coupling that serves neither simplicity nor flexibility.\\n\", \"value_lens\": \"{\\\"scalability\\\": 0.5, \\\"maintainability\\\": 0.8, \\\"velocity\\\": 0.3, \\\"correctness\\\": 0.3, \\\"simplicity\\\": 0.9, \\\"flexibility\\\": 0.9}\\n\"}"
           }
         ]
       },
       {
         "cell_id": 5,
-        "red_persona": "legacy_cassandra",
-        "blue_persona": "context_historian",
+        "red_persona": "maintainer",
+        "blue_persona": "adapter",
         "position": "debt",
-        "confidence": 0.75,
-        "key_argument": "A 20-module strongly connected component with blast_radius=1.0 and principle_severity=1.0 means the entire Flask package cannot evolve independently - the specific bidirectional edge between flask.sansio.scaffold and flask.templating exemplifies coupling that blocks modular extraction.",
+        "confidence": 0.9,
+        "key_argument": "The 20-module strongly connected component with 88 internal edges, including the bidirectional cycle between flask.wrappers and flask.debughelpers, prevents any module from being extracted for isolated testing or independent evolution.\n</parameter",
         "value_lens": {
-          "scalability": 0.6,
-          "maintainability": 0.9,
-          "velocity": 0.2,
-          "correctness": 0.3,
-          "simplicity": 0.5,
-          "flexibility": 0.7
+          "scalability": 0.0,
+          "maintainability": 0.0,
+          "velocity": 0.0,
+          "correctness": 0.0,
+          "simplicity": 0.0,
+          "flexibility": 0.0
         },
         "transcript": [
           {
@@ -365,7 +365,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:legacy_cassandra",
+            "speaker": "red:maintainer",
             "text": ""
           },
           {
@@ -375,7 +375,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:context_historian",
+            "speaker": "blue:adapter",
             "text": ""
           },
           {
@@ -385,7 +385,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "red:legacy_cassandra",
+            "speaker": "red:maintainer",
             "text": ""
           },
           {
@@ -395,7 +395,7 @@
           },
           {
             "role": "assistant",
-            "speaker": "blue:context_historian",
+            "speaker": "blue:adapter",
             "text": ""
           },
           {
@@ -406,14 +406,14 @@
           {
             "role": "assistant",
             "speaker": "vote",
-            "text": "{\"position\": \"debt\", \"confidence\": 0.75, \"key_argument\": \"A 20-module strongly connected component with blast_radius=1.0 and principle_severity=1.0 means the entire Flask package cannot evolve independently - the specific bidirectional edge between flask.sansio.scaffold and flask.templating exemplifies coupling that blocks modular extraction.\", \"value_lens\": {\"scalability\": 0.6, \"maintainability\": 0.9, \"velocity\": 0.2, \"correctness\": 0.3, \"simplicity\": 0.5, \"flexibility\": 0.7}}"
+            "text": "{\"position\": \"debt\\n</parameter\", \"confidence\": \"0.9\\n</parameter\", \"key_argument\": \"The 20-module strongly connected component with 88 internal edges, including the bidirectional cycle between flask.wrappers and flask.debughelpers, prevents any module from being extracted for isolated testing or independent evolution.\\n</parameter\", \"value_lens\": \"{\\\"scalability\\\": 0.3, \\\"maintainability\\\": 0.9, \\\"velocity\\\": 0.0, \\\"correctness\\\": 0.2, \\\"simplicity\\\": 0.1, \\\"flexibility\\\": 0.8}\\n</parameter\"}"
           }
         ]
       }
     ],
     "aggregate_vote": {
       "winner": "debt",
-      "score_debt": 4.35,
+      "score_debt": 4.55,
       "score_justified": 0,
       "n_debt": 6,
       "n_justified": 0,
@@ -426,9 +426,9 @@
     },
     "judge": {
       "verdict": "STRUCTURAL DEBT",
-      "reasoning": "The panel reached unanimous consensus (6/6 votes for DEBT) with moderate-to-high confidence across all cells, and the Layer 1 evidence strongly supports this conclusion. The measured metrics show a 20-module strongly connected component (SCC) with `scc_size: 20`, `total_internal_edges_within_scc: 88`, and a `blast_radius: 1.0` \u2014 meaning every module in Flask's core is entangled with every other, and no single module can be extracted, tested, or evolved without touching the entire cluster. Cell 0 (modularity_hawk) correctly identified that this is the textbook definition of structural debt under P1: a component graph that is not a DAG prevents independent evolution by construction. Cell 5 (legacy_cassandra) pinpointed the specific cycle edge driving the SCC: the bidirectional dependency between `flask.sansio.scaffold` and `flask.templating` (confirmed in `cycle_edges` in the measured evidence), which is particularly damning because the `sansio` sub-package was architecturally intended to be a sans-I/O, framework-agnostic layer \u2014 yet it reaches back up into `flask.templating`, collapsing the intended layering. The `principle_severity: 1.0` and `pattern_violation: 1.0` scores leave no ambiguity about the severity of the violation. Cell 2 further noted that with 88 internal edges, the coupling is not incidental but deeply structural, making incremental untangling non-trivial but necessary. The `recency: 0.0` score indicates this is not a recent regression but an entrenched architectural condition, consistent with STRUCTURAL DEBT rather than CRITICAL (no active production failure is evidenced).",
-      "dissent_summary": "The strongest defense (implicit in the Blue personas across cells) is that Flask is a mature, stable framework where this coupling reflects intentional ergonomic design \u2014 the flat public API in `flask/__init__.py` requires aggregating all submodules, and the `sansio` split was already a partial remediation effort. Breaking the cycle may impose significant migration cost with little observable runtime benefit for a library that changes infrequently.",
-      "recommended_action": "Break the bidirectional cycle between `flask.sansio.scaffold` and `flask.templating` (confirmed cycle edges in measured evidence) by extracting the shared templating interface or protocol into a new lower-level module (e.g., `flask.sansio.templating_protocol`) that both `flask.sansio.scaffold` and `flask.templating` can depend on one-way; this is a targeted change of approximately 1\u20133 new files and modifications to `src/flask/sansio/scaffold.py` and `src/flask/templating.py` to remove the back-reference, which should collapse the 20-module SCC into a proper DAG.",
+      "reasoning": "The panel reached unanimous consensus (6/6 votes for STRUCTURAL DEBT) with no dissenting votes, and the Layer 1 evidence strongly supports this conclusion. The measured `scc_size` of 20 modules with 88 internal edges and a `blast_radius` of 1.0 confirms that every module in the Flask package is entangled in a single strongly connected component \u2014 meaning no module can be changed, tested, or extracted without potentially affecting all others. Cell 4 (confidence 0.90) identified this as \"maximum coupling that serves neither simplicity nor flexibility,\" noting that no module can be understood or tested independently. Cell 2 (confidence 0.70) highlighted the correctness risk: the bidirectional cycle between `flask.wrappers` and `flask.debughelpers` (confirmed in `cycle_edges` in the measured evidence) makes exhaustive boundary reasoning impossible across the entire SCC. The `principle_severity` and `pattern_violation` metrics both score 1.0, indicating the most severe possible violation of the Acyclic Dependencies Principle. Cell 5 (confidence 0.90) further noted that the wrappers\u2194debughelpers cycle specifically prevents isolated testing or independent evolution of either module. While Flask is a mature, stable framework (recency: 0.0 suggests no recent churn), the structural cost is real and observable: the cycle is not a design choice but an artifact of accumulated coupling that the sansio sub-package partially attempts to address, suggesting the team has already recognized the problem. The plausible alternatives \u2014 extracting a shared interface, moving coupling into one module, or using dependency inversion \u2014 are all tractable and well-understood techniques.",
+      "dissent_summary": "The strongest argument from the Blue (defender) side is that Flask is a mature, stable framework with low recent churn (recency: 0.0), and the tight coupling within the package reflects intentional cohesion of a monolithic micro-framework where all modules are meant to be deployed together \u2014 breaking the SCC may introduce indirection complexity without meaningful operational benefit for typical users.",
+      "recommended_action": "Break the bidirectional cycle between `flask.wrappers` (src/flask/wrappers.py) and `flask.debughelpers` (src/flask/debughelpers.py) first \u2014 this is the only confirmed `cycle_edge` pair \u2014 by extracting the shared type or interface they mutually reference into a new low-level module (e.g., `src/flask/sansio/types.py` or `src/flask/_types.py`, ~50\u2013100 lines), then updating both modules to depend on that shared module unidirectionally; this is a small, targeted change that begins collapsing the 20-module SCC without requiring a full architectural overhaul.",
       "override": false,
       "model": "claude-sonnet-4-6",
       "panel_size": 6

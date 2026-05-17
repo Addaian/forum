@@ -174,11 +174,13 @@ async def run_judge(
     )
 
     verdict = _extract_tool_input(msg, "submit_verdict")
-    # Sonnet sometimes emits "STRUCTURAL_DEBT" instead of "STRUCTURAL DEBT" —
-    # Anthropic's tool-use enum is advisory, not enforced server-side, so
-    # normalize lightly before validating.
+    # Sonnet sometimes emits "STRUCTURAL_DEBT" or "Structural-Debt" instead of
+    # the canonical "STRUCTURAL DEBT" — Anthropic's tool-use enum is advisory,
+    # not enforced server-side. Normalize underscores, hyphens, repeated whitespace,
+    # and case before validating.
+    import re as _re
     raw = verdict["verdict"]
-    normalized = raw.replace("_", " ").strip().upper()
+    normalized = _re.sub(r"[\s_\-]+", " ", str(raw)).strip().upper()
     if normalized not in VERDICT_VALUES:
         raise ValueError(
             f"judge returned out-of-enum verdict: {raw!r} "
@@ -313,7 +315,12 @@ def _cli() -> None:
 
     # Achievement checks the user can eyeball
     reasoning = verdict.get("reasoning", "")
-    n_cell_refs = sum(1 for i in range(len(cells)) if f"cell {i}" in reasoning.lower())
+    # Use \b boundaries — otherwise "cell 1" matches inside "cell 10/11/…".
+    import re as _re
+    n_cell_refs = sum(
+        1 for i in range(len(cells))
+        if _re.search(rf"\bcell {i}\b", reasoning.lower())
+    )
     rec = verdict.get("recommended_action", "")
     print(f"\n--- achievement checks ---")
     print(f"  reasoning cites {n_cell_refs} cell ids (target ≥ 2)")

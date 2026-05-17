@@ -1,87 +1,620 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
 <meta charset="utf-8">
-<title>Forum — Architectural Audit for FastAPI</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Forum: an AI architectural audit calibrated to your engineering values. Live re-projection of the FastAPI audit under your value vector.">
-<link rel="stylesheet" href="style.css">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>FORUM AUDIT</title>
+<meta name="description" content="Forum — AI architectural audit calibrated to your engineering values. Live re-projection of cached audits.">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@100..800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "background": "#141313",
+        "surface": "#141313",
+        "surface-dim": "#141313",
+        "surface-bright": "#3a3939",
+        "surface-container-lowest": "#0e0e0e",
+        "surface-container-low": "#1c1b1b",
+        "surface-container": "#201f1f",
+        "surface-container-high": "#2b2a2a",
+        "surface-container-highest": "#353434",
+        "surface-variant": "#353434",
+        "inverse-surface": "#e5e2e1",
+        "inverse-on-surface": "#313030",
+        "on-background": "#e5e2e1",
+        "on-surface": "#e5e2e1",
+        "on-surface-variant": "#c7c6ca",
+        "primary": "#c8c6c7",
+        "primary-fixed": "#e5e2e3",
+        "primary-fixed-dim": "#c8c6c7",
+        "primary-container": "#0a0a0b",
+        "on-primary": "#313031",
+        "on-primary-container": "#7a797a",
+        "on-primary-fixed": "#1c1b1c",
+        "on-primary-fixed-variant": "#474647",
+        "inverse-primary": "#5f5e5f",
+        "secondary": "#c8c6c8",
+        "secondary-container": "#474649",
+        "secondary-fixed": "#e4e2e4",
+        "secondary-fixed-dim": "#c8c6c8",
+        "on-secondary": "#303032",
+        "on-secondary-container": "#b6b4b7",
+        "on-secondary-fixed": "#1b1b1d",
+        "on-secondary-fixed-variant": "#474649",
+        "tertiary": "#cac6c2",
+        "tertiary-container": "#0b0a08",
+        "tertiary-fixed": "#e7e2dd",
+        "tertiary-fixed-dim": "#cac6c2",
+        "on-tertiary": "#32302d",
+        "on-tertiary-container": "#7c7975",
+        "on-tertiary-fixed": "#1d1b19",
+        "on-tertiary-fixed-variant": "#494643",
+        "error": "#ffb4ab",
+        "error-container": "#93000a",
+        "on-error": "#690005",
+        "on-error-container": "#ffdad6",
+        "outline": "#919094",
+        "outline-variant": "#46464a",
+        "surface-tint": "#c8c6c7",
+      },
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      spacing: { "panel-padding": "24px", "margin-mobile": "16px", "margin-desktop": "32px", "gutter": "16px" },
+      fontFamily: {
+        "headline-lg": ["Geist"], "headline-md": ["Geist"], "headline-sm": ["Geist"],
+        "body-lg": ["Geist"], "body-md": ["Geist"],
+        "code-md": ["JetBrains Mono"], "code-sm": ["JetBrains Mono"],
+        "label-caps": ["JetBrains Mono"],
+      },
+      fontSize: {
+        "headline-lg": ["32px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" }],
+        "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+        "headline-sm": ["18px", { lineHeight: "1.4", fontWeight: "500" }],
+        "body-lg": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+        "body-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+        "code-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+        "code-sm": ["12px", { lineHeight: "1.4", fontWeight: "400" }],
+        "label-caps": ["11px", { lineHeight: "1", letterSpacing: "0.1em", fontWeight: "700" }],
+      },
+    },
+  },
+};
+</script>
 </head>
-<body>
-<header class="topbar">
-  <div class="brand">
-    <span class="prompt">$</span> <span class="cmd">forum audit </span><span id="brand-target">…</span>
+
+<body class="overflow-hidden bg-background text-on-background font-body-md">
+
+<!-- =========================== TOP BAR =========================== -->
+<header class="fixed top-0 z-50 flex justify-between items-center w-full px-margin-desktop h-16 bg-surface border-b border-outline-variant">
+  <div class="flex items-center gap-8">
+    <span class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">FORUM AUDIT</span>
+    <nav class="hidden md:flex items-center gap-6">
+      <span class="text-on-surface-variant font-code-sm" id="topbar-commit" title="The exact Git commit Forum audited.">—</span>
+      <span class="text-on-surface-variant font-code-sm" id="topbar-branch" title="Git branch the commit was on.">—</span>
+      <span class="text-on-surface-variant font-code-sm" id="topbar-backend" title="Which AI provider ran the debate cells. Cells run on Wafer (Qwen3.5) or Anthropic (Haiku 4.5); the judge always uses Sonnet, the report always uses Opus.">—</span>
+      <span class="text-on-surface-variant font-code-sm" id="topbar-cost" title="Approximate total spend that produced this audit.">—</span>
+    </nav>
   </div>
-  <div class="audit-switcher" id="audit-switcher"></div>
-  <div class="meta">
-    <a href="https://github.com/Addaian/forum" target="_blank">github.com/Addaian/forum</a>
+  <div class="flex items-center gap-4">
+    <button class="px-4 py-1.5 border border-primary text-primary font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-all active:opacity-80 active:scale-95"
+            id="btn-whatif" title="Jump to Prioritization. Drag sliders to see how a different set of team priorities would re-rank these findings.">WHAT-IF</button>
+    <button class="px-4 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps font-bold opacity-50 cursor-not-allowed"
+            id="btn-rerun" title="This page is a static cache. To run a fresh audit, use the CLI: forum audit <repo>" disabled>RE-RUN</button>
+    <div class="flex gap-2 ml-2">
+      <span class="material-symbols-outlined cursor-pointer text-on-surface-variant hover:text-primary" id="btn-download" title="Download the full markdown briefing">download</span>
+    </div>
   </div>
 </header>
 
-<main>
-  <aside class="sidebar">
-    <section class="panel">
-      <h2>Team value vector</h2>
-      <p class="hint">Drag a slider. The verdict text never changes — the ranking, salient
-        dissents, and flip thresholds re-project live. Zero LLM calls.</p>
+<!-- =========================== MAIN LAYOUT =========================== -->
+<div class="flex h-screen pt-16">
 
-      <div class="presets">
-        <button data-preset="baseline" class="preset-btn active">baseline</button>
-        <button data-preset="velocity" class="preset-btn">velocity-first</button>
-        <button data-preset="correctness" class="preset-btn">correctness-first</button>
-        <button data-preset="maintainability" class="preset-btn">maintainability-first</button>
+  <!-- =========================== SIDEBAR =========================== -->
+  <aside class="hidden md:flex flex-col h-full w-64 bg-surface-container border-r border-outline-variant py-panel-padding flex-shrink-0">
+    <div class="px-6 mb-8">
+      <div class="font-headline-sm text-headline-sm font-black text-primary">FORUM</div>
+      <div class="text-[10px] text-on-surface-variant mt-1 leading-tight">
+        AI architectural audit
       </div>
+      <div class="flex items-center gap-2 mt-3">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-label-caps text-[10px] text-on-surface-variant">VIEWING CACHED AUDIT</span>
+      </div>
+    </div>
 
-      <div id="sliders"></div>
-    </section>
+    <!-- Audit switcher -->
+    <div class="px-4 mb-6">
+      <div class="font-label-caps text-[10px] text-on-tertiary-container mb-1 tracking-widest px-2">SWITCH AUDIT</div>
+      <div class="text-[10px] text-on-surface-variant opacity-60 px-2 mb-2 leading-tight">
+        Each one is a different repo Forum audited.
+      </div>
+      <div class="space-y-1" id="audit-switcher"></div>
+      <button id="btn-new-audit" class="hidden mt-2 w-full text-left audit-pill audit-pill-new" title="Submit a repo URL — only works when the local FastAPI server is running.">
+        <span class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[14px]">add</span>
+          <span>NEW AUDIT</span>
+        </span>
+        <span class="lang lang-python">live</span>
+      </button>
+    </div>
 
-    <section class="panel">
-      <h2>Re-projected ranking</h2>
-      <p class="hint">Composite = structural × (1 + 0.5 × value-affinity).
-        Watch the order shift with the sliders above.</p>
-      <ol id="ranking"></ol>
-    </section>
+    <nav class="flex-1 space-y-1" id="nav">
+      <a class="nav-item active bg-primary-container text-primary border-l-4 border-primary px-4 py-3 flex items-start gap-3 transition-all" href="#evidence" data-view="evidence">
+        <span class="material-symbols-outlined mt-0.5">analytics</span>
+        <span>
+          <span class="font-label-caps text-label-caps block">Evidence</span>
+          <span class="text-[9px] opacity-60 font-normal normal-case tracking-normal">What the code checks found</span>
+        </span>
+      </a>
+      <a class="nav-item text-on-surface-variant px-4 py-3 flex items-start gap-3 hover:bg-secondary-container hover:text-on-secondary-container transition-all border-l-4 border-transparent" href="#prioritization" data-view="prioritization">
+        <span class="material-symbols-outlined mt-0.5">vertical_align_top</span>
+        <span>
+          <span class="font-label-caps text-label-caps block">Prioritization</span>
+          <span class="text-[9px] opacity-60 font-normal normal-case tracking-normal">Ranking under your priorities</span>
+        </span>
+      </a>
+      <a class="nav-item text-on-surface-variant px-4 py-3 flex items-start gap-3 hover:bg-secondary-container hover:text-on-secondary-container transition-all border-l-4 border-transparent" href="#jury" data-view="jury">
+        <span class="material-symbols-outlined mt-0.5">gavel</span>
+        <span>
+          <span class="font-label-caps text-label-caps block">AI Jury</span>
+          <span class="text-[9px] opacity-60 font-normal normal-case tracking-normal">10-cell debates per finding</span>
+        </span>
+      </a>
+      <a class="nav-item text-on-surface-variant px-4 py-3 flex items-start gap-3 hover:bg-secondary-container hover:text-on-secondary-container transition-all border-l-4 border-transparent" href="#briefing" data-view="briefing">
+        <span class="material-symbols-outlined mt-0.5">description</span>
+        <span>
+          <span class="font-label-caps text-label-caps block">Briefing</span>
+          <span class="text-[9px] opacity-60 font-normal normal-case tracking-normal">The written report</span>
+        </span>
+      </a>
+    </nav>
 
-    <section class="panel">
-      <h2>Audit summary</h2>
-      <ul class="stats">
-        <li>Repo: <code id="stat-repo">…</code></li>
-        <li>Commit: <code id="stat-commit">…</code></li>
-        <li>Modules: <code id="stat-modules">…</code></li>
-        <li>Decision points: <code id="stat-dps">…</code></li>
-        <li>Principles flagged: <code id="stat-principles">…</code></li>
-      </ul>
-    </section>
+    <div class="mt-auto px-4 space-y-2">
+      <button class="w-full py-2 bg-on-surface text-surface font-label-caps text-label-caps font-bold hover:opacity-90 transition-opacity" id="btn-export">
+        EXPORT REPORT
+      </button>
+      <div class="pt-4 border-t border-outline-variant">
+        <a class="text-on-surface-variant px-2 py-2 flex items-center gap-3 hover:text-primary transition-all" href="https://github.com/Addaian/forum" target="_blank" rel="noopener">
+          <span class="material-symbols-outlined text-[18px]">terminal</span>
+          <span class="font-label-caps text-label-caps">Source</span>
+        </a>
+        <a class="text-on-surface-variant px-2 py-2 flex items-center gap-3 hover:text-primary transition-all" href="https://github.com/Addaian/forum/issues" target="_blank" rel="noopener">
+          <span class="material-symbols-outlined text-[18px]">help_outline</span>
+          <span class="font-label-caps text-label-caps">Issues</span>
+        </a>
+        <button id="btn-settings" class="w-full text-left text-on-surface-variant px-2 py-2 flex items-center gap-3 hover:text-primary transition-all" title="Connect to a live Forum backend (your laptop via a tunnel)">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span class="font-label-caps text-label-caps">Live backend</span>
+          <span id="settings-status-dot" class="ml-auto w-2 h-2 rounded-full bg-outline-variant" title="Disconnected"></span>
+        </button>
+      </div>
+    </div>
   </aside>
 
-  <article class="report">
-    <section class="panel" id="tribunal-panel">
-      <h2>Live tribunal — top-1 decision point</h2>
-      <div id="tribunal"></div>
+  <!-- =========================== VIEWS =========================== -->
+  <main class="flex-1 overflow-hidden bg-background flex flex-col">
+
+    <!-- ===== EVIDENCE VIEW ===== -->
+    <section class="view flex-1 flex flex-col overflow-hidden" data-view="evidence">
+      <div class="flex flex-1 overflow-hidden">
+        <div class="flex flex-col flex-1 p-gutter gap-gutter overflow-y-auto">
+
+          <!-- View intro explainer -->
+          <div class="bg-surface-container-low border-l-2 border-primary px-4 py-3 text-[12px] text-on-surface-variant leading-relaxed">
+            <span class="font-label-caps text-[10px] text-primary mr-2">EVIDENCE</span>
+            What plain static-analysis tools (no AI) found in the code. These are the raw findings —
+            ranking and AI deliberation happen in later steps.
+          </div>
+
+          <!-- CLI input display -->
+          <section class="bg-surface-container-low border border-outline-variant p-4">
+            <div class="flex items-center gap-3 text-primary mb-2">
+              <span class="material-symbols-outlined text-[18px]">terminal</span>
+              <span class="font-label-caps text-label-caps">THE COMMAND THAT PRODUCED THIS AUDIT</span>
+            </div>
+            <div class="flex items-center gap-2 bg-surface-container-lowest p-3 border border-outline-variant">
+              <span class="font-code-md text-code-md text-primary font-bold">$</span>
+              <input type="text" readonly spellcheck="false"
+                     class="bg-transparent border-none focus:ring-0 w-full font-code-md text-code-md text-on-surface p-0"
+                     id="cli-display" value="">
+              <div class="w-2 h-5 bg-primary animate-pulse ml-1 opacity-30"></div>
+            </div>
+          </section>
+
+          <div class="grid grid-cols-12 gap-gutter flex-grow">
+            <!-- Layer 1 metric cards -->
+            <div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+              <div class="bg-surface-container border border-outline-variant flex flex-col">
+                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+                  <span class="font-label-caps text-label-caps text-primary">WHAT THE CHECKS FOUND</span>
+                  <span class="text-[10px] text-on-surface-variant font-code-sm uppercase" id="ev-language">—</span>
+                </div>
+                <div class="p-4 space-y-6" id="ev-metrics">
+                  <!-- filled by JS -->
+                </div>
+              </div>
+              <div class="bg-surface-container border border-outline-variant p-4">
+                <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-1">REPO STATS</h4>
+                <p class="text-[10px] text-on-surface-variant opacity-70 mb-4 leading-tight">
+                  Numbers about the code we walked, before any AI.
+                </p>
+                <div class="space-y-2 font-code-sm text-on-surface-variant" id="ev-telemetry">
+                  <!-- filled by JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Dep graph view -->
+            <div class="col-span-12 lg:col-span-8 bg-surface-container-low border border-outline-variant relative flex flex-col min-h-[500px]">
+              <div class="p-4 flex justify-between items-center border-b border-outline-variant">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px] text-primary">hub</span>
+                  <span class="font-label-caps text-label-caps">DEPENDENCY MAP</span>
+                  <span class="text-[10px] text-on-surface-variant opacity-70 ml-2 normal-case font-normal tracking-normal">
+                    Each arrow = one file imports another
+                  </span>
+                </div>
+                <span class="text-[10px] text-on-surface-variant font-code-sm" id="ev-graph-stats">—</span>
+              </div>
+              <div class="flex-grow relative bg-surface-container-lowest" id="ev-graph-wrap">
+                <!-- Sigma canvas injected by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="panel">
-      <h2>Briefing (Opus 4.7)</h2>
-      <p class="hint">Single Opus pass. Verdict text preserved literally; vocabulary
-        and emphasis follow your value vector.</p>
-      <div id="report-md" class="markdown-body"></div>
+    <!-- ===== PRIORITIZATION VIEW ===== -->
+    <section class="view hidden flex-1 flex flex-col overflow-hidden" data-view="prioritization">
+      <div class="px-margin-desktop py-6 border-b border-outline-variant bg-surface-container-low flex justify-between items-end flex-shrink-0">
+        <div class="max-w-2xl">
+          <h1 class="font-headline-lg text-headline-lg text-on-background">Prioritization</h1>
+          <p class="font-code-sm text-on-surface-variant mt-1 uppercase tracking-tighter">Drag sliders → ranking shifts live · no AI calls</p>
+          <ul class="text-[12px] text-on-surface-variant mt-3 space-y-1 list-disc list-inside leading-relaxed">
+            <li>Each finding has a <span class="text-primary">raw severity</span> (how bad it looks structurally) and a <span class="text-primary">value-affinity</span> (how much your team's priorities care about that kind of issue).</li>
+            <li>The two combine into a <span class="text-primary">composite score</span> — the order you see on the left.</li>
+            <li>Verdict labels never change here. Only the ranking shifts.</li>
+          </ul>
+        </div>
+        <div class="flex gap-4">
+          <div class="flex flex-col items-end">
+            <span class="font-label-caps text-[9px] text-on-tertiary-container">FINDINGS RANKED</span>
+            <span class="font-code-md text-primary" id="prio-stat-dps">—</span>
+          </div>
+          <div class="flex flex-col items-end border-l border-outline-variant pl-4">
+            <span class="font-label-caps text-[9px] text-on-tertiary-container">RE-ORDERED</span>
+            <span class="font-code-md text-primary" id="prio-stat-shift">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-1 overflow-hidden">
+        <!-- Top DPs list -->
+        <div class="flex-1 overflow-y-auto p-margin-desktop">
+          <h2 class="font-label-caps text-label-caps text-on-surface-variant mb-1 tracking-widest">RANKED FINDINGS</h2>
+          <p class="text-[12px] text-on-surface-variant opacity-70 mb-4">
+            Highest composite score first. Numbers update as you move sliders on the right.
+          </p>
+          <div class="space-y-3" id="prio-ranking">
+            <!-- filled by JS -->
+          </div>
+        </div>
+        <!-- Value sliders -->
+        <aside class="w-96 bg-surface-container border-l border-outline-variant flex flex-col flex-shrink-0">
+          <div class="p-4 border-b border-outline-variant bg-surface-container-high">
+            <h3 class="font-label-caps text-label-caps text-primary">YOUR TEAM'S PRIORITIES</h3>
+            <ul class="text-[10px] text-on-surface-variant mt-2 space-y-1 list-disc list-inside leading-snug">
+              <li>Six dials representing how much your team cares about each value.</li>
+              <li>Try a preset, or drag the dials.</li>
+              <li>Watch the left side re-rank in real time.</li>
+            </ul>
+          </div>
+          <div class="p-4 space-y-2 border-b border-outline-variant" id="prio-presets">
+            <!-- preset buttons injected by JS -->
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 space-y-5" id="prio-sliders">
+            <!-- sliders injected by JS -->
+          </div>
+          <div class="p-4 border-t border-outline-variant bg-surface-container-low">
+            <button class="w-full py-3 bg-secondary-container text-on-secondary-container font-label-caps text-label-caps flex items-center justify-center gap-2 border border-outline-variant hover:bg-on-surface hover:text-surface transition-all" id="btn-reset">
+              <span class="material-symbols-outlined text-[18px]">refresh</span>
+              RESET TO BASELINE
+            </button>
+            <p class="text-[10px] text-on-surface-variant opacity-70 mt-3 leading-snug">
+              This view never claims a verdict actually changed. It compares
+              each cell's self-reported values against your dials to show what
+              <em>would have</em> been emphasized.
+            </p>
+          </div>
+        </aside>
+      </div>
     </section>
 
-    <section class="panel collapsible">
-      <h2>Dependency graph (Layer 1)</h2>
-      <p class="hint">FastAPI's module-level import graph as detected by Forum's static
-        analysis. The 18-module SCC at the core is P1's cycle finding.</p>
-      <div id="graph-wrap"></div>
+    <!-- ===== JURY VIEW ===== -->
+    <section class="view hidden flex-1 flex flex-col overflow-hidden" data-view="jury">
+      <div class="px-margin-desktop py-6 border-b border-outline-variant bg-surface-container-low flex justify-between items-end flex-shrink-0">
+        <div class="max-w-2xl">
+          <h1 class="font-headline-lg text-headline-lg text-on-background">AI Jury</h1>
+          <p class="font-code-sm text-on-surface-variant mt-1 uppercase tracking-tighter">How each top finding got its verdict</p>
+          <ul class="text-[12px] text-on-surface-variant mt-3 space-y-1 list-disc list-inside leading-relaxed">
+            <li>Six monomaniacal personas — <span class="text-primary">Simplifier · Shipper · Maintainer · Verifier · Scaler · Adapter</span> — each cares about exactly one value and is indifferent to the other five.</li>
+            <li>10 cells per finding, each pitting two personas with naturally opposing values (Simplifier vs Shipper, Verifier vs Adapter, etc.). 4-turn debate, then a structured vote.</li>
+            <li>Each persona argues whatever its value reads in the evidence — debt OR justified. Convergence is a strong signal; divergence gets resolved by the vote-extractor.</li>
+            <li>The <span class="text-primary">judge</span> reads all 10 debates and renders one verdict. May override the majority when the evidence supports it.</li>
+          </ul>
+        </div>
+        <div class="flex gap-4">
+          <div class="flex flex-col items-end">
+            <span class="font-label-caps text-[9px] text-on-tertiary-container">FINDINGS DEBATED</span>
+            <span class="font-code-md text-primary" id="jury-stat-tribunals">—</span>
+          </div>
+          <div class="flex flex-col items-end border-l border-outline-variant pl-4">
+            <span class="font-label-caps text-[9px] text-on-tertiary-container">CELLS RUN</span>
+            <span class="font-code-md text-primary" id="jury-stat-cells">—</span>
+          </div>
+          <div class="flex flex-col items-end border-l border-outline-variant pl-4">
+            <span class="font-label-caps text-[9px] text-on-tertiary-container">JUDGE OVERRODE</span>
+            <span class="font-code-md text-primary" id="jury-stat-overrides">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-1 overflow-hidden">
+        <!-- Tribunal cells grid -->
+        <div class="flex-1 overflow-y-auto p-6 bg-surface-container-lowest" id="jury-cells">
+          <!-- filled by JS -->
+        </div>
+        <!-- Judge panel -->
+        <aside class="w-96 border-l border-outline-variant bg-surface-container-high flex flex-col flex-shrink-0">
+          <div class="p-6 border-b border-outline-variant">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+              <span class="font-label-caps text-label-caps text-on-surface-variant">THE JUDGE</span>
+            </div>
+            <h2 class="font-headline-md text-headline-md text-on-surface">Anthropic Sonnet 4.6</h2>
+            <p class="text-[11px] text-on-surface-variant mt-2 leading-snug">
+              Reads all 10 debates per finding and renders one verdict.
+              May override the panel majority when the evidence clearly
+              supports the dissenters.
+            </p>
+          </div>
+          <div class="flex-1 p-6 space-y-6 overflow-y-auto" id="jury-judges">
+            <!-- filled by JS -->
+          </div>
+          <div class="p-6 border-t border-outline-variant bg-surface-container">
+            <button class="w-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-bold py-3 border border-outline-variant hover:bg-on-surface hover:text-surface transition-all flex items-center justify-center gap-2" id="btn-scroll-action">
+              <span class="material-symbols-outlined text-sm">east</span>
+              JUMP TO RECOMMENDED ACTION
+            </button>
+          </div>
+        </aside>
+      </div>
     </section>
-  </article>
-</main>
 
-<footer>
-  <div>Forum · CLI-first AI architectural audit · Anthropic Haiku / Sonnet / Opus + Wafer Qwen3.5</div>
-  <div class="tracks">tracks: Tensormesh (cache reuse) · Most Uncommon (50-cell jury) · Wafer (Qwen3.5 cells)</div>
+    <!-- ===== BRIEFING VIEW ===== -->
+    <section class="view hidden flex-1 overflow-hidden flex flex-col" data-view="briefing">
+      <div class="flex-1 overflow-y-auto bg-background">
+        <div class="max-w-5xl mx-auto py-12 px-margin-desktop">
+
+          <!-- Intro explainer -->
+          <div class="mb-8 bg-surface-container-low border-l-2 border-primary px-5 py-4 text-[13px] text-on-surface-variant leading-relaxed">
+            <div class="font-label-caps text-[10px] text-primary mb-2">HOW TO READ THIS</div>
+            <ul class="space-y-1.5 list-disc list-inside">
+              <li>This is the deliverable. An Opus 4.7 model wrote it from the panel deliberations.</li>
+              <li>The <span class="text-primary">verdict labels</span> (CRITICAL, STRUCTURAL DEBT, JUSTIFIED VIOLATION, etc.) are quoted verbatim from the judge — they never change when you switch the tone.</li>
+              <li>The <span class="text-primary">tone preset</span> below changes which finding leads, what vocabulary is used (e.g., "ship cost" vs "risk surface"), and which dissents get prominence. The substance is identical.</li>
+            </ul>
+          </div>
+
+          <!-- Tone switcher -->
+          <div class="mb-3 text-[11px] text-on-surface-variant opacity-70">
+            Pick the tone of the briefing — same findings, different framing for different teams:
+          </div>
+          <div class="flex items-center mb-12 bg-surface-container-low border border-outline-variant p-1 rounded-lg">
+            <div class="flex-1 flex text-center" id="brief-tones">
+              <!-- presets injected by JS -->
+            </div>
+          </div>
+
+          <!-- Verdict summary cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-12" id="brief-summary">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Long-form report -->
+          <div class="bg-surface-container p-margin-desktop border border-outline-variant relative">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+            <div class="flex justify-between items-center mb-8 pb-4 border-b border-outline-variant">
+              <div>
+                <div class="font-code-sm text-on-surface-variant opacity-60 mb-2" id="brief-report-id">REPORT_ID: —</div>
+                <h2 class="font-headline-lg text-headline-lg m-0">Executive Briefing</h2>
+              </div>
+              <div class="text-right">
+                <div class="font-label-caps text-label-caps text-primary mb-1" id="brief-words">— WORDS</div>
+                <div class="font-code-sm text-on-surface-variant opacity-60" id="brief-stamp">—</div>
+              </div>
+            </div>
+            <div class="markdown-body" id="brief-markdown">
+              <!-- markdown rendered by JS -->
+            </div>
+
+            <!-- Verbatim verdict blocks (judge.reasoning quotes) -->
+            <div id="brief-verbatims" class="mt-8 space-y-6">
+              <!-- filled by JS -->
+            </div>
+
+            <!-- Watermark -->
+            <div class="mt-16 flex justify-between items-end opacity-20 select-none">
+              <div class="font-black text-6xl tracking-tighter text-primary">FORUM</div>
+              <div class="text-right">
+                <div class="font-code-sm text-on-surface-variant" id="brief-watermark-stamp">—</div>
+                <div class="font-code-sm text-on-surface-variant" id="brief-watermark-sig">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- =========================== REPLAY FOOTER =========================== -->
+<footer class="fixed bottom-0 left-0 right-0 h-12 border-t border-outline-variant bg-surface-container-lowest px-margin-desktop flex items-center justify-between font-code-sm text-[10px] text-on-surface-variant z-50">
+  <div class="flex items-center gap-6">
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+      <span>Static demo — no AI calls, no cost</span>
+    </div>
+    <span id="footer-layers">—</span>
+  </div>
+  <div class="flex items-center gap-6">
+    <button class="px-4 py-1 border border-outline-variant font-label-caps text-[10px] hover:border-primary hover:text-primary transition-all"
+            id="btn-bundle" title="Download all audit artifacts (evidence, ranking, debates, report, graph) as a zip.">
+      DOWNLOAD ALL
+    </button>
+    <span class="text-primary font-bold" id="footer-clock">—</span>
+  </div>
 </footer>
 
-<script src="app.js"></script>
+<!-- =========================== NEW-AUDIT MODAL (live mode) =========================== -->
+<div id="audit-modal" class="hidden fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4">
+  <div id="audit-modal-inner" class="bg-surface-container border border-outline-variant w-full max-w-2xl max-h-[85vh] flex flex-col transition-all">
+    <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+      <div>
+        <h3 class="font-headline-sm text-headline-sm text-primary" id="audit-modal-title">New audit</h3>
+        <p class="text-[11px] text-on-surface-variant opacity-70 mt-0.5" id="audit-modal-sub">Submit a public git URL. Runs locally on this laptop.</p>
+      </div>
+      <button id="audit-modal-close" class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">close</button>
+    </div>
+
+    <!-- Form (visible before submit) -->
+    <form id="audit-form" class="p-4 space-y-4">
+      <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">REPO URL</label>
+        <input type="text" name="repo_url" required placeholder="https://github.com/foo/bar"
+               class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">SLUG (optional)</label>
+          <input type="text" name="slug" placeholder="auto from URL" pattern="[a-z0-9][a-z0-9-]{0,40}"
+                 class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">LANGUAGE</label>
+          <select name="language" class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+            <option value="auto">auto-detect</option>
+            <option value="python">python</option>
+            <option value="c">c</option>
+          </select>
+        </div>
+      </div>
+      <p class="text-[10px] text-on-surface-variant opacity-70 leading-snug">
+        Requires <code>ANTHROPIC_API_KEY</code> in the server's env. Each audit takes minutes and costs real money — usually $0.50–$2.
+      </p>
+      <button type="submit" class="w-full py-2 bg-primary text-on-primary font-label-caps text-label-caps font-bold hover:opacity-90">
+        START AUDIT
+      </button>
+    </form>
+
+    <!-- Live audit panel (visible after submit) -->
+    <div id="audit-log-wrap" class="hidden flex-1 flex flex-col overflow-hidden">
+      <div class="p-2 border-b border-outline-variant flex items-center gap-3 bg-surface-container-low">
+        <div id="audit-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span id="audit-status-label" class="font-label-caps text-[10px] text-on-surface-variant">RUNNING</span>
+        <span id="audit-active-meta" class="ml-auto font-code-sm text-[10px] text-on-surface-variant opacity-70 truncate"></span>
+      </div>
+
+      <!-- Streaming debate cell -->
+      <div id="audit-live-wrap" class="hidden flex flex-col flex-1 overflow-hidden border-b border-outline-variant">
+        <div class="p-3 border-b border-outline-variant bg-surface-container">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span id="audit-live-side-pill" class="font-label-caps text-[10px] px-2 py-0.5 border" style="border-color:currentColor;color:#ef4444">RED</span>
+              <span id="audit-live-speaker" class="font-code-sm text-[11px] text-primary">—</span>
+              <span id="audit-live-turn-label" class="font-label-caps text-[9px] text-on-surface-variant opacity-70">OPEN</span>
+            </div>
+            <div id="audit-live-cell-tag" class="font-code-sm text-[10px] text-on-surface-variant opacity-70">—</div>
+          </div>
+          <div id="audit-live-dp" class="text-[10px] text-on-surface-variant opacity-60 mt-1 truncate"></div>
+        </div>
+        <pre id="audit-live-text" class="flex-1 overflow-y-auto bg-surface-container-lowest text-on-surface font-body-md text-[14px] leading-relaxed p-4 m-0 whitespace-pre-wrap"></pre>
+        <div class="px-3 py-2 border-t border-outline-variant bg-surface-container-low">
+          <div class="flex items-center gap-1 flex-wrap" id="audit-cells-strip"></div>
+        </div>
+      </div>
+
+      <!-- Plain log (always visible, smaller after debate starts) -->
+      <pre id="audit-log" class="flex-shrink-0 max-h-[150px] overflow-y-auto bg-surface-container-lowest text-on-surface-variant font-code-sm text-[10px] p-3 m-0 whitespace-pre-wrap leading-snug opacity-80"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- =========================== SETTINGS MODAL (live backend config) =========================== -->
+<div id="settings-modal" class="hidden fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4">
+  <div class="bg-surface-container border border-outline-variant w-full max-w-xl flex flex-col">
+    <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+      <div>
+        <h3 class="font-headline-sm text-headline-sm text-primary">Live backend</h3>
+        <p class="text-[11px] text-on-surface-variant opacity-70 mt-0.5">Point this page at a running <code>forum</code> server so you can submit new audits.</p>
+      </div>
+      <button id="settings-modal-close" class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">close</button>
+    </div>
+
+    <form id="settings-form" class="p-4 space-y-4">
+      <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">BACKEND URL</label>
+        <input type="text" name="api_base" placeholder="https://abc123.trycloudflare.com" autocomplete="off"
+               class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+        <p class="text-[10px] text-on-surface-variant opacity-70 mt-1 leading-snug">
+          The tunnel URL of the laptop running <code>uvicorn server:app</code>.
+          Leave blank if you're hitting the server same-origin (localhost).
+        </p>
+      </div>
+      <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">ACCESS TOKEN</label>
+        <input type="password" name="api_token" placeholder="shared secret" autocomplete="off"
+               class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+        <p class="text-[10px] text-on-surface-variant opacity-70 mt-1 leading-snug">
+          Whatever the owner set as <code>FORUM_API_TOKEN</code> in the server env. If they didn't set one, leave blank.
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" id="settings-test" class="flex-1 py-2 bg-secondary-container text-on-secondary-container font-label-caps text-label-caps border border-outline-variant hover:bg-on-surface hover:text-surface">TEST</button>
+        <button type="submit" class="flex-1 py-2 bg-primary text-on-primary font-label-caps text-label-caps font-bold hover:opacity-90">SAVE</button>
+      </div>
+      <div id="settings-result" class="text-[11px] font-code-sm leading-snug min-h-[14px]"></div>
+
+      <details class="pt-2 border-t border-outline-variant">
+        <summary class="cursor-pointer text-[10px] text-on-surface-variant opacity-70 hover:opacity-100">How do I run the server?</summary>
+        <pre class="mt-2 p-3 bg-surface-container-lowest border border-outline-variant text-[10px] font-code-sm text-on-surface-variant whitespace-pre-wrap leading-relaxed">
+# 1. install (one time)
+uv pip install -e ".[server]"
+
+# 2. set secrets
+export ANTHROPIC_API_KEY=sk-...
+export FORUM_API_TOKEN=$(openssl rand -hex 16)   # share this with your friends
+
+# 3. boot
+uv run uvicorn server:app --port 8001
+
+# 4. expose to the internet (pick one)
+cloudflared tunnel --url http://localhost:8001   # zero account, random URL
+ngrok http 8001                                  # stable URL with free account
+
+# 5. paste the tunnel URL + token into this dialog
+</pre>
+      </details>
+    </form>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
 </body>
 </html>

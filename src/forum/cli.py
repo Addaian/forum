@@ -47,6 +47,10 @@ def _commit_sha(repo_path: Path) -> str:
 def main() -> None:
     """Forum — an AI architectural audit for Python codebases."""
     load_dotenv()
+    # Activates per-token streaming via stdout-prefixed JSON when the FastAPI
+    # server (or any caller) sets FORUM_EVENTS=1. No-op otherwise.
+    from . import events as fevents
+    fevents.install_stdout_emitter_if_requested()
 
 
 @main.command()
@@ -65,6 +69,10 @@ def main() -> None:
               help="Skip Layer 3 (markdown report).")
 @click.option("--only", "only_checkers", default=None,
               help="Comma-separated principle IDs to run (e.g. P1,P3).")
+@click.option("--language", "language", default=None,
+              type=click.Choice(["python", "c", "auto"]),
+              help="Source language. 'auto' (default) picks by file extension. "
+              "P4 (LCOM) is skipped on C; P5 (dead code) requires cppcheck on C.")
 @click.option("--cell-backend", "cell_backend",
               type=click.Choice(["anthropic", "wafer"]), default="anthropic",
               help="Inference backend for Layer-2 cells. 'anthropic' uses "
@@ -78,7 +86,8 @@ def main() -> None:
 def audit(repo: Path | None, values_path: Path | None,
           value_overrides: tuple[str, ...], top_n: int, cache_dir: Path,
           skip_jury: bool, skip_report: bool, only_checkers: str | None,
-          cell_backend: str, replay_dir: Path | None, verbose: bool) -> None:
+          language: str | None, cell_backend: str,
+          replay_dir: Path | None, verbose: bool) -> None:
     """Audit a Python repository and produce a markdown briefing.
 
     With --replay, re-emits a previously-cached audit (no API calls); used
@@ -117,8 +126,9 @@ def audit(repo: Path | None, values_path: Path | None,
     want = None
     if only_checkers:
         want = {p.strip().upper() for p in only_checkers.split(",")}
+    lang_arg = None if (language in (None, "auto")) else language
     with phase(console, "Layer 1: deterministic evidence extraction"):
-        bundle = run_evidence(repo, audit_dir, run_checkers=want)
+        bundle = run_evidence(repo, audit_dir, run_checkers=want, language=lang_arg)
     console.print(f"[green]Layer 1[/]: {len(bundle.decision_points)} decision points "
                   f"across {len({d.principle for d in bundle.decision_points})} principles")
 
@@ -144,11 +154,27 @@ def audit(repo: Path | None, values_path: Path | None,
     if not skip_jury:
         import asyncio
         import json
+        import os
 
         from ._polish import verdict_markup
         from .cache.prompt_cache import HAIKU, PromptCache
         from .jury.judge import run_judge
         from .jury.speculative import run_tribunal_speculative
+
+        # Pre-flight: catch missing API keys before we instantiate clients,
+        # so the user gets a friendly Click error instead of a stack trace.
+        if cell_backend == "wafer" and not os.environ.get("WAFER_API_KEY"):
+            console.print(
+                "[red]WAFER_API_KEY is not set.[/] Drop it into .env or "
+                "drop --cell-backend wafer."
+            )
+            sys.exit(2)
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            console.print(
+                "[red]ANTHROPIC_API_KEY is not set.[/] The judge (Sonnet) "
+                "needs it even when cells go to Wafer."
+            )
+            sys.exit(2)
 
         # Cell backend: Anthropic Haiku (cached) or Wafer Qwen3.5 (no cache).
         # The judge always stays on Anthropic Sonnet — we reuse `judge_pc`
@@ -241,9 +267,12 @@ def audit(repo: Path | None, values_path: Path | None,
 
         verdicts_path = audit_dir / "verdicts.json"
         if not verdicts_path.exists():
-            log.error("Cannot write report: %s is missing (Layer 2 was skipped).",
-                      verdicts_path)
-            return
+            console.print(
+                f"[red]Cannot write report:[/] {verdicts_path} is missing. "
+                f"Layer 2 was skipped — either drop --skip-jury, or also pass "
+                f"--skip-report."
+            )
+            sys.exit(2)
         verdicts_data = json.loads(verdicts_path.read_text())
 
         report_pc = PromptCache(model=OPUS)

@@ -1,40 +1,13 @@
 {
   "values": {
-    "maintainability": 1.0,
-    "simplicity": 1.2,
-    "correctness": 1.0,
-    "scalability": 1.0,
+    "flexibility": 1.0,
     "velocity": 1.5,
-    "flexibility": 1.0
+    "correctness": 1.0,
+    "simplicity": 1.2,
+    "scalability": 1.0,
+    "maintainability": 1.0
   },
   "items": [
-    {
-      "decision_point_id": "d9318cf6a4",
-      "principle": "P3",
-      "subject": "Function fastapi.dependencies.utils.analyze_param has cyclomatic complexity 45",
-      "structural_score": 0.68,
-      "value_affinity_score": 0.609,
-      "composite_score": 0.887,
-      "rank": 1
-    },
-    {
-      "decision_point_id": "97d35f80d7",
-      "principle": "P3",
-      "subject": "Function fastapi.openapi.utils.get_openapi_path has cyclomatic complexity 44",
-      "structural_score": 0.68,
-      "value_affinity_score": 0.609,
-      "composite_score": 0.887,
-      "rank": 2
-    },
-    {
-      "decision_point_id": "18d38f4025",
-      "principle": "P3",
-      "subject": "Function fastapi.encoders.jsonable_encoder has cyclomatic complexity 35",
-      "structural_score": 0.615,
-      "value_affinity_score": 0.609,
-      "composite_score": 0.8023,
-      "rank": 3
-    },
     {
       "decision_point_id": "4587c93f89",
       "principle": "P1",
@@ -42,7 +15,7 @@
       "structural_score": 0.7,
       "value_affinity_score": 0.2687,
       "composite_score": 0.794,
-      "rank": 4
+      "rank": 1
     },
     {
       "decision_point_id": "32987311bb",
@@ -51,6 +24,33 @@
       "structural_score": 0.6147,
       "value_affinity_score": 0.3985,
       "composite_score": 0.7372,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "c19ed2630f",
+      "principle": "P6",
+      "subject": "Layering violation: fastapi.security.http (layer 5) imports fastapi.exceptions (layer 1)",
+      "structural_score": 0.6,
+      "value_affinity_score": 0.3179,
+      "composite_score": 0.6954,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "919dce6b71",
+      "principle": "P4",
+      "subject": "Class fastapi.datastructures.UploadFile has low cohesion (LCOM \u2248 1.00)",
+      "structural_score": 0.53,
+      "value_affinity_score": 0.3985,
+      "composite_score": 0.6356,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "03660484f5",
+      "principle": "P4",
+      "subject": "Class fastapi.openapi.models.EmailStr has low cohesion (LCOM \u2248 1.00)",
+      "structural_score": 0.51,
+      "value_affinity_score": 0.3985,
+      "composite_score": 0.6116,
       "rank": 5
     }
   ]

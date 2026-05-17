@@ -10,6 +10,7 @@ from itertools import combinations
 from pathlib import Path
 
 from ..types import CodeLocation, DecisionPoint
+from .languages import Language
 from .utils import RepoIndex, rel_path, read_snippet, stable_id
 
 LCOM_THRESHOLD = 0.7
@@ -44,7 +45,11 @@ def _lcom_for_class(cls: ast.ClassDef) -> tuple[float, int] | None:
     return (p / total, len(methods))
 
 
-def check(index: RepoIndex) -> list[DecisionPoint]:
+def check(index: RepoIndex, language: Language | None = None) -> list[DecisionPoint]:
+    # LCOM is a class-cohesion metric — meaningless for languages without classes.
+    lang_name = language.name if language else index.language
+    if lang_name != "python":
+        return []
     findings: list[tuple] = []  # (lcom, qn, cls_name, path, lineno, endline, n_methods)
     for qn, mi in index.modules.items():
         try:

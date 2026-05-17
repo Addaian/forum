@@ -1,0 +1,57 @@
+{
+  "values": {
+    "simplicity": 1.2,
+    "correctness": 1.0,
+    "maintainability": 1.0,
+    "flexibility": 1.0,
+    "scalability": 1.0,
+    "velocity": 1.5
+  },
+  "items": [
+    {
+      "decision_point_id": "9618e7df81",
+      "principle": "P1",
+      "subject": "Dependency cycle across 27 modules: adlist \u2192 anet \u2192 atomicvar \u2192 bio\u2026",
+      "structural_score": 0.7,
+      "value_affinity_score": 0.2687,
+      "composite_score": 0.794,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "78a213ebfe",
+      "principle": "P3",
+      "subject": "Function src.rdb.rdbLoadObject has cyclomatic complexity 300",
+      "structural_score": 0.59,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.7696,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "d3ef5f006b",
+      "principle": "P2",
+      "subject": "Stable module src.server depends on unstable module src.estore (SDP violation)",
+      "structural_score": 0.6183,
+      "value_affinity_score": 0.2254,
+      "composite_score": 0.688,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "90ebb8ca6f",
+      "principle": "P2",
+      "subject": "Stable module src.server depends on unstable module src.syscheck (SDP violation)",
+      "structural_score": 0.6116,
+      "value_affinity_score": 0.2254,
+      "composite_score": 0.6806,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "c26ec8ad2a",
+      "principle": "P3",
+      "subject": "Function src.redis-cli.parseOptions has cyclomatic complexity 218",
+      "structural_score": 0.5025,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.6555,
+      "rank": 5
+    }
+  ]
+}

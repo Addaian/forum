@@ -154,12 +154,12 @@
         "scc_size": 20,
         "cycle_edges": [
           [
-            "flask.sansio.scaffold",
-            "flask.templating"
+            "flask.templating",
+            "flask.sansio.app"
           ],
           [
-            "flask.templating",
-            "flask.sansio.scaffold"
+            "flask.sansio.app",
+            "flask.templating"
           ]
         ],
         "total_internal_edges_within_scc": 88
@@ -215,16 +215,17 @@
         "function": "register",
         "module": "flask.sansio.blueprints",
         "complexity": 23,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 0.575,
-        "principle_severity": 0.32,
+        "blast_radius": 0.046,
+        "principle_severity": 0.02666666666666667,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -249,16 +250,17 @@
         "function": "routes_command",
         "module": "flask.cli",
         "complexity": 18,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 0.45,
-        "principle_severity": 0.12,
+        "blast_radius": 0.036,
+        "principle_severity": 0.01,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -283,16 +285,17 @@
         "function": "make_response",
         "module": "flask.app",
         "complexity": 16,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 0.4,
-        "principle_severity": 0.04,
+        "blast_radius": 0.032,
+        "principle_severity": 0.0033333333333333335,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -494,7 +497,8 @@
         "module": "flask.config",
         "confidence": 100,
         "first_line": 30,
-        "last_line": 30
+        "last_line": 30,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -530,7 +534,8 @@
         "module": "flask.config",
         "confidence": 100,
         "first_line": 33,
-        "last_line": 33
+        "last_line": 33,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -566,7 +571,8 @@
         "module": "flask.config",
         "confidence": 100,
         "first_line": 35,
-        "last_line": 35
+        "last_line": 35,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -602,7 +608,8 @@
         "module": "flask.ctx",
         "confidence": 100,
         "first_line": 512,
-        "last_line": 512
+        "last_line": 512,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -638,7 +645,8 @@
         "module": "flask.helpers",
         "confidence": 100,
         "first_line": 667,
-        "last_line": 667
+        "last_line": 667,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",

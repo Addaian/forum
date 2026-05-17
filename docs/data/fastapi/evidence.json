@@ -140,12 +140,28 @@
         "scc_size": 18,
         "cycle_edges": [
           [
-            "fastapi._compat.v2",
+            "fastapi.dependencies.utils",
+            "fastapi.dependencies.models"
+          ],
+          [
+            "fastapi.dependencies.models",
             "fastapi._compat"
           ],
           [
             "fastapi._compat",
             "fastapi._compat.v2"
+          ],
+          [
+            "fastapi._compat.v2",
+            "fastapi"
+          ],
+          [
+            "fastapi",
+            "fastapi.routing"
+          ],
+          [
+            "fastapi.routing",
+            "fastapi.dependencies.utils"
           ]
         ],
         "total_internal_edges_within_scc": 59
@@ -199,16 +215,17 @@
         "function": "analyze_param",
         "module": "fastapi.dependencies.utils",
         "complexity": 45,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 1.0,
-        "principle_severity": 1.0,
+        "blast_radius": 0.09,
+        "principle_severity": 0.1,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -233,16 +250,17 @@
         "function": "get_openapi_path",
         "module": "fastapi.openapi.utils",
         "complexity": 44,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 1.0,
-        "principle_severity": 1.0,
+        "blast_radius": 0.088,
+        "principle_severity": 0.09666666666666666,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -267,16 +285,17 @@
         "function": "jsonable_encoder",
         "module": "fastapi.encoders",
         "complexity": 35,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 0.875,
-        "principle_severity": 0.8,
+        "blast_radius": 0.07,
+        "principle_severity": 0.06666666666666667,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -301,16 +320,17 @@
         "function": "__init__",
         "module": "fastapi.routing",
         "complexity": 31,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 0.775,
-        "principle_severity": 0.64,
+        "blast_radius": 0.062,
+        "principle_severity": 0.05333333333333334,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -335,16 +355,17 @@
         "function": "include_router",
         "module": "fastapi.routing",
         "complexity": 29,
-        "threshold": 15
+        "threshold": 15,
+        "analyzer": "radon"
       },
       "alternatives": [
         "Extract helper functions to reduce branching.",
-        "Replace nested conditionals with dispatch (dict, polymorphism, or strategy).",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 0.725,
-        "principle_severity": 0.56,
+        "blast_radius": 0.058,
+        "principle_severity": 0.04666666666666667,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -476,7 +497,8 @@
         "module": "fastapi.applications",
         "confidence": 100,
         "first_line": 4602,
-        "last_line": 4609
+        "last_line": 4609,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -512,7 +534,8 @@
         "module": "fastapi.datastructures",
         "confidence": 100,
         "first_line": 146,
-        "last_line": 146
+        "last_line": 146,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -548,7 +571,8 @@
         "module": "fastapi.openapi.models",
         "confidence": 100,
         "first_line": 52,
-        "last_line": 52
+        "last_line": 52,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -584,7 +608,8 @@
         "module": "fastapi.responses",
         "confidence": 100,
         "first_line": 17,
-        "last_line": 17
+        "last_line": 17,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
@@ -620,7 +645,8 @@
         "module": "fastapi.responses",
         "confidence": 100,
         "first_line": 17,
-        "last_line": 17
+        "last_line": 17,
+        "analyzer": "vulture"
       },
       "alternatives": [
         "Delete the symbol if truly unreachable.",
