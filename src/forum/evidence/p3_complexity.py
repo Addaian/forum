@@ -48,8 +48,13 @@ def check(index: RepoIndex, language: Language | None = None) -> list[DecisionPo
                 "Accept the complexity if the function is a parser/dispatcher where it's inherent.",
             ],
             measured_impact={
-                "blast_radius": min(1.0, cc / 40),
-                "principle_severity": min(1.0, (cc - CC_THRESHOLD) / 25),
+                # Old formula clamped at CC=40 — anything past it (CC=45,
+                # 154, 300, …) scored identically. New scaling differentiates
+                # all the way up to truly extreme cases: blast_radius hits
+                # 1.0 at CC=500, principle_severity at CC=315. Real-world
+                # CC=15-300 range now produces a continuous score gradient.
+                "blast_radius": min(1.0, cc / 500),
+                "principle_severity": min(1.0, (cc - CC_THRESHOLD) / 300),
                 "pattern_violation": 1.0,
                 "advocate_absence": 0.4,
                 "recency": 0.0,

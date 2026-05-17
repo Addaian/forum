@@ -203,28 +203,12 @@
         "scc_size": 27,
         "cycle_edges": [
           [
-            "src.fwtree",
-            "src.zmalloc"
-          ],
-          [
-            "src.zmalloc",
-            "src.atomicvar"
-          ],
-          [
-            "src.atomicvar",
-            "src.config"
-          ],
-          [
-            "src.config",
-            "src.connection"
-          ],
-          [
-            "src.connection",
-            "src.server"
-          ],
-          [
             "src.server",
-            "src.fwtree"
+            "src.cluster"
+          ],
+          [
+            "src.cluster",
+            "src.server"
           ]
         ],
         "total_internal_edges_within_scc": 68
@@ -386,8 +370,8 @@
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 1.0,
-        "principle_severity": 1.0,
+        "blast_radius": 0.6,
+        "principle_severity": 0.95,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -421,8 +405,8 @@
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 1.0,
-        "principle_severity": 1.0,
+        "blast_radius": 0.436,
+        "principle_severity": 0.6766666666666666,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -456,8 +440,8 @@
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 1.0,
-        "principle_severity": 1.0,
+        "blast_radius": 0.42,
+        "principle_severity": 0.65,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -491,8 +475,8 @@
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 1.0,
-        "principle_severity": 1.0,
+        "blast_radius": 0.376,
+        "principle_severity": 0.5766666666666667,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0
@@ -526,8 +510,8 @@
         "Accept the complexity if the function is a parser/dispatcher where it's inherent."
       ],
       "measured_impact": {
-        "blast_radius": 1.0,
-        "principle_severity": 1.0,
+        "blast_radius": 0.308,
+        "principle_severity": 0.4633333333333333,
         "pattern_violation": 1.0,
         "advocate_absence": 0.4,
         "recency": 0.0

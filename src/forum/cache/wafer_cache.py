@@ -265,17 +265,25 @@ class WaferCache:
         OpenAI's tool_calls carry the JSON as a string in
         `tool_calls[i].function.arguments`; we parse it here so callers
         receive a dict, matching PromptCache.extract_tool_input.
+
+        Qwen3.5 on Wafer occasionally leaks its native XML-style tool-call
+        markers (`</parameter>`, `<parameter>`) into the OpenAI-formatted
+        argument values. We sanitize before parsing.
         """
+        import re as _re
         choice = msg.choices[0]
         calls = getattr(choice.message, "tool_calls", None) or []
         for call in calls:
             if call.function.name == tool_name:
+                raw = call.function.arguments
+                # Strip Qwen's native end-tags wherever they appear.
+                clean = _re.sub(r"</?parameter\s*[^>]*>", "", raw)
                 try:
-                    return json.loads(call.function.arguments)
+                    return json.loads(clean)
                 except json.JSONDecodeError as e:
                     raise RuntimeError(
                         f"Wafer returned malformed JSON for tool "
-                        f"{tool_name!r}: {e}; raw: {call.function.arguments[:200]}"
+                        f"{tool_name!r}: {e}; raw: {raw[:200]}"
                     ) from e
         finish = getattr(choice, "finish_reason", "?")
         hint = ""

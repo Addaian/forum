@@ -1,16 +1,27 @@
-"""One debate cell: Red vs Blue across 4 turns + tool-use vote extraction.
+"""One debate cell: two personas read the evidence and argue from their
+respective values; a neutral observer extracts a vote at the end.
 
-Each cell is a self-contained call into Haiku 4.5:
+Each cell is a self-contained set of Haiku/Qwen calls:
 
-    1. Red opens (prosecution)              ← uses prompts/red.md  + red persona
-    2. Blue responds (defence)              ← uses prompts/blue.md + blue persona
-    3. Red rebuts                            ← red persona, short follow-up
-    4. Blue closes                           ← blue persona, short follow-up
-    5. Vote extraction                       ← neutral observer, tool-use only
+    1. Persona A opens                    ← persona A reads the evidence
+    2. Persona B responds                 ← persona B reads the evidence
+    3. Persona A reacts to B              ← engages B's specific claims
+    4. Persona B closes                   ← engages A's reaction
+    5. Vote extraction (tool-use only)    ← neutral observer
 
-The full transcript and a structured CellVote are returned. Multi-turn
-calls share the cached prefix (codebase summary in system, DP evidence in
-user-block-1) so turns 2–5 should see cache reads near 100% on the prefix.
+Neither persona is locked to "debt" or "justified" — each argues for
+whichever side their value reads in the evidence. When both personas
+converge, that's a strong cell vote. When they diverge, the observer
+picks the side whose argument was more specific and better-grounded.
+
+The two persona pools (red_pool / blue_pool) carry their original file
+names for compatibility; semantically they're "pool A" and "pool B"
+characterised by their typical predisposition (critical vs defending)
+but not bound to a side.
+
+Multi-turn calls share the cached prefix (codebase summary in system,
+DP evidence in user-block-1) so turns 2–5 should see cache reads near
+100% on the prefix.
 
 Run standalone for the T3 self-check:
 
@@ -177,16 +188,25 @@ to a 10-cell debate panel (Layer 2 — that's you), synthesizes each panel
 with a per-DP judge (Layer 2 — Sonnet 4.6, not you), and writes a single
 markdown briefing (Layer 3 — Opus 4.7, not you).
 
-Your role is one cell of the 10-cell debate panel. You will be assigned
-either the prosecution (Red — argue the decision is structural debt) or
-the defence (Blue — argue the decision is justified). Two cells with the
-same persona pair will never disagree on substance; the variance across
-the 10 cells comes from persona diversity (six Reds × six Blues, paired
-on a deterministic diagonal) and a linear temperature ramp from 0.5 at
-cell 0 to 0.9 at cell 9. Higher-temperature cells take riskier positions
-and surface edge-case arguments; lower-temperature cells anchor the
-panel on the most-defensible reading. Both ends of the ramp matter:
-your job is to argue your side well, not to predict the verdict.
+Your role is one debater inside one cell of the 10-cell panel. Each cell
+pairs two personas with different architectural values; each persona
+reads the Layer 1 evidence through the value it champions and forms an
+honest reading. You are not assigned a side. You don't argue "for debt"
+or "for justified" by mandate — you argue what your value reads in the
+specific evidence. If your value is harmed by the decision, you'll
+argue it's structural debt. If your value is served by it, or is
+indifferent to it, you'll argue it's justified.
+
+Two cells with the same persona pair will reach similar substance; the
+variance across the 10 cells comes from persona diversity (six personas
+in pool A, six in pool B, paired on a deterministic diagonal) and a
+linear temperature ramp from 0.5 at cell 0 to 0.9 at cell 9. Higher-
+temperature cells take riskier positions and surface edge-case arguments;
+lower-temperature cells anchor the panel on the most-defensible reading.
+
+The cell's vote — "debt" or "justified" — emerges from the debate,
+extracted at the end by a neutral observer. When both personas read the
+evidence the same way, that's a stronger signal than when they disagree.
 
 # Hard ground rules (apply to every turn)
 
@@ -200,18 +220,21 @@ your job is to argue your side well, not to predict the verdict.
    Do not invent facts about the codebase that the evidence does not
    establish. If the evidence is silent on something material to your
    argument, name the silence rather than fabricating around it.
-4. Do not soften your assigned position. The cell vote is rendered by a
-   neutral observer at the end of the debate; you advocate, the observer
-   adjudicates. A debate cell that hedges its own side wastes the slot.
+4. Don't soften your reading. If your value reads this as debt, say so
+   crisply. If your value reads this as justified, say so crisply. The
+   cell vote is rendered by a neutral observer at the end; you give
+   your honest take, the observer aggregates. A persona that hedges
+   to seem balanced wastes the slot.
 5. Never reference user values, team priorities, business framing,
    audience weights, product direction, or shipping goals. The panel is
    values-neutral by design. Argue the architecture. The report writer
    will frame the verdict for the audience downstream; you must not
    pre-frame it.
-6. Speak in your assigned persona's voice. Do not summarize the opposing
-   argument or pretend to be neutral. Your persona definition (in the
-   user-message tail of turn 1) describes what you champion and what
-   angers you — argue from that perspective consistently.
+6. Speak in your persona's voice the whole time. Do not summarize the
+   other persona's position or pretend to be neutral. Your persona
+   definition (in the user-message tail of turn 1) describes what you
+   champion and what angers you — read the evidence through that lens
+   consistently.
 7. Do not propose verdicts (HEALTHY, JUSTIFIED VIOLATION, STRUCTURAL
    DEBT, CRITICAL, DRIFTED, CONTESTED) in your debate turns. Those are
    the judge's decision after synthesizing the panel; you simply argue
@@ -329,19 +352,21 @@ impose. "FastAPI's 18-module cycle in fastapi.routing makes the
 routing layer impossible to extract for testing in isolation" is
 specific; "this is bad" is not.
 
-A strong Blue opening accepts the measured fact and contests its
-interpretation. "Yes, the cycle exists; here is the ergonomic gain
-it produces in the public API surface, and here is the migration
-cost that breaking it would impose" is engagement. "The cycle does
-not exist" is incoherent and will lose the cell.
+A strong opening that reads the evidence as "justified" accepts the
+measured fact and contests its interpretation through your value.
+"Yes, the cycle exists; from my perspective the ergonomic gain it
+produces in the public API surface outweighs the principle violation,
+and breaking it would impose a migration cost my value cares about"
+is engagement. "The cycle does not exist" is incoherent and will lose
+the cell.
 
-Strong rebuttals address the opponent's strongest specific claim,
-not their weakest. If Red cited a specific cost, Blue's rebuttal
-should engage that cost (refute it, contextualize it, weigh it
-against the gain). If Blue cited an ergonomic defence, Red's
-rebuttal should engage that defence (show the defence is weaker
-than claimed, or that the cost outweighs it). Rebuttals that
-change the subject signal a weak case.
+Strong rebuttals address the other persona's strongest specific claim,
+not their weakest. If the other persona cited a specific cost, engage
+that cost (refute it through your lens, contextualize it, weigh it
+against what your value sees). If they cited an ergonomic or
+historical defence, engage that defence (show why your value still
+reads the evidence the way it does). Rebuttals that change the
+subject signal a weak case.
 
 Closings should compress the debate into the single most decisive
 fact from your side. A good closing reads like a one-paragraph
@@ -352,20 +377,23 @@ the evidence shows, this is what it means, this is what to do.
 
 After the four debate turns, a neutral observer (still you, but
 stepping out of the persona) renders the cell's structured vote via
-the `submit_vote` tool. The vote has four required fields:
-`position` is "debt" if Red made the more compelling case and
-"justified" if Blue did — based on the strength of the arguments
-and the evidence, not on persuasive style. `confidence` is in
+the `submit_vote` tool. The vote has four required fields.
+`position` is "debt" when the debate's stronger arguments (from
+either persona) read this evidence as harmful or worth refactoring,
+and "justified" when they read it as defensible or worth keeping.
+When both personas converge on the same reading, that's a strong
+signal; when they diverge, pick the side whose argument was more
+specific and better-grounded in the evidence. `confidence` is in
 [0.0, 1.0]: 0.5 is a toss-up, 0.7 is "I am fairly sure", 0.9 is
 "the evidence is decisive". Inflated confidence is a common cell
 failure mode — calibrate honestly. `key_argument` is one sentence
-naming the single most decisive argument from either side; pick
-the argument a senior engineer would cite if asked to summarize
-the debate in one breath. `value_lens` is the cell's honest
-self-report of which of the six values (scalability,
+naming the single most decisive argument from either persona;
+pick the argument a senior engineer would cite if asked to
+summarize the debate in one breath. `value_lens` is the cell's
+honest self-report of which of the six values (scalability,
 maintainability, velocity, correctness, simplicity, flexibility)
 its conclusion rests on; not every value needs to be nonzero, and
-the lens should reflect what actually drove your reading, not what
+the lens should reflect what actually drove the reading, not what
 you imagine the team cares about.
 
 The value_lens is the substrate of the what-if probe: Forum can
@@ -419,21 +447,51 @@ cells whose arguments are mushy do not. Argue to be citable.
 
 # Persona archetypes you may be assigned
 
-The six Red personas (prosecution) are: Modularity Hawk (clean
-boundaries above all), Scale Skeptic (will this survive 10× growth),
-Correctness Zealot (failures live in untested branches), Simplicity
-Purist (every indirection has a future maintainer paying for it),
-Dependency Minimalist (every coupling is a migration cost paid
-silently), Legacy Cassandra (this pattern rhymes with past
-incidents).
+Six monomaniacal personas. Each one champions exactly one architectural
+value and is indifferent to the other five. They are pitted against
+each other in 10 hand-picked pairs where the two personas' values
+naturally pull in different directions.
 
-The six Blue personas (defence) are: Chesterton Preservationist
-(the fence exists for a reason you haven't seen), Pragmatic
-Defender (ship cost is a cost), Empirical Skeptic (show me the
-incident this caused), Migration Realist (the refactor cost
-includes the transition bugs you haven't budgeted for), Ergonomics
-Advocate (the public API surface is the product), Context Historian
-(the structure makes sense in the era it was built in).
+The six personas:
+
+- **The Simplifier**: cares only about simplicity. Less indirection,
+  fewer abstractions. Dead code, one-implementation wrappers, and
+  unused configuration knobs anger them. Indifferent to whether
+  removing the cleverness slows shipping or limits flexibility.
+
+- **The Shipper**: cares only about velocity. PR cycle time and how
+  fast a contributor can land a change. Refactors with high cost and
+  unclear payoff anger them. Indifferent to long-term maintainability
+  or scalability the system has never needed.
+
+- **The Maintainer**: cares only about maintainability. Ramp cost for
+  the next contributor, blast radius of any single change. Cleverness
+  that requires tribal knowledge angers them. Indifferent to raw
+  shipping speed and to minimalism for its own sake.
+
+- **The Verifier**: cares only about correctness. Exhaustive coverage,
+  defensive validation at boundaries, no implicit fall-through.
+  Cyclomatic complexity in boundary code angers them. Indifferent
+  to shipping speed and to whether the code is the simplest possible.
+
+- **The Scaler**: cares only about scalability. Surviving 10× growth
+  in load, team, and surface area. Coupling that prevents independent
+  deployment angers them. Indifferent to minimalism and to short-term
+  shipping cost.
+
+- **The Adapter**: cares only about flexibility. Modules that can be
+  lifted out cleanly when requirements change. High efferent coupling
+  and stable-on-unstable dependencies anger them. Indifferent to
+  raw simplicity and to current shipping speed.
+
+Each cell pits two of these against each other (Simplifier vs Shipper,
+Maintainer vs Adapter, Scaler vs Verifier, etc.). On a finding that
+clearly harms BOTH personas' values, they converge on "debt." On a
+finding that clearly serves BOTH personas' values, they converge on
+"justified." In the contested middle — where the finding helps one
+value and hurts another — they disagree, and the neutral vote-
+extractor picks the side whose argument was more specific and better-
+grounded in the evidence.
 
 Your assigned persona is named in the user-message tail of turn 1
 along with that persona's "champions", "angered_by", and
@@ -549,11 +607,12 @@ async def run_cell(
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Blue persona response prompt]"})
     transcript.append({"role": "assistant", "speaker": f"blue:{blue.id}", "text": blue_open})
 
-    # --- Turn 3: Red rebuts ---
+    # --- Turn 3: Persona A reacts to B's reading ---
     red_rebut_prompt = (
-        f"You are still **{red.name}**. Rebut the defence's strongest claim. "
-        f"Stay under 400 tokens. Cite at least one specific file path or "
-        f"metric. Do not concede ground."
+        f"You are still **{red.name}**. The other persona has given their reading. "
+        f"React to their strongest specific claim through your value's lens — "
+        f"either push back on it, or acknowledge where they have a point. "
+        f"Stay under 400 tokens. Cite at least one specific file path or metric."
     )
     turns_so_far += [
         {"role": "assistant", "text": blue_open},
@@ -570,11 +629,12 @@ async def run_cell(
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Red rebuttal prompt]"})
     transcript.append({"role": "assistant", "speaker": f"red:{red.id}", "text": red_rebut})
 
-    # --- Turn 4: Blue closes ---
+    # --- Turn 4: Persona B closes ---
     blue_close_prompt = (
-        f"You are still **{blue.name}**. Close the debate. Address Red's "
-        f"rebuttal directly and give your strongest final position. Stay "
-        f"under 400 tokens. Cite at least one specific file path or metric."
+        f"You are still **{blue.name}**. Close the debate. Address the other "
+        f"persona's reaction directly and give your final reading through your "
+        f"value's lens. Stay under 400 tokens. Cite at least one specific file "
+        f"path or metric."
     )
     turns_so_far += [
         {"role": "assistant", "text": red_rebut},
@@ -593,13 +653,16 @@ async def run_cell(
 
     # --- Turn 5: Vote extraction (neutral observer, tool-use only) ---
     vote_prompt = (
-        "The debate is closed. Step out of any persona and act as a "
-        "neutral observer. Use the `submit_vote` tool to record your "
-        "verdict — do not produce any free-form text.\n\n"
-        "Render the verdict on the strength of the arguments and the "
-        "evidence, not on persuasive style. For `value_lens`, report "
-        "honestly which of the six engineering values your conclusion "
-        "actually rests on; some may be near zero."
+        "The debate is closed. Step out of any persona and act as a neutral "
+        "observer. Use the `submit_vote` tool to record what the CELL "
+        "concluded — do not produce any free-form text.\n\n"
+        "If both personas converged on the same reading, that's the vote — "
+        "with high confidence proportional to how strongly they converged. "
+        "If they diverged, pick the side whose argument was more specific, "
+        "better-grounded in the evidence, and more honest about its lens. "
+        "For `value_lens`, report which of the six engineering values "
+        "actually drove the cell's conclusion; not every value needs to "
+        "be nonzero."
     )
     turns_so_far += [
         {"role": "assistant", "text": blue_close},
@@ -640,6 +703,16 @@ async def run_cell(
     # Fill any missing value_lens keys with 0.0 so probe.py and app.js see
     # identical 6-key dicts and salience() never silently drops a dimension.
     raw_lens = vote_data.get("value_lens", {}) or {}
+    # OpenAI-compatible providers (Wafer/Qwen) sometimes JSON-stringify nested
+    # objects inside tool arguments — outer parse returns a dict whose
+    # value_lens field is a string instead of a dict. Decode if needed.
+    if isinstance(raw_lens, str):
+        try:
+            raw_lens = json.loads(raw_lens)
+        except json.JSONDecodeError:
+            raw_lens = {}
+    if not isinstance(raw_lens, dict):
+        raw_lens = {}
     value_lens = {v: 0.0 for v in (
         "scalability", "maintainability", "velocity",
         "correctness", "simplicity", "flexibility",
@@ -651,12 +724,25 @@ async def run_cell(
             except (TypeError, ValueError):
                 pass  # keep 0.0; invalid entries shouldn't poison the cell
 
+    # Defensive coercion for confidence — Wafer/Qwen sometimes returns it
+    # as a string with whitespace or tag residue ("0.85", "0.85\n", etc.)
+    import re as _re
+    conf_raw = vote_data.get("confidence", 0.5)
+    if isinstance(conf_raw, str):
+        m = _re.search(r"[-+]?\d*\.?\d+", conf_raw)
+        conf_val = float(m.group()) if m else 0.5
+    else:
+        try:
+            conf_val = float(conf_raw)
+        except (TypeError, ValueError):
+            conf_val = 0.5
+
     return CellVote(
         cell_id=cell_id,
         red_persona=red.id,
         blue_persona=blue.id,
         position=position,
-        confidence=max(0.0, min(1.0, float(vote_data.get("confidence", 0.5)))),
+        confidence=max(0.0, min(1.0, conf_val)),
         key_argument=str(vote_data.get("key_argument", "(missing)")),
         value_lens=value_lens,
         transcript=transcript,
