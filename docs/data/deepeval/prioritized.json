@@ -1,0 +1,57 @@
+{
+  "values": {
+    "simplicity": 1.0,
+    "velocity": 1.0,
+    "maintainability": 1.0,
+    "correctness": 1.0,
+    "scalability": 1.0,
+    "flexibility": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "7a0630119a",
+      "principle": "P1",
+      "subject": "Dependency cycle across 173 modules: deepeval \u2192 api \u2192 types \u2192 contextvars\u2026",
+      "structural_score": 0.7,
+      "value_affinity_score": 0.3333,
+      "composite_score": 0.8167,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "e36b42f9c1",
+      "principle": "P2",
+      "subject": "Stable module deepeval.models depends on unstable module deepeval.models.llms (SDP violation)",
+      "structural_score": 0.6791,
+      "value_affinity_score": 0.2833,
+      "composite_score": 0.7753,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "8c6b4dc054",
+      "principle": "P2",
+      "subject": "Stable module deepeval.dataset depends on unstable module deepeval.dataset.dataset (SDP violation)",
+      "structural_score": 0.6733,
+      "value_affinity_score": 0.2833,
+      "composite_score": 0.7686,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "4b160792c0",
+      "principle": "P2",
+      "subject": "Stable module deepeval.scorer depends on unstable module deepeval.scorer.scorer (SDP violation)",
+      "structural_score": 0.6689,
+      "value_affinity_score": 0.2833,
+      "composite_score": 0.7636,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "b5b5d17668",
+      "principle": "P6",
+      "subject": "Layering violation: deepeval.models._summac_model (layer 9) imports deepeval (layer 0)",
+      "structural_score": 0.64,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.7627,
+      "rank": 5
+    }
+  ]
+}

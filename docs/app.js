@@ -162,6 +162,46 @@ const PRESETS = {
   },
 };
 
+// --- live-audit tracker (set when the new-audit modal kicks off a job) ---
+// Used by handleEvent so server-streamed `tribunal_complete` events can
+// re-fetch and re-render the audit-in-progress without the user clicking.
+let currentRunningSlug = null;
+let _liveRefreshPending = null; // simple debouncer
+
+async function liveRefreshAudit(slug) {
+  // Debounce: many tribunal_complete events arriving back-to-back collapse
+  // into one refresh. ~250ms is short enough to feel live, long enough to
+  // avoid hammering loadAudit while the server's still copying files.
+  if (_liveRefreshPending) return;
+  _liveRefreshPending = setTimeout(async () => {
+    _liveRefreshPending = null;
+    try {
+      // Make sure the manifest has this slug — if the audit hasn't been
+      // published yet, inject a temporary entry so loadAudit can find it.
+      if (!state.manifest.audits.find((a) => a.slug === slug)) {
+        state.manifest.audits.push({
+          slug,
+          label: slug,
+          version: "live",
+          language: "python",
+          source: "(in-progress audit)",
+          commit: "live",
+          note: "Audit running — verdicts appear as each finding's debate concludes.",
+        });
+        renderAuditSwitcher();
+      }
+      // Only re-render if the user is already on this slug (don't yank them
+      // mid-browse). If they're elsewhere, the pill will switch to this on
+      // SSE 'done' anyway.
+      if (state.activeSlug === slug) {
+        await loadAudit(slug);
+      }
+    } catch (e) {
+      console.error("liveRefreshAudit failed:", e);
+    }
+  }, 250);
+}
+
 // --- shared state ---
 const state = {
   manifest: null,
@@ -312,12 +352,25 @@ async function loadAudit(slug) {
   state.activePreset = "baseline";
 
   // Refresh everything (each view reads from state, switching just shows it).
-  renderTopBar(entry);
-  renderEvidence();
-  renderPrioritization(); // also rebuilds sliders + presets
-  renderJury();
-  renderBriefing();
-  renderFooterStatus(entry);
+  // Each step is wrapped so one bad render doesn't blank the others — the
+  // console error names which view crashed and on what data.
+  const safe = (label, fn) => {
+    try {
+      fn();
+    } catch (e) {
+      console.error(`render(${label}) failed for "${slug}":`, e, {
+        evidence,
+        prioritized,
+        verdicts,
+      });
+    }
+  };
+  safe("topBar", () => renderTopBar(entry));
+  safe("evidence", () => renderEvidence());
+  safe("prioritization", () => renderPrioritization());
+  safe("jury", () => renderJury());
+  safe("briefing", () => renderBriefing());
+  safe("footerStatus", () => renderFooterStatus(entry));
   switchView(state.activeView);
 }
 
@@ -362,16 +415,78 @@ function renderAuditSwitcher() {
   root.innerHTML = "";
   for (const entry of state.manifest.audits) {
     const btn = document.createElement("div");
-    btn.className = "audit-pill";
+    btn.className = "audit-pill group";
     btn.dataset.slug = entry.slug;
     btn.innerHTML = `
-      <span>${escapeHtml(entry.label)}</span>
-      <span class="lang lang-${entry.language}">${entry.language}</span>`;
+      <span class="flex-1 min-w-0 truncate">${escapeHtml(entry.label)}</span>
+      <span class="lang lang-${entry.language}">${entry.language}</span>
+      <button class="audit-pill-delete opacity-0 group-hover:opacity-100 hover:text-error transition-opacity"
+              title="Delete this audit"
+              data-slug="${escapeHtml(entry.slug)}">
+        <span class="material-symbols-outlined text-[14px] align-middle">close</span>
+      </button>`;
     btn.title = `${entry.source} @ ${entry.commit}\n\n${entry.note}`;
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      // Don't switch audits when the ✕ inside the pill was clicked.
+      if (e.target.closest(".audit-pill-delete")) return;
       if (state.activeSlug !== entry.slug) loadAudit(entry.slug);
     });
+    btn.querySelector(".audit-pill-delete").addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteAudit(entry);
+    });
     root.appendChild(btn);
+  }
+}
+
+async function deleteAudit(entry) {
+  if (!state.liveMode) {
+    alert(
+      `Delete requires the live backend (server.py) — this page is currently ` +
+        `in static mode and can only read files. Configure a backend URL in Settings to enable delete.`,
+    );
+    return;
+  }
+  if (
+    !confirm(
+      `Delete audit "${entry.label}"?\n\nThis removes docs/data/${entry.slug}/ from disk and the entry from manifest.json. Cannot be undone.`,
+    )
+  ) {
+    return;
+  }
+  let res;
+  try {
+    res = await apiFetch(`/api/audits/${encodeURIComponent(entry.slug)}`, {
+      method: "DELETE",
+    });
+  } catch (err) {
+    alert(`Couldn't reach the backend: ${err.message}`);
+    return;
+  }
+  if (!res.ok) {
+    const msg = (await res.json().catch(() => ({}))).detail || res.statusText;
+    alert(`Delete refused: ${msg}`);
+    return;
+  }
+
+  // Refresh manifest + sidebar. If the deleted slug was the active one,
+  // switch to whatever's left (or show a hint if the manifest is now empty).
+  try {
+    const mres = await fetch("data/manifest.json", { cache: "no-store" });
+    state.manifest = await mres.json();
+  } catch (err) {
+    alert(`Deleted, but couldn't reload manifest: ${err.message}`);
+    return;
+  }
+  renderAuditSwitcher();
+  if (state.activeSlug === entry.slug) {
+    const fallback = state.manifest.default || state.manifest.audits[0]?.slug;
+    if (fallback) {
+      await loadAudit(fallback);
+    } else {
+      document.body.innerHTML = `<div style="padding:40px;color:#919094;font-family:sans-serif;text-align:center">
+        <h2>No audits left.</h2><p>Run a new audit via the CLI or the live backend.</p></div>`;
+    }
   }
 }
 
@@ -423,39 +538,58 @@ function switchView(view) {
   document
     .querySelectorAll(".nav-item")
     .forEach((a) => a.classList.toggle("active", a.dataset.view === view));
+
+  // Re-build the 3D dependency graph when switching INTO Evidence. The
+  // original build in loadAudit() runs while Evidence may still be hidden,
+  // so the canvas initializes at 0×0. Rebuilding here guarantees the
+  // container has real dimensions before Three.js sizes itself.
+  if (view === "evidence" && state.graphJson) {
+    // requestAnimationFrame waits for the browser to apply the un-hide
+    // and recompute layout, so clientWidth/Height are non-zero.
+    requestAnimationFrame(() => {
+      try {
+        renderDependencyGraph();
+      } catch (e) {
+        console.error("graph rebuild failed:", e);
+      }
+    });
+  }
 }
 
 function wireButtons() {
   // Top-bar WHAT-IF → jump to Prioritization
   document
     .getElementById("btn-whatif")
-    .addEventListener("click", () => switchView("prioritization"));
+    ?.addEventListener("click", () => switchView("prioritization"));
   // Top-bar download icon → download report.md
   document
     .getElementById("btn-download")
-    .addEventListener("click", downloadReport);
+    ?.addEventListener("click", downloadReport);
   // Sidebar EXPORT REPORT
   document
     .getElementById("btn-export")
-    .addEventListener("click", downloadReport);
-  // Footer DOWNLOAD_BUNDLE
+    ?.addEventListener("click", downloadReport);
+  // Footer DOWNLOAD_BUNDLE — footer was removed; null-guard so wireButtons
+  // doesn't throw and kill the rest of init() (including wireAuditModal).
   document
     .getElementById("btn-bundle")
-    .addEventListener("click", downloadBundle);
+    ?.addEventListener("click", downloadBundle);
   // Jury jump-to-action
-  document.getElementById("btn-scroll-action").addEventListener("click", () => {
-    switchView("briefing");
-    setTimeout(() => {
-      const el = document.querySelector("#brief-verbatims");
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 80);
-  });
+  document
+    .getElementById("btn-scroll-action")
+    ?.addEventListener("click", () => {
+      switchView("briefing");
+      setTimeout(() => {
+        const el = document.querySelector("#brief-verbatims");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    });
   // Reset sliders to baseline
   document
     .getElementById("btn-reset")
-    .addEventListener("click", () => applyPreset("baseline"));
+    ?.addEventListener("click", () => applyPreset("baseline"));
   // Copy report markdown to clipboard for pasting into an agent
-  document.getElementById("btn-copy-agent").addEventListener("click", () => {
+  document.getElementById("btn-copy-agent")?.addEventListener("click", () => {
     const md = state.reportMd;
     if (!md) return;
     navigator.clipboard.writeText(md).then(() => {
@@ -516,6 +650,37 @@ function renderEvidence() {
   const e = state.evidence;
   document.getElementById("ev-language").textContent =
     `${e.decision_points.length} findings · ${(e.git_summary?.commit_sha || "").slice(0, 8) || "no-git"}`;
+
+  // Empty-audit callout: when Layer 1 found nothing, the user sees a blank UI
+  // unless we explain why. Most common causes are non-Python/C repos or all
+  // source under a directory Forum skips (tests/, docs/, scripts/, …).
+  const gs = e.graph_summary || {};
+  if (e.decision_points.length === 0 || (gs.num_modules || 0) === 0) {
+    document.getElementById("ev-metrics").innerHTML = `
+      <div class="bg-error/10 border border-error/40 p-4 rounded">
+        <div class="font-label-caps text-label-caps text-error mb-2">NO FINDINGS</div>
+        <p class="text-[12px] text-on-surface leading-relaxed">
+          Forum walked this repo but found nothing to audit. Three usual causes:
+        </p>
+        <ul class="text-[12px] text-on-surface-variant mt-2 space-y-1 list-disc list-inside leading-snug">
+          <li>The repo has no <code>.py</code> or <code>.c</code> files (Forum is Python + C only — TypeScript / JS / notebooks are skipped).</li>
+          <li>All source lives under a skipped directory: <code>tests</code>, <code>docs</code>, <code>scripts</code>, <code>examples</code>, <code>build</code>, <code>vendor</code>, <code>node_modules</code>, etc.</li>
+          <li>No top-level Python package (no folder with an <code>__init__.py</code>) and no <code>src/</code> dir for C.</li>
+        </ul>
+        <p class="text-[11px] text-on-surface-variant opacity-70 mt-3">
+          Try another repo, or relax Forum's <code>SKIP_DIRS</code> in <code>src/forum/evidence/utils.py</code>.
+        </p>
+      </div>`;
+    document.getElementById("ev-telemetry").innerHTML = `
+      <div class="flex justify-between"><span>Files analyzed</span><span class="text-error">0</span></div>
+      <div class="flex justify-between"><span>Imports between files</span><span class="text-error">0</span></div>
+      <div class="flex justify-between"><span>Top-level packages</span><span class="text-error">0</span></div>`;
+    document.getElementById("ev-graph-stats").textContent = "no graph";
+    const wrap = document.getElementById("ev-graph-wrap");
+    if (wrap)
+      wrap.innerHTML = `<div style="padding:48px;color:#919094;text-align:center">No dependency graph — Layer 1 found no source files to analyze.</div>`;
+    return;
+  }
 
   // Metric cards from real Layer 1 data
   const principlesFound = new Set(e.decision_points.map((d) => d.principle));
@@ -593,8 +758,7 @@ function renderEvidence() {
 
   document.getElementById("ev-metrics").innerHTML = metricsHtml.join("");
 
-  // Telemetry pane (plain-English labels)
-  const gs = e.graph_summary || {};
+  // Telemetry pane (plain-English labels) — `gs` already declared at top of fn.
   document.getElementById("ev-telemetry").innerHTML = `
     <div class="flex justify-between"><span>Files analyzed</span><span class="text-primary">${gs.num_modules ?? "?"}</span></div>
     <div class="flex justify-between"><span>Imports between files</span><span class="text-primary">${gs.num_edges ?? "?"}</span></div>
@@ -1138,7 +1302,7 @@ function renderJury() {
         </div>
         <div class="font-body-lg text-on-surface leading-tight">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
         <div class="text-[11px] text-on-surface-variant opacity-70 mt-2">
-          Below: 10 debate pairs argued from their own value perspectives. Each card is one pairing.
+          Below: 15 debate pairs argued from their own value perspectives. Each card is one pairing.
         </div>
       </div>`;
     root.appendChild(header);
@@ -1319,7 +1483,7 @@ function renderCellCard(c, opts = {}) {
       <div class="flex justify-between items-start mb-3 gap-3">
         <div class="min-w-0">
           <div class="font-headline-sm text-on-surface leading-tight"
-               title="Debate ${c.cell_id + 1} of 10. Each persona cares about exactly one engineering value and argues from that perspective.">
+               title="Debate ${c.cell_id + 1} of 15. Each persona cares about exactly one engineering value and argues from that perspective.">
             <span title="${escapeHtml(aInfo.name)} — cares only about ${escapeHtml(aInfo.value)}">
               ${dot(aInfo.color)} <span style="color:${aInfo.color}">${escapeHtml(aInfo.name)}</span>
             </span>
@@ -1410,7 +1574,7 @@ function renderJuryAggregates() {
     line.innerHTML = `
       <div class="bg-surface-container-low border border-outline-variant/40 p-3 rounded">
         <div class="mb-1">
-          <span class="text-on-surface-variant">What the 10 pairs decided:</span>
+          <span class="text-on-surface-variant">What the 15 pairs decided:</span>
           <b class="text-[#fb923c]">${dCount} said PROBLEM</b>
           ·
           <b class="text-[#4ade80]">${jCount} said FINE</b>
@@ -1861,6 +2025,24 @@ function wireAuditModal() {
   };
 
   const handleEvent = (ev) => {
+    // Live-publish: when the CLI streams a tribunal_complete event, the
+    // server has just copied a partial verdicts.json into docs/data/<slug>/.
+    // Re-fetch and re-render that audit's views in the background so the
+    // user watches findings populate as they're decided.
+    if (
+      ev.t === "tribunal_complete" ||
+      ev.t === "layer1_done" ||
+      ev.t === "layer3_done"
+    ) {
+      const slug = currentRunningSlug;
+      if (slug) {
+        // Already viewing this slug? Just re-render. Not viewing? Add to
+        // the switcher so they CAN view it mid-flight.
+        liveRefreshAudit(slug);
+      }
+      return;
+    }
+
     const cell = ev.cell || {};
     const turn = ev.turn || {};
     const dpId = cell.dp_id;
@@ -1965,6 +2147,29 @@ function wireAuditModal() {
       return;
     }
     const { job_id, slug } = await res.json();
+
+    // Track the slug the live-audit is writing to so handleEvent() knows
+    // whose docs/data/<slug>/ to re-fetch when partial events fire.
+    currentRunningSlug = slug;
+
+    // Pre-add the slug to the switcher (as a placeholder) and switch the
+    // main views to it RIGHT NOW. The user can watch Evidence, Jury, and
+    // Briefing populate live as each phase completes — much more dramatic
+    // than staring at the modal log.
+    if (!state.manifest.audits.find((a) => a.slug === slug)) {
+      state.manifest.audits.push({
+        slug,
+        label: slug,
+        version: "live",
+        language: "python",
+        source: "(in-progress audit)",
+        commit: "live",
+        note: "Audit running — phases appear as they complete.",
+      });
+      renderAuditSwitcher();
+    }
+    state.activeSlug = slug;
+    markAuditActive(slug);
 
     form.classList.add("hidden");
     logWrap.classList.remove("hidden");

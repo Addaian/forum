@@ -33,7 +33,7 @@ log = logging.getLogger("forum.jury.parallel")
 async def run_tribunal(
     *,
     decision_point: DecisionPoint,
-    num_cells: int = 10,
+    num_cells: int = 15,
     codebase_summary: str = "",
     git_summary: str = "",
     model: str = HAIKU,

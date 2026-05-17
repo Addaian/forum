@@ -1,0 +1,30 @@
+{
+  "values": {
+    "correctness": 1.0,
+    "scalability": 1.0,
+    "simplicity": 1.0,
+    "flexibility": 1.0,
+    "velocity": 1.0,
+    "maintainability": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "faab999dd4",
+      "principle": "P4",
+      "subject": "Class model.module.RotaryPositionalEmbedding has low cohesion (LCOM \u2248 0.83)",
+      "structural_score": 0.4667,
+      "value_affinity_score": 0.4167,
+      "composite_score": 0.5639,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "99d0181bd8",
+      "principle": "P3",
+      "subject": "Function model.kronos.predict_batch has cyclomatic complexity 18",
+      "structural_score": 0.2892,
+      "value_affinity_score": 0.6,
+      "composite_score": 0.376,
+      "rank": 2
+    }
+  ]
+}

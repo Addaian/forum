@@ -20,9 +20,8 @@ PERSONA_POOL: tuple[str, ...] = (
     "simplifier", "shipper", "maintainer", "verifier", "scaler", "adapter",
 )
 
-# Hand-picked tension pairs. 10 of the 15 possible unordered pairs (6C2=15).
-# Skipped pairs (low tension, redundant): (maintainer,verifier),
-# (maintainer,scaler), (adapter,scaler), (adapter,shipper), (verifier,scaler).
+# All 15 unordered pairs from 6 personas (6C2=15). High-tension pairs first,
+# lower-tension pairs at the end so early cells always get the sharpest debates.
 PAIRINGS: tuple[tuple[str, str], ...] = (
     ("simplifier",  "shipper"),     # minimalism vs ship-now
     ("maintainer",  "shipper"),     # long-term care vs short-term ship
@@ -34,6 +33,11 @@ PAIRINGS: tuple[tuple[str, str], ...] = (
     ("simplifier",  "maintainer"),  # minimalism vs explicit cohesion
     ("scaler",      "simplifier"),  # extract for scale vs uniform shape
     ("scaler",      "verifier"),    # extract for scale vs hold the seams
+    ("maintainer",  "verifier"),    # cohesion discipline vs test coverage
+    ("maintainer",  "scaler"),      # careful layering vs extract-for-scale
+    ("adapter",     "scaler"),      # swappable seams vs performance headroom
+    ("adapter",     "shipper"),     # configurability vs ship-now
+    ("verifier",    "scaler"),      # correctness guarantees vs scale extraction
 )
 
 
@@ -47,7 +51,7 @@ def pairings(num_cells: int) -> list[tuple[str, str]]:
     return [pair_for(i) for i in range(num_cells)]
 
 
-def cell_temperature(cell_index: int, num_cells: int = 10,
+def cell_temperature(cell_index: int, num_cells: int = 15,
                      lo: float = 0.5, hi: float = 0.9) -> float:
     """Linear temperature ramp; cell 0 → lo, cell (num_cells-1) → hi."""
     if num_cells <= 1:
