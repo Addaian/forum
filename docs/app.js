@@ -1541,7 +1541,7 @@ function renderCellCard(c, opts = {}) {
       <div class="flex justify-between items-start mb-3 gap-3">
         <div class="min-w-0">
           <div class="font-headline-sm text-on-surface leading-tight"
-               title="Debate ${c.cell_id + 1} of 15. Each persona cares about exactly one engineering value and argues from that perspective.">
+               title="Debate ${c.cell_id + 1} of ${cells.length}. Each persona cares about exactly one engineering value and argues from that perspective.">
             <span title="${escapeHtml(aInfo.name)} — cares only about ${escapeHtml(aInfo.value)}">
               ${dot(aInfo.color)} <span style="color:${aInfo.color}">${escapeHtml(aInfo.name)}</span>
             </span>
@@ -1632,7 +1632,7 @@ function renderJuryAggregates() {
     line.innerHTML = `
       <div class="bg-surface-container-low border border-outline-variant/40 p-3 rounded">
         <div class="mb-1">
-          <span class="text-on-surface-variant">What the 15 pairs decided:</span>
+          <span class="text-on-surface-variant">What the ${cells.length} pairs decided:</span>
           <b class="text-[#fb923c]">${dCount} said PROBLEM</b>
           ·
           <b class="text-[#4ade80]">${jCount} said FINE</b>
