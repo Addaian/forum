@@ -49,27 +49,35 @@ JUDGE_TOOL = {
             "reasoning": {
                 "type": "string",
                 "description": (
-                    "A paragraph (3–6 sentences) synthesizing the panel's "
-                    "deliberation. MUST cite at least two cells by numeric "
-                    "ID (e.g., 'cell 3', 'cell 7') and at least one piece "
-                    "of Layer 1 evidence by file path, line range, or "
-                    "measured metric value."
+                    "2-3 bullet points. Format EXACTLY: '• <bullet text>\\n• "
+                    "<next bullet>'. Each bullet ≤15 words, starts with a "
+                    "verb or noun, no preamble. Collectively cite ≥2 cells "
+                    "by numeric ID (e.g., 'cell 3', 'cell 7') and ≥1 piece "
+                    "of Layer 1 evidence (file path, line, or metric). "
+                    "Example: '• Cell 3 and cell 7 cite a 15-edge cycle in "
+                    "auth/.\\n• Layer 1 metric: SCC size 12.\\n• Cycle "
+                    "blocks isolated extraction of auth.session.'"
                 ),
             },
             "dissent_summary": {
                 "type": "string",
                 "description": (
-                    "The strongest argument from the losing side, in one "
-                    "or two sentences. Required even if you agree with the "
-                    "majority."
+                    "1-2 bullet points naming the strongest losing argument(s). "
+                    "Format: '• <bullet>\\n• <next>'. Each ≤15 words. "
+                    "Required even if you agree with the majority. State the "
+                    "claim, don't contrast it."
                 ),
             },
             "recommended_action": {
                 "type": "string",
                 "description": (
-                    "Concrete next step naming WHAT, WHERE (file/module), "
-                    "and roughly HOW LARGE the change is. 'Refactor this' "
-                    "is not acceptable."
+                    "1-3 bullet points. Format: '• <bullet>\\n• <next>'. "
+                    "Each bullet starts with a verb. Name WHAT, WHERE "
+                    "(file/module), and HOW LARGE (e.g., '~50 LOC', "
+                    "'one PR'). Example: '• Extract fastapi/protocols.py "
+                    "(~80 LOC).\\n• Make routing and dependencies depend on "
+                    "it one-way.\\n• Delete the back-edges from "
+                    "params.py.' 'Refactor this' is unacceptable."
                 ),
             },
             "override": {
@@ -151,7 +159,7 @@ async def run_judge(
     cells: list[CellVote],
     pc: PromptCache | None = None,
     model: str = SONNET,
-    max_tokens: int = 1500,
+    max_tokens: int = 600,
     temperature: float = 0.3,
 ) -> dict:
     """Synthesize one panel into one verdict. Returns a dict ready to drop

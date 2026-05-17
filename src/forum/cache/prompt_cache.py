@@ -22,7 +22,9 @@ never appear in any segment passed through this wrapper.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
+import os
 import time
 from dataclasses import dataclass, field
 from typing import Any, Sequence
@@ -126,10 +128,41 @@ class PromptCache:
     constructing). Carries a CacheMetrics aggregator that every call updates.
     """
 
-    def __init__(self, model: str = HAIKU) -> None:
+    def __init__(self, model: str = HAIKU,
+                 max_concurrent: int | None = None,
+                 min_interval_s: float | None = None) -> None:
         self.client = AsyncAnthropic()
         self.default_model = model
         self.metrics = CacheMetrics()
+
+        # Throttling. Anthropic Tier-1 caps at 50 RPM and 50K ITPM on Sonnet;
+        # with --top-n=0 we fan out N judge calls concurrently and instantly
+        # hit 429. Two knobs:
+        #   * max_concurrent — cap simultaneous in-flight requests
+        #   * min_interval_s — minimum gap between successive request starts
+        # Override via env: ANTHROPIC_MAX_CONCURRENT, ANTHROPIC_MIN_INTERVAL_S.
+        # Defaults: 4 concurrent, 1.0s gap → max ~60 RPM, comfortably under cap.
+        if max_concurrent is None:
+            max_concurrent = int(os.environ.get("ANTHROPIC_MAX_CONCURRENT", "4"))
+        if min_interval_s is None:
+            min_interval_s = float(os.environ.get("ANTHROPIC_MIN_INTERVAL_S", "1.0"))
+        self._sem = asyncio.Semaphore(max(1, max_concurrent))
+        self._min_interval_s = max(0.0, min_interval_s)
+        self._pacer_lock = asyncio.Lock()
+        self._last_dispatch_ts = 0.0
+
+    async def _pace(self) -> None:
+        """Block until at least `min_interval_s` has elapsed since the last
+        dispatch. Held under a lock so concurrent callers serialize their
+        pacing decisions instead of all reading the same stale timestamp."""
+        if self._min_interval_s <= 0:
+            return
+        async with self._pacer_lock:
+            now = time.perf_counter()
+            wait = self._min_interval_s - (now - self._last_dispatch_ts)
+            if wait > 0:
+                await asyncio.sleep(wait)
+            self._last_dispatch_ts = time.perf_counter()
 
     async def call(
         self,
@@ -303,12 +336,14 @@ class PromptCache:
         return "anthropic"
 
     async def _send(self, kwargs: dict) -> Any:
-        t0 = time.perf_counter()
-        if fevents.is_active():
-            msg = await self._send_streaming(kwargs)
-        else:
-            msg = await self.client.messages.create(**kwargs)
-        dt = time.perf_counter() - t0
+        async with self._sem:
+            await self._pace()
+            t0 = time.perf_counter()
+            if fevents.is_active():
+                msg = await self._send_streaming(kwargs)
+            else:
+                msg = await self.client.messages.create(**kwargs)
+            dt = time.perf_counter() - t0
 
         u = msg.usage
         in_t = getattr(u, "input_tokens", 0) or 0

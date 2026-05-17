@@ -1,5 +1,5 @@
 {
-  "repo": "/private/var/folders/zd/s7jl32v96ys2vvr589y26gqr0000gn/T/forum-shadowbroker-whrd_zub/repo",
+  "repo": "/private/var/folders/zd/s7jl32v96ys2vvr589y26gqr0000gn/T/forum-shadowbroker-ptxgbrns/repo",
   "commit_sha": "25a98a9869c73d06c6c681b25e9c3838f796a1d0",
   "decision_points": [
     {
@@ -63,16 +63,16 @@
         "scc_size": 7,
         "cycle_edges": [
           [
-            "services.mesh.mesh_wormhole_contacts",
-            "services.mesh.mesh_wormhole_dead_drop"
+            "services.mesh.mesh_wormhole_root_transparency",
+            "services.mesh.mesh_wormhole_root_manifest"
           ],
           [
-            "services.mesh.mesh_wormhole_dead_drop",
+            "services.mesh.mesh_wormhole_root_manifest",
             "services.mesh.mesh_wormhole_identity"
           ],
           [
             "services.mesh.mesh_wormhole_identity",
-            "services.mesh.mesh_wormhole_contacts"
+            "services.mesh.mesh_wormhole_root_transparency"
           ]
         ],
         "total_internal_edges_within_scc": 19
@@ -146,12 +146,16 @@
         "scc_size": 5,
         "cycle_edges": [
           [
+            "services.openclaw_watchdog",
+            "routers.ai_intel"
+          ],
+          [
             "routers.ai_intel",
             "services.openclaw_channel"
           ],
           [
             "services.openclaw_channel",
-            "routers.ai_intel"
+            "services.openclaw_watchdog"
           ]
         ],
         "total_internal_edges_within_scc": 9
@@ -209,16 +213,16 @@
         "scc_size": 3,
         "cycle_edges": [
           [
-            "services.infonet.markets.resolution",
-            "services.infonet.bootstrap"
-          ],
-          [
             "services.infonet.bootstrap",
             "services.infonet.bootstrap.eligibility"
           ],
           [
             "services.infonet.bootstrap.eligibility",
             "services.infonet.markets.resolution"
+          ],
+          [
+            "services.infonet.markets.resolution",
+            "services.infonet.bootstrap"
           ]
         ],
         "total_internal_edges_within_scc": 3
@@ -373,12 +377,12 @@
         "scc_size": 2,
         "cycle_edges": [
           [
-            "services.mesh.mesh_rns",
-            "services.mesh.mesh_hashchain"
-          ],
-          [
             "services.mesh.mesh_hashchain",
             "services.mesh.mesh_rns"
+          ],
+          [
+            "services.mesh.mesh_rns",
+            "services.mesh.mesh_hashchain"
           ]
         ],
         "total_internal_edges_within_scc": 2
@@ -426,12 +430,12 @@
         "scc_size": 2,
         "cycle_edges": [
           [
-            "services.wormhole_supervisor",
-            "services.mesh.mesh_router"
-          ],
-          [
             "services.mesh.mesh_router",
             "services.wormhole_supervisor"
+          ],
+          [
+            "services.wormhole_supervisor",
+            "services.mesh.mesh_router"
           ]
         ],
         "total_internal_edges_within_scc": 2

@@ -10,16 +10,26 @@ import hashlib
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# Skip dirs every language wants to exclude. Per-language extensions are added
-# on top in each Language subclass.
-BASE_SKIP_DIRS = {
+# Always-skip: structurally mandatory excludes (build artifacts, vendor dirs,
+# cache dirs). Scanning these is never useful and often catastrophic (size).
+MANDATORY_SKIP_DIRS = {
     ".git", ".venv", "venv", "env", "__pycache__", ".pytest_cache",
-    ".ruff_cache", ".mypy_cache", ".mypy_cache", "node_modules",
+    ".ruff_cache", ".mypy_cache", "node_modules",
     "dist", "build", "site-packages", ".tox", ".eggs",
-    # Demo/example/test/doc dirs — almost always noise for an architecture audit.
+}
+
+# Soft-skip: noise dirs for a typical library audit (where the interesting
+# code is in src/, not in tests/examples/scripts). The strict scan excludes
+# these; if the strict scan finds zero files, the language detector falls
+# back to MANDATORY_SKIP_DIRS only and warns. This handles repos whose
+# primary content IS scripts/examples (cookbooks, plugin collections).
+SOFT_SKIP_DIRS = {
     "tests", "test", "docs", "doc", "docs_src", "scripts", "examples",
     "example", "samples", "sample",
 }
+
+# Default skip set: strict (excludes both mandatory and soft).
+BASE_SKIP_DIRS = MANDATORY_SKIP_DIRS | SOFT_SKIP_DIRS
 
 
 @dataclass

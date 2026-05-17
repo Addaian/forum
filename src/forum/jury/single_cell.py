@@ -589,6 +589,13 @@ async def run_cell(
         max_tokens=max_turn_tokens,
     )
     red_open = pc.extract_text(msg)
+    # Empty turn output → vote extraction would get garbage. Raise to trigger
+    # the speculative retry loop instead of silently feeding "" to Blue.
+    if not red_open or not red_open.strip():
+        raise RuntimeError(
+            f"cell {cell_id}: Red turn produced empty content (likely Wafer "
+            f"returned null content or hit finish_reason=length on turn 1)."
+        )
     fevents.emit("turn_end", text=red_open)
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Red persona opening prompt]"})
     transcript.append({"role": "assistant", "speaker": f"red:{red.id}", "text": red_open})
@@ -609,6 +616,11 @@ async def run_cell(
         max_tokens=max_turn_tokens,
     )
     blue_open = pc.extract_text(msg)
+    if not blue_open or not blue_open.strip():
+        raise RuntimeError(
+            f"cell {cell_id}: Blue turn produced empty content (likely Wafer "
+            f"returned null content or hit finish_reason=length on turn 2)."
+        )
     fevents.emit("turn_end", text=blue_open)
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Blue persona response prompt]"})
     transcript.append({"role": "assistant", "speaker": f"blue:{blue.id}", "text": blue_open})
@@ -640,10 +652,13 @@ async def run_cell(
         user_cached_prefix=user_cached,
         turns=turns_so_far,
         temperature=0.2,  # vote should be steady; lower temperature
-        # 1500 not 400: Qwen / OpenAI-style models often emit reasoning
-        # text before the tool call; the small JSON of submit_vote itself
-        # is ~200 tokens, so we need budget for both.
-        max_tokens=1500,
+        # 3000 not 1500: Qwen reasoning models on Wafer routinely emit 2000+
+        # tokens of CoT before the tool call. At 1500 we hit finish_reason=
+        # "length" and extract_tool_input raises "Wafer did not call tool",
+        # which empirically was the dominant cause of the 13/15 cell-failure
+        # rate. Anthropic Haiku doesn't need this much budget but eats only
+        # what it emits, so the ceiling is harmless there.
+        max_tokens=3000,
         tools=[VOTE_TOOL],
         tool_choice={"type": "tool", "name": "submit_vote"},
     )
@@ -654,14 +669,28 @@ async def run_cell(
 
     # Defensive normalization — Anthropic tool-use enum is advisory, not
     # enforced server-side, and Wafer/Qwen sometimes returns variants like
-    # "Debt", "STRUCTURAL_DEBT", "debt.", etc. Map them to the strict literal
-    # before Pydantic validates.
+    # "Debt", "STRUCTURAL_DEBT", "debt.", and reasoning-leak terms like
+    # "uncertain", "split", "either". Map cleanly where we can; for genuine
+    # ambiguity, degrade to a low-confidence "justified" (the conservative
+    # default — don't accuse code of debt without a clear signal) rather
+    # than killing the whole cell.
     raw_pos = str(vote_data.get("position", "")).strip().lower()
     raw_pos = raw_pos.replace("_", " ").rstrip(".")
-    if raw_pos.startswith("just"):              # "justified", "justified violation"
+    if raw_pos.startswith("just") or raw_pos in {"healthy", "fine", "ok"}:
         position = "justified"
-    elif raw_pos.startswith("debt") or "debt" in raw_pos:
+    elif raw_pos.startswith("debt") or "debt" in raw_pos or raw_pos in {
+        "structural", "violation", "critical", "drifted",
+    }:
         position = "debt"
+    elif raw_pos in {"unclear", "uncertain", "split", "either",
+                     "contested", "ambiguous", "mixed", "", "none"}:
+        log.warning("cell %d: ambiguous vote position %r — degrading to "
+                    "low-confidence 'justified'", cell_id, raw_pos)
+        position = "justified"
+        # Force confidence down so the aggregator doesn't weight this cell.
+        vote_data["confidence"] = min(
+            float(vote_data.get("confidence", 0.5) or 0.5), 0.3,
+        )
     else:
         raise RuntimeError(
             f"cell {cell_id}: unrecognized vote position "

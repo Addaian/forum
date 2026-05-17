@@ -167,9 +167,9 @@
           WHAT-IF
         </button>
         <button
-          class="px-4 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps font-bold opacity-50 cursor-not-allowed"
+          class="px-4 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps font-bold opacity-50 cursor-not-allowed transition-opacity"
           id="btn-rerun"
-          title="This page is a static cache. To run a fresh audit, use the CLI: forum audit <repo>"
+          title="Connect a live backend to re-run audits. Static mode is read-only."
           disabled
         >
           RE-RUN
@@ -559,25 +559,36 @@
               <p
                 class="font-code-sm text-on-surface-variant mt-1 uppercase tracking-tighter"
               >
-                Drag sliders → ranking shifts live · no AI calls
+                Pick which findings deserve the AI jury's time
               </p>
               <ul
-                class="text-[12px] text-on-surface-variant mt-3 space-y-1 list-disc list-inside leading-relaxed"
+                class="text-[12px] text-on-surface-variant mt-3 space-y-2 list-disc list-inside leading-relaxed"
               >
                 <li>
-                  Each finding has a
-                  <span class="text-primary">raw severity</span> (how bad it
-                  looks structurally) and a
-                  <span class="text-primary">value-affinity</span> (how much
-                  your team's priorities care about that kind of issue).
+                  Static analysis flagged
+                  <span class="text-primary" id="prio-explain-n">many</span>
+                  issues in this codebase. AI debate is slow and costs money,
+                  so we only run it on the
+                  <span class="text-primary">top few</span> — the rest stay on
+                  disk untouched.
                 </li>
                 <li>
-                  The two combine into a
-                  <span class="text-primary">composite score</span> — the order
-                  you see on the left.
+                  Use the
+                  <span class="text-primary">6 dials on the right</span> to
+                  tell Forum what your team weighs most. A shipping-fast
+                  startup might max <em>velocity</em>; a fintech might max
+                  <em>correctness</em>; a long-lived library might max
+                  <em>maintainability</em>. The ranking re-sorts in real-time
+                  to surface issues your priorities care about.
                 </li>
                 <li>
-                  Verdict labels never change here. Only the ranking shifts.
+                  The
+                  <span class="text-primary">top
+                    <span id="prio-explain-topn">N</span></span>
+                  on this list are what got sent to the AI jury (next tab).
+                  Sliding the dials here changes the order; to change the
+                  <em>set</em> of findings sent to the jury you'd re-run the
+                  audit with different values.
                 </li>
               </ul>
             </div>
@@ -585,7 +596,8 @@
               <div class="flex flex-col items-end">
                 <span
                   class="font-label-caps text-[9px] text-on-tertiary-container"
-                  >FINDINGS RANKED</span
+                  title="Number of findings being ranked here — the same set Forum sent to the AI jury for this audit."
+                  >IN THIS LIST</span
                 >
                 <span class="font-code-md text-primary" id="prio-stat-dps"
                   >—</span
@@ -596,7 +608,8 @@
               >
                 <span
                   class="font-label-caps text-[9px] text-on-tertiary-container"
-                  >RE-ORDERED</span
+                  title="How many items moved up or down since you last touched a dial."
+                  >MOVED BY SLIDERS</span
                 >
                 <span class="font-code-md text-primary" id="prio-stat-shift"
                   >0</span
@@ -610,11 +623,12 @@
               <h2
                 class="font-label-caps text-label-caps text-on-surface-variant mb-1 tracking-widest"
               >
-                RANKED FINDINGS
+                FINDINGS, RANKED FOR YOUR TEAM
               </h2>
               <p class="text-[12px] text-on-surface-variant opacity-70 mb-4">
-                Highest composite score first. Numbers update as you move
-                sliders on the right.
+                The highest item is the one that — given your team's priorities
+                on the right — most deserves attention. Move a dial and watch
+                the order shift.
               </p>
               <div class="space-y-3" id="prio-ranking">
                 <!-- filled by JS -->
@@ -630,16 +644,14 @@
                 <h3 class="font-label-caps text-label-caps text-primary">
                   YOUR TEAM'S PRIORITIES
                 </h3>
-                <ul
-                  class="text-[10px] text-on-surface-variant mt-2 space-y-1 list-disc list-inside leading-snug"
+                <p
+                  class="text-[11px] text-on-surface-variant opacity-80 mt-2 leading-snug"
                 >
-                  <li>
-                    Six dials representing how much your team cares about each
-                    value.
-                  </li>
-                  <li>Try a preset, or drag the dials.</li>
-                  <li>Watch the left side re-rank in real time.</li>
-                </ul>
+                  These dials describe what your team weighs most when picking
+                  what to refactor. A 4-engineer startup and a 200-engineer
+                  bank should set them differently. Pick a preset or drag a
+                  dial — the ranking on the left re-sorts instantly.
+                </p>
               </div>
               <div
                 class="p-4 space-y-2 border-b border-outline-variant"
@@ -1117,15 +1129,57 @@
                 class="text-[10px] text-on-surface-variant opacity-60 mt-1 truncate"
               ></div>
             </div>
+
+            <!-- Concurrent tribunals — one chip per in-flight finding -->
+            <div
+              id="audit-tribunals-wrap"
+              class="hidden px-3 py-2 border-b border-outline-variant bg-surface-container-lowest"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <span
+                  class="font-label-caps text-[9px] text-on-surface-variant opacity-70"
+                  >CONCURRENT TRIBUNALS</span
+                >
+                <span
+                  id="audit-tribunals-count"
+                  class="font-code-sm text-[10px] text-on-surface-variant opacity-70"
+                ></span>
+              </div>
+              <div
+                class="flex items-center gap-2 flex-wrap"
+                id="audit-tribunals-list"
+              ></div>
+            </div>
+
+            <!-- The 6 debaters; the 2 paired in the active cell light up -->
+            <div
+              class="px-3 py-2 border-b border-outline-variant bg-surface-container-low"
+            >
+              <div
+                class="font-label-caps text-[9px] text-on-surface-variant opacity-70 mb-2 text-center"
+              >
+                DEBATERS IN THIS CELL
+              </div>
+              <div
+                class="flex items-center justify-center gap-4 flex-wrap"
+                id="audit-personas-row"
+              ></div>
+            </div>
+
             <pre
               id="audit-live-text"
-              class="flex-1 overflow-y-auto bg-surface-container-lowest text-on-surface font-body-md text-[14px] leading-relaxed p-4 m-0 whitespace-pre-wrap"
+              class="flex-1 min-h-0 max-h-[40vh] overflow-y-auto bg-surface-container-lowest text-on-surface font-body-md text-[14px] leading-relaxed p-4 m-0 whitespace-pre-wrap"
             ></pre>
             <div
               class="px-3 py-2 border-t border-outline-variant bg-surface-container-low"
             >
               <div
-                class="flex items-center gap-1 flex-wrap"
+                class="font-label-caps text-[9px] text-on-surface-variant opacity-70 mb-2 text-center"
+              >
+                CELLS · 1–15
+              </div>
+              <div
+                class="flex items-center justify-center gap-1 flex-wrap"
                 id="audit-cells-strip"
               ></div>
             </div>

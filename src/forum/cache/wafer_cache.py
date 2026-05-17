@@ -27,6 +27,7 @@ Differences from PromptCache:
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -140,7 +141,9 @@ class WaferCache:
 
     def __init__(self, model: str = QWEN3,
                  api_key: str | None = None,
-                 base_url: str = WAFER_BASE_URL) -> None:
+                 base_url: str = WAFER_BASE_URL,
+                 max_concurrent: int | None = None,
+                 min_interval_s: float | None = None) -> None:
         key = api_key or os.environ.get("WAFER_API_KEY")
         if not key:
             raise RuntimeError(
@@ -149,6 +152,21 @@ class WaferCache:
         self.client = AsyncOpenAI(api_key=key, base_url=base_url)
         self.default_model = model
         self.metrics = CacheMetrics()
+
+        # Throttling. Wafer Serverless throttles aggressively under burst load
+        # (we were seeing ~85% cell-failure rates from nested parallelism: N
+        # tribunals × 15 cells × 3 turns). Two knobs:
+        #   * max_concurrent — cap simultaneous in-flight requests
+        #   * min_interval_s — minimum gap between successive request starts
+        # Override via env: WAFER_MAX_CONCURRENT, WAFER_MIN_INTERVAL_S.
+        if max_concurrent is None:
+            max_concurrent = int(os.environ.get("WAFER_MAX_CONCURRENT", "4"))
+        if min_interval_s is None:
+            min_interval_s = float(os.environ.get("WAFER_MIN_INTERVAL_S", "0.25"))
+        self._sem = asyncio.Semaphore(max(1, max_concurrent))
+        self._min_interval_s = max(0.0, min_interval_s)
+        self._pacer_lock = asyncio.Lock()
+        self._last_dispatch_ts = 0.0
 
     @property
     def backend_name(self) -> str:
@@ -300,6 +318,19 @@ class WaferCache:
 
     # --- internals ---
 
+    async def _pace(self) -> None:
+        """Block until at least `min_interval_s` has elapsed since the last
+        dispatch. Held under a lock so concurrent callers serialize their
+        pacing decisions instead of all reading the same stale timestamp."""
+        if self._min_interval_s <= 0:
+            return
+        async with self._pacer_lock:
+            now = time.perf_counter()
+            wait = self._min_interval_s - (now - self._last_dispatch_ts)
+            if wait > 0:
+                await asyncio.sleep(wait)
+            self._last_dispatch_ts = time.perf_counter()
+
     async def _send(
         self, *, messages: list[dict], model: str,
         max_tokens: int, temperature: float,
@@ -318,9 +349,11 @@ class WaferCache:
         if otc is not None:
             kwargs["tool_choice"] = otc
 
-        t0 = time.perf_counter()
-        msg = await self.client.chat.completions.create(**kwargs)
-        dt = time.perf_counter() - t0
+        async with self._sem:
+            await self._pace()
+            t0 = time.perf_counter()
+            msg = await self.client.chat.completions.create(**kwargs)
+            dt = time.perf_counter() - t0
 
         u = msg.usage
         in_t = getattr(u, "prompt_tokens", 0) or 0

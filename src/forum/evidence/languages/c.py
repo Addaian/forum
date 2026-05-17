@@ -45,7 +45,7 @@ class CLanguage(Language):
 
     @property
     def skip_dirs(self) -> set[str]:
-        return BASE_SKIP_DIRS | _C_EXTRA_SKIP
+        return self._effective_skip_dirs(BASE_SKIP_DIRS | _C_EXTRA_SKIP) | _C_EXTRA_SKIP
 
     # ------------------------------------------------------------------
     # Discovery

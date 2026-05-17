@@ -20,12 +20,19 @@ class PythonLanguage(Language):
 
     @property
     def skip_dirs(self) -> set[str]:
-        return BASE_SKIP_DIRS
+        return self._effective_skip_dirs(BASE_SKIP_DIRS)
 
     # ------------------------------------------------------------------
 
     def discover_packages(self, repo_root: Path) -> list[PackageInfo]:
-        """Top-level packages: dirs with __init__.py whose parent has none."""
+        """Top-level packages: dirs with __init__.py whose parent has none.
+
+        Fallback for "loose script" repos (no __init__.py anywhere — e.g.,
+        plugin collections, cookbooks): synthesize one package rooted at
+        the repo, so per-function checks (P3 complexity, P4 cohesion, P5
+        dead code) still surface findings. The import graph will be sparse
+        or empty, which is honest for that kind of repo.
+        """
         repo_root = repo_root.resolve()
         skip = self.skip_dirs
         found: list[PackageInfo] = []
@@ -42,7 +49,26 @@ class PythonLanguage(Language):
             if name in skip or name.startswith("_test"):
                 continue
             found.append(PackageInfo(name=name, root=Path(dirpath), parent=parent))
-        return found
+
+        if found:
+            return found
+
+        # No __init__.py-style packages anywhere. If there are any .py files
+        # under the (effective) skip set, treat the repo as a single synthetic
+        # package so the per-function checkers still have something to grind on.
+        has_py = False
+        for dirpath, dirnames, filenames in os.walk(repo_root):
+            dirnames[:] = [d for d in dirnames if d not in skip and not d.startswith(".")]
+            if any(f.endswith(".py") for f in filenames):
+                has_py = True
+                break
+        if has_py:
+            return [PackageInfo(
+                name=repo_root.name or "repo",
+                root=repo_root,
+                parent=repo_root.parent,
+            )]
+        return []
 
     def build_repo_index(self, repo_root: Path) -> RepoIndex:
         packages = self.discover_packages(repo_root)

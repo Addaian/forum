@@ -40,15 +40,22 @@ explicitly by setting `override: true` and naming the override in your
 
 Hard rules:
 
-- In `reasoning`, cite **at least two** specific cells by numeric ID
-  (e.g., "cell 3 argued…", "cell 7 noted…").
-- In `reasoning`, cite **at least one** specific piece of Layer 1 evidence
-  by file path, line range, or measured metric value.
-- `dissent_summary` must capture the strongest argument from the losing side
-  in one or two sentences, even if you find the majority correct.
-- `recommended_action` must be a concrete sentence that names **what** to
-  do, **where** (file or module), and roughly **how large** the change is.
-  "Refactor this" is not acceptable.
+- **Bullet points only — no prose.** Every text field (`reasoning`,
+  `dissent_summary`, `recommended_action`) is formatted as a bulleted
+  list using the literal character `•` followed by a space, with `\n`
+  separating bullets. Example: `• First point.\n• Second point.\n• Third.`
+  Each bullet is ≤15 words. No preamble, no full sentences strung
+  together — bullets only.
+- **Field-specific caps:**
+  - `reasoning`: 2-3 bullets. Collectively must cite ≥2 cells by
+    numeric ID (e.g., "cell 3", "cell 7") and ≥1 piece of Layer 1
+    evidence (file path, line range, or metric value).
+  - `dissent_summary`: 1-2 bullets naming the strongest losing
+    argument(s). State the claim; do not contrast. Required even
+    if you agree with the majority.
+  - `recommended_action`: 1-3 bullets. Each starts with a verb.
+    Name WHAT, WHERE (file/module), and HOW LARGE ("~50 LOC",
+    "one PR", "multi-week"). "Refactor this" is unacceptable.
 - Do not reference user values, team priorities, business framing, or
-  audience weights anywhere in the verdict. The jury is values-neutral.
+  audience weights. The jury is values-neutral.
 - Use the `submit_verdict` tool. Do not produce free-form text outside it.

@@ -559,6 +559,10 @@ function wireButtons() {
   document
     .getElementById("btn-whatif")
     ?.addEventListener("click", () => switchView("prioritization"));
+  // Top-bar RE-RUN → open New-Audit modal pre-filled with active audit's URL
+  document
+    .getElementById("btn-rerun")
+    ?.addEventListener("click", openRerunModal);
   // Top-bar download icon → download report.md
   document
     .getElementById("btn-download")
@@ -639,6 +643,54 @@ function wireButtons() {
     });
   });
 }
+
+function openRerunModal() {
+  // Opens the existing New-Audit modal pre-filled with the active audit's
+  // repo URL and a fresh slug suggestion. User picks language, hits submit,
+  // and the existing modal flow takes over (SSE stream, live updates, etc.).
+  if (!state.liveMode) {
+    alert(
+      "Re-run requires the live backend. Static demo mode is read-only — " +
+      "configure a backend URL in Settings or run `uvicorn server:app` locally."
+    );
+    return;
+  }
+  const entry = state.manifest.audits.find(a => a.slug === state.activeSlug);
+  if (!entry) {
+    alert("No active audit to re-run. Pick one from the sidebar first.");
+    return;
+  }
+  // Map "github.com/foo/bar" → "https://github.com/foo/bar" (git clone-able).
+  let repoUrl = String(entry.source || "");
+  if (repoUrl && !/^https?:\/\//.test(repoUrl) && !/^git@/.test(repoUrl)) {
+    repoUrl = "https://" + repoUrl.replace(/^\/+/, "");
+  }
+  // Suggest a fresh slug so the POST doesn't 409 on the existing dir. The
+  // server will accept this hint or derive its own.
+  const stamp = new Date().toISOString().slice(5, 10).replace("-", "");  // MMDD
+  const slugSuggestion = `${entry.slug}-${stamp}`;
+
+  const modal = document.getElementById("audit-modal");
+  const form  = document.getElementById("audit-form");
+  if (!modal || !form) {
+    alert("New-Audit modal isn't on the page — can't open it.");
+    return;
+  }
+  // Set field values + open modal (re-uses the audit-modal's own wired handler).
+  const repoInput = form.elements.repo_url;
+  const slugInput = form.elements.slug;
+  const langInput = form.elements.language;
+  if (repoInput) repoInput.value = repoUrl;
+  if (slugInput) slugInput.value = slugSuggestion;
+  if (langInput && entry.language && entry.language !== "auto") {
+    langInput.value = entry.language;
+  }
+  // Just toggle the modal visible. The audit-modal's open-button handler
+  // would normally call reset(); for a re-run we want the user's pre-filled
+  // values to stick, so we skip reset and just unhide.
+  modal.classList.remove("hidden");
+}
+
 
 function downloadReport() {
   if (!state.reportMd) {
@@ -1145,8 +1197,14 @@ function renderPrioritization() {
   renderPresets();
   renderSliders();
   renderRanking();
-  document.getElementById("prio-stat-dps").textContent =
-    state.prioritized.items.length;
+  const topN = state.prioritized.items.length;
+  const totalFindings = state.evidence?.decision_points?.length ?? topN;
+  document.getElementById("prio-stat-dps").textContent = topN;
+  // Plain-English placeholders in the header explainer.
+  const elN    = document.getElementById("prio-explain-n");
+  const elTopN = document.getElementById("prio-explain-topn");
+  if (elN)    elN.textContent    = `${totalFindings}`;
+  if (elTopN) elTopN.textContent = `${topN}`;
 }
 
 function renderPresets() {
@@ -1398,56 +1456,12 @@ function renderJury() {
 
         <!-- Judge reasoning -->
         <div class="mt-3 pt-3 border-t border-outline-variant/30 text-[12px] text-on-surface leading-relaxed">
-          <span class="font-label-caps text-[9px] text-primary">JUDGE</span>
-          <span class="ml-1">${escapeHtml(judge.reasoning || "(no reasoning)")}</span>
+          <div class="font-label-caps text-[9px] text-primary mb-1">JUDGE</div>
+          <div class="whitespace-pre-line">${escapeHtml(judge.reasoning || "(no reasoning)")}</div>
         </div>
       </div>
-
-      <!-- Expand toggle -->
-      <button class="jury-expand-btn w-full py-2 border-t border-outline-variant text-[11px] text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps tracking-wider">
-        SHOW ALL ${cells.length} DEBATE CARDS
-      </button>
-      <div class="jury-expand-body hidden p-4 pt-0 border-t border-outline-variant/30"></div>
     `;
     root.appendChild(section);
-
-    // Wire expand toggle
-    const expandBtn = section.querySelector(".jury-expand-btn");
-    const expandBody = section.querySelector(".jury-expand-body");
-    expandBtn.addEventListener("click", () => {
-      const open = !expandBody.classList.contains("hidden");
-      expandBody.classList.toggle("hidden");
-      expandBtn.textContent = open
-        ? `SHOW ALL ${cells.length} DEBATE CARDS`
-        : "HIDE DEBATE CARDS";
-      if (!open && !expandBody.hasChildNodes()) {
-        // Render cards on first expand
-        const majHeader = document.createElement("div");
-        majHeader.className = "mb-2 mt-3 flex items-center gap-2 text-[11px]";
-        majHeader.innerHTML = `<span class="inline-block w-2 h-2 rounded-full" style="background:${majorityColor}"></span>
-          <span class="font-label-caps text-[10px]" style="color:${majorityColor}">${majCells.length} said ${majorityLabel}</span>`;
-        expandBody.appendChild(majHeader);
-        const majGrid = document.createElement("div");
-        majGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-3";
-        majCells.forEach((c) =>
-          majGrid.appendChild(renderCellCard(c, { isDissent: false })),
-        );
-        expandBody.appendChild(majGrid);
-        if (disCells.length > 0) {
-          const disHeader = document.createElement("div");
-          disHeader.className = "mt-3 mb-2 flex items-center gap-2 text-[11px]";
-          disHeader.innerHTML = `<span class="inline-block w-2 h-2 rounded-full" style="background:${dissentColor}"></span>
-            <span class="font-label-caps text-[10px]" style="color:${dissentColor}">↯ ${disCells.length} dissented — said ${majority === "debt" ? "FINE" : "PROBLEM"}</span>`;
-          expandBody.appendChild(disHeader);
-          const disGrid = document.createElement("div");
-          disGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3";
-          disCells.forEach((c) =>
-            disGrid.appendChild(renderCellCard(c, { isDissent: true })),
-          );
-          expandBody.appendChild(disGrid);
-        }
-      }
-    });
 
     // ---- Aggregate line (re-projected under current weights) ----
     const aggLine = document.createElement("div");
@@ -1501,114 +1515,6 @@ function personaPill(personaId) {
           </span>`;
 }
 
-function renderCellCard(c, opts = {}) {
-  const { isDissent = false } = opts;
-  // New model: two personas debate, the CELL votes. Vote color reflects the
-  // cell's conclusion (debt=orange, justified=green) — NOT the persona's
-  // "side" since neither persona has a side anymore.
-  const voteIsDebt = c.position === "debt";
-  const voteColor = voteIsDebt ? "#fb923c" : "#4ade80";
-
-  // red_persona/blue_persona field names are kept for schema compat; they're
-  // now just "persona A" and "persona B" labels — neither is prosecution/defense.
-  const personaAId = c.red_persona;
-  const personaBId = c.blue_persona;
-  const confidencePct = Math.round((c.confidence || 0) * 100);
-
-  // Salience under current weights
-  const b = salience(c.value_lens, state.baselineWeights);
-  const n = salience(c.value_lens, state.currentWeights);
-  const ratio = b > 0 ? n / b : n > 0 ? INFINITY_SENTINEL : 1;
-  const salient = ratio >= SALIENCE_BUMP;
-  const ratioStr = ratio >= INFINITY_SENTINEL ? "∞" : `${ratio.toFixed(2)}×`;
-
-  const voteShort = voteIsDebt
-    ? "real problem, worth fixing"
-    : "fine as-is, defensible";
-  const voteExplainer = voteIsDebt
-    ? "Cell concluded: this is real debt — the personas' reading converged on harm."
-    : "Cell concluded: this is justified — the personas' reading converged on serving / defensible.";
-  const salienceTitle = salient
-    ? `This cell's reasoning rests on values your sliders weight highly. Your priorities care ${ratioStr} more about this argument than the baseline.`
-    : "How much your current priorities overlap with the values this cell's argument rests on. 1.00× = baseline.";
-
-  const card = document.createElement("div");
-  // Dissenters get a stronger border in their vote-color to make the
-  // "this pair pushed back" signal pop against the surrounding majority.
-  const dissentRing = isDissent ? ` ring-2 ring-offset-0` : "";
-  card.className =
-    "bg-surface-container border border-outline-variant relative" +
-    (salient ? " ring-1 ring-yellow-400/40" : "") +
-    dissentRing;
-  if (isDissent) {
-    card.style.boxShadow = `0 0 0 1px ${voteColor}55`;
-  }
-  // Use the persona pair as the headline. Each persona's display name IS
-  // the value it cares about (e.g. "Simplicity vs Velocity") — paired with
-  // a colored dot for instant visual recognition.
-  const aInfo = PERSONA_INFO[personaAId] || {
-    name: personaAId,
-    value: "?",
-    color: "#919094",
-  };
-  const bInfo = PERSONA_INFO[personaBId] || {
-    name: personaBId,
-    value: "?",
-    color: "#919094",
-  };
-  const dot = (color) =>
-    `<span class="inline-block w-2.5 h-2.5 rounded-full align-middle" style="background:${color}"></span>`;
-
-  const dissentRibbon = isDissent
-    ? `<div class="absolute top-0 right-0 font-label-caps text-[8px] px-1.5 py-0.5 tracking-widest"
-            style="color:${voteColor};background:${voteColor}22;border-bottom-left-radius:3px;"
-            title="This pair disagreed with the majority — pushed back from their value's perspective.">↯ PUSHED BACK</div>`
-    : "";
-
-  card.innerHTML = `
-    ${dissentRibbon}
-    <div class="h-1 w-full" style="background:${voteColor}"></div>
-    <div class="p-4">
-      <div class="flex justify-between items-start mb-3 gap-3">
-        <div class="min-w-0">
-          <div class="font-headline-sm text-on-surface leading-tight"
-               title="Debate ${c.cell_id + 1} of ${cells.length}. Each persona cares about exactly one engineering value and argues from that perspective.">
-            <span title="${escapeHtml(aInfo.name)} — cares only about ${escapeHtml(aInfo.value)}">
-              ${dot(aInfo.color)} <span style="color:${aInfo.color}">${escapeHtml(aInfo.name)}</span>
-            </span>
-            <span class="text-on-surface-variant opacity-60 font-normal text-[14px] mx-1">vs</span>
-            <span title="${escapeHtml(bInfo.name)} — cares only about ${escapeHtml(bInfo.value)}">
-              ${dot(bInfo.color)} <span style="color:${bInfo.color}">${escapeHtml(bInfo.name)}</span>
-            </span>
-          </div>
-        </div>
-        <div class="flex flex-col items-end gap-0.5 flex-shrink-0">
-          <span class="font-label-caps text-[9px] px-2 py-0.5 border whitespace-nowrap"
-                style="color:${voteColor};border-color:${voteColor};background:${voteColor}1a"
-                title="${escapeHtml(voteExplainer)}">
-            ${voteIsDebt ? "PROBLEM" : "FINE"}
-          </span>
-          <span class="text-[9px] text-on-surface-variant opacity-70 italic">${voteShort}</span>
-        </div>
-      </div>
-      <!-- Confidence bar -->
-      <div class="flex items-center gap-2 mb-3 bg-surface-container-high p-2 border border-outline-variant/30" title="How sure this pair was of their conclusion (0% = toss-up, 100% = decisive)">
-        <div class="flex-1 h-1.5 bg-surface-variant relative overflow-hidden">
-          <div class="absolute left-0 top-0 h-full" style="width:${confidencePct}%;background:${voteColor}"></div>
-        </div>
-        <span class="font-code-sm text-[10px]" style="color:${voteColor}">${confidencePct}% sure</span>
-      </div>
-      <div class="text-[12px] text-on-surface leading-relaxed italic">
-        "${escapeHtml(c.key_argument || "(no argument)")}"
-      </div>
-      <div class="mt-3 pt-2 border-t border-outline-variant/30 text-[10px] text-on-surface-variant flex items-center justify-between"
-           title="${escapeHtml(salienceTitle)}">
-        <span>your priorities care about this</span>
-        <span class="${salient ? "text-yellow-400 font-bold" : ""}">${ratioStr}${salient ? " — emphasized" : ""}</span>
-      </div>
-    </div>`;
-  return card;
-}
 
 function renderJudgeCard(trib, tribIdx, dp) {
   const judge = trib.judge || {};
@@ -1627,15 +1533,15 @@ function renderJudgeCard(trib, tribIdx, dp) {
     <div class="font-code-sm text-on-surface-variant text-[10px] mb-3 truncate" title="${escapeHtml(dp?.subject || "")}">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
     ${verdictExplainer ? `<div class="text-[11px] text-on-surface-variant opacity-70 mb-3 leading-snug">${escapeHtml(verdictExplainer)}</div>` : ""}
     <div class="font-body-md text-on-surface leading-relaxed text-[13px]">
-      <span class="font-label-caps text-[9px] text-on-tertiary-container">REASONING</span><br>
-      ${escapeHtml(judge.reasoning || "(no reasoning)")}
+      <div class="font-label-caps text-[9px] text-on-tertiary-container mb-1">REASONING</div>
+      <div class="whitespace-pre-line">${escapeHtml(judge.reasoning || "(no reasoning)")}</div>
     </div>
     ${
       judge.dissent_summary
         ? `
       <div class="mt-3 pt-3 border-t border-outline-variant/30">
         <div class="font-label-caps text-[9px] text-on-tertiary-container mb-1">STRONGEST DISSENT (the losing side's best point)</div>
-        <div class="font-code-sm text-on-surface-variant text-[11px] italic">${escapeHtml(judge.dissent_summary)}</div>
+        <div class="font-code-sm text-on-surface-variant text-[11px] italic whitespace-pre-line">${escapeHtml(judge.dissent_summary)}</div>
       </div>`
         : ""
     }`;
@@ -1840,9 +1746,7 @@ function renderBriefingVerbatims() {
       </div>
       ${plain ? `<div class="text-[11px] text-on-surface-variant opacity-70 mb-3 leading-snug">${escapeHtml(plain)}</div>` : ""}
       <div class="font-code-sm text-on-surface-variant text-[11px] mb-3">${escapeHtml(dp?.subject || "(no subject)")}</div>
-      <blockquote class="m-0 border-none p-0 text-on-surface italic font-code-md leading-relaxed">
-        "${escapeHtml(judge.recommended_action || "(no recommended action)")}"
-      </blockquote>`;
+      <blockquote class="m-0 border-none p-0 text-on-surface italic font-code-md leading-relaxed whitespace-pre-line">${escapeHtml(judge.recommended_action || "(no recommended action)")}</blockquote>`;
     root.appendChild(block);
   });
 }
@@ -1920,6 +1824,13 @@ async function detectLiveMode() {
     await res.json();
     state.liveMode = true;
     document.getElementById("btn-new-audit").classList.remove("hidden");
+    // Top-bar RE-RUN button only makes sense when a backend can re-run.
+    const rerun = document.getElementById("btn-rerun");
+    if (rerun) {
+      rerun.disabled = false;
+      rerun.classList.remove("opacity-50", "cursor-not-allowed");
+      rerun.title = "Re-run an audit on the active repo (opens the New Audit modal pre-filled).";
+    }
   } catch {
     /* unreachable backend — leave button hidden */
   }
@@ -2036,13 +1947,27 @@ function wireAuditModal() {
   const liveDp = document.getElementById("audit-live-dp");
   const liveSidePill = document.getElementById("audit-live-side-pill");
   const cellsStrip = document.getElementById("audit-cells-strip");
+  const personasRow = document.getElementById("audit-personas-row");
+  const tribunalsWrap = document.getElementById("audit-tribunals-wrap");
+  const tribunalsList = document.getElementById("audit-tribunals-list");
+  const tribunalsCount = document.getElementById("audit-tribunals-count");
   const statusDot = document.getElementById("audit-status-dot");
   const statusLabel = document.getElementById("audit-status-label");
   const activeMeta = document.getElementById("audit-active-meta");
   if (!openBtn || !modal) return;
 
   // Per-audit live state — reset on each open.
-  const live = { activeDp: null, cells: new Map() };
+  //   tribunals: dpId → { subject, principle, status, cellsVoted, cellsFailed }
+  //   activeCell: { red, blue } for the currently-streaming cell (drives the
+  //     6-persona row highlight)
+  //   userPinnedDp: if the user clicks a tribunal chip, pin focus there
+  const live = {
+    activeDp: null,
+    cells: new Map(),
+    tribunals: new Map(),
+    activeCell: { red: null, blue: null },
+    userPinnedDp: null,
+  };
 
   const reset = () => {
     form.classList.remove("hidden");
@@ -2057,14 +1982,29 @@ function wireAuditModal() {
     liveCellTag.textContent = "—";
     liveDp.textContent = "";
     cellsStrip.innerHTML = "";
+    if (personasRow) personasRow.innerHTML = "";
+    if (tribunalsList) tribunalsList.innerHTML = "";
+    if (tribunalsWrap) tribunalsWrap.classList.add("hidden");
+    if (tribunalsCount) tribunalsCount.textContent = "";
     activeMeta.textContent = "";
     statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
     statusLabel.textContent = "RUNNING";
     live.activeDp = null;
     live.cells.clear();
+    live.tribunals.clear();
+    live.activeCell = { red: null, blue: null };
+    live.userPinnedDp = null;
   };
 
   openBtn.addEventListener("click", () => {
+    // If an audit is already running, just re-open the modal — preserve the
+    // live progress view instead of wiping it back to the empty form.
+    // currentRunningSlug clears in the SSE `done` handler below, so this
+    // condition only holds while the backend is actively streaming.
+    if (currentRunningSlug) {
+      modal.classList.remove("hidden");
+      return;
+    }
     // Open the modal first, then reset. If reset() throws on a stale/
     // missing element, the modal still appears so the user sees *something*
     // happen and we get a console error pinpointing the bad reference.
@@ -2086,6 +2026,137 @@ function wireAuditModal() {
       // Modal widens so the streaming text has room to breathe.
       modalInner.classList.remove("max-w-2xl");
       modalInner.classList.add("max-w-4xl");
+      // Paint the 6 personas immediately (all dimmed, no active pair yet) so
+      // users understand the 6-agent system from the moment the panel opens.
+      renderPersonasRow();
+    }
+  };
+
+  // The dpId we render details for: the user's pinned choice if they clicked
+  // a tribunal chip, otherwise the most-recently-active one.
+  const focusedDp = () => live.userPinnedDp || live.activeDp;
+
+  // Render the row of in-flight tribunals at the top of the live panel.
+  // Each chip = one finding being audited concurrently; clicking switches
+  // the cells strip + persona row + streaming text to that tribunal.
+  const renderTribunalsList = () => {
+    if (!tribunalsList) return;
+    const tribs = [...live.tribunals.values()];
+    if (tribs.length === 0) {
+      tribunalsWrap?.classList.add("hidden");
+      return;
+    }
+    tribunalsWrap?.classList.remove("hidden");
+
+    const inFlight = tribs.filter((t) => t.status !== "complete").length;
+    if (tribunalsCount) {
+      tribunalsCount.textContent =
+        `${inFlight} running · ${tribs.length - inFlight} done`;
+    }
+
+    tribunalsList.innerHTML = "";
+    const focus = focusedDp();
+    tribs
+      .sort((a, b) => (a.idx ?? 0) - (b.idx ?? 0))
+      .forEach((t) => {
+        const isFocus = t.dpId === focus;
+        const dotColor =
+          t.status === "complete"
+            ? "#4ade80"
+            : t.status === "active"
+              ? "#facc15"
+              : "#919094";
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = [
+          "flex items-center gap-2 px-2 py-1 border font-code-sm text-[10px]",
+          "transition-colors",
+          isFocus
+            ? "bg-primary/20 border-primary text-on-surface"
+            : "bg-surface-container border-outline-variant text-on-surface-variant hover:bg-surface-container-high",
+        ].join(" ");
+        chip.title =
+          `${t.principle || ""} · ${t.subject || t.dpId}\n` +
+          `${t.cellsVoted}/${t.cellsTotal} cells voted` +
+          (t.cellsFailed ? ` · ${t.cellsFailed} failed` : "");
+        const dot = document.createElement("span");
+        dot.className = "w-1.5 h-1.5 rounded-full" + (
+          t.status === "active" ? " animate-pulse" : ""
+        );
+        dot.style.background = dotColor;
+        const label = document.createElement("span");
+        label.textContent =
+          `${t.principle || "?"} · ${(t.subject || t.dpId).slice(0, 28)}`;
+        const prog = document.createElement("span");
+        prog.className = "opacity-70 ml-1";
+        prog.textContent = `${t.cellsVoted}/${t.cellsTotal}`;
+        chip.append(dot, label, prog);
+        chip.addEventListener("click", () => {
+          live.userPinnedDp = t.dpId;
+          renderTribunalsList();
+          renderPersonasRow();
+          renderCellsStrip(t.dpId);
+        });
+        tribunalsList.appendChild(chip);
+      });
+  };
+
+  const PERSONA_ORDER = [
+    "simplifier", "shipper", "maintainer",
+    "verifier", "scaler", "adapter",
+  ];
+  // Subset of PERSONA_INFO duplicated here so the live modal works even if
+  // app.js's main render path hasn't run yet (the modal opens before any
+  // verdicts.json fetch). Keep in sync with the global PERSONA_INFO.
+  const PERSONA_PALETTE = {
+    simplifier: { name: "Simplicity",    color: "#a78bfa" },
+    shipper:    { name: "Velocity",      color: "#fb923c" },
+    maintainer: { name: "Maintainability", color: "#5dd6ff" },
+    verifier:   { name: "Correctness",   color: "#4ade80" },
+    scaler:     { name: "Scalability",   color: "#f472b6" },
+    adapter:    { name: "Flexibility",   color: "#facc15" },
+  };
+
+  // Render the 6-persona row. The 2 personas paired in the currently-streaming
+  // cell glow with a colored ring + animate-pulse; the others are dimmed.
+  const renderPersonasRow = () => {
+    if (!personasRow) return;
+    personasRow.innerHTML = "";
+    const { red, blue } = live.activeCell;
+    for (const id of PERSONA_ORDER) {
+      const info = PERSONA_PALETTE[id];
+      const isActive = id === red || id === blue;
+      const role =
+        id === red ? "RED" : id === blue ? "BLUE" : null;
+
+      const wrap = document.createElement("div");
+      wrap.className = "flex flex-col items-center gap-1";
+      wrap.title = `${info.name}${role ? ` · ${role}` : ""}`;
+
+      const circle = document.createElement("div");
+      circle.className =
+        "w-9 h-9 rounded-full flex items-center justify-center " +
+        "font-code-sm text-[11px] font-bold border-2 transition-all";
+      if (isActive) {
+        circle.style.background = info.color;
+        circle.style.borderColor = info.color;
+        circle.style.boxShadow = `0 0 12px ${info.color}80`;
+        circle.style.color = "#0a0a0b";
+        circle.classList.add("animate-pulse");
+      } else {
+        circle.style.background = "transparent";
+        circle.style.borderColor = info.color + "40";
+        circle.style.color = info.color + "60";
+      }
+      circle.textContent = info.name.charAt(0);
+
+      const label = document.createElement("div");
+      label.className = "font-label-caps text-[8px] tracking-wider";
+      label.style.color = isActive ? info.color : info.color + "60";
+      label.textContent = info.name;
+
+      wrap.append(circle, label);
+      personasRow.appendChild(wrap);
     }
   };
 
@@ -2113,20 +2184,60 @@ function wireAuditModal() {
     }
   };
 
+  // Bump a tribunal's tally and re-render the chips row. No-op if the
+  // tribunal isn't yet registered (e.g., cell events arrive before
+  // tribunal_start because they emit from a different async path).
+  const bumpTribunal = (dpId, field) => {
+    let t = live.tribunals.get(dpId);
+    if (!t) {
+      t = {
+        dpId, idx: null, subject: null, principle: null,
+        status: "active", cellsVoted: 0, cellsFailed: 0, cellsTotal: 0,
+      };
+      live.tribunals.set(dpId, t);
+    }
+    t[field] = (t[field] || 0) + 1;
+    renderTribunalsList();
+  };
+
   const handleEvent = (ev) => {
-    // Live-publish: when the CLI streams a tribunal_complete event, the
-    // server has just copied a partial verdicts.json into docs/data/<slug>/.
-    // Re-fetch and re-render that audit's views in the background so the
-    // user watches findings populate as they're decided.
+    // ---- Tribunal-level events: track concurrent in-flight findings ----
+    if (ev.t === "tribunal_start") {
+      const dpId = ev.dp_id;
+      if (dpId) {
+        const existing = live.tribunals.get(dpId) || {
+          dpId,
+          idx: ev.trib_idx,
+          status: "active",
+          cellsVoted: 0,
+          cellsFailed: 0,
+          cellsTotal: 0,
+        };
+        existing.idx = ev.trib_idx ?? existing.idx;
+        existing.subject = ev.subject || existing.subject;
+        existing.principle = ev.principle || existing.principle;
+        existing.status = "active";
+        live.tribunals.set(dpId, existing);
+        ensureLivePanel();
+        renderTribunalsList();
+      }
+    }
+
+    // ---- Live-publish refresh (preserved) + mark tribunal complete ----
     if (
       ev.t === "tribunal_complete" ||
       ev.t === "layer1_done" ||
       ev.t === "layer3_done"
     ) {
+      if (ev.t === "tribunal_complete" && ev.dp_id) {
+        const t = live.tribunals.get(ev.dp_id);
+        if (t) {
+          t.status = "complete";
+          renderTribunalsList();
+        }
+      }
       const slug = currentRunningSlug;
       if (slug) {
-        // Already viewing this slug? Just re-render. Not viewing? Add to
-        // the switcher so they CAN view it mid-flight.
         liveRefreshAudit(slug);
       }
       return;
@@ -2138,7 +2249,6 @@ function wireAuditModal() {
     const cellId = cell.cell_id;
 
     if (!dpId || cellId == null) {
-      // Some events (judge, report) won't carry cell context — just log.
       return;
     }
 
@@ -2160,11 +2270,18 @@ function wireAuditModal() {
       case "cell_start":
         entry.status = "active";
         live.activeDp = dpId;
+        live.activeCell = { red: cell.red, blue: cell.blue };
         liveDp.textContent = `${cell.principle || ""} · ${dpId}`;
         liveCellTag.textContent = `cell ${cellId} · ${cell.red} vs ${cell.blue}`;
-        activeMeta.textContent = `${cell.principle || ""} · cell ${cellId}/10`;
+        activeMeta.textContent = `${cell.principle || ""} · cell ${cellId}/15`;
         ensureLivePanel();
-        renderCellsStrip(dpId);
+        bumpTribunal(dpId, "cellsTotal");
+        renderPersonasRow();
+        // Only refocus the cells strip onto this dp if the user hasn't
+        // pinned a different one via the tribunal chips.
+        if (!live.userPinnedDp || live.userPinnedDp === dpId) {
+          renderCellsStrip(dpId);
+        }
         break;
 
       case "turn_start":
@@ -2200,12 +2317,18 @@ function wireAuditModal() {
       case "cell_voted":
         entry.status = "voted";
         entry.position = ev.position;
-        renderCellsStrip(dpId);
+        bumpTribunal(dpId, "cellsVoted");
+        if (!live.userPinnedDp || live.userPinnedDp === dpId) {
+          renderCellsStrip(dpId);
+        }
         break;
 
       case "cell_failed":
         entry.status = "failed";
-        renderCellsStrip(dpId);
+        bumpTribunal(dpId, "cellsFailed");
+        if (!live.userPinnedDp || live.userPinnedDp === dpId) {
+          renderCellsStrip(dpId);
+        }
         break;
     }
   };
@@ -2283,6 +2406,9 @@ function wireAuditModal() {
       statusLabel.textContent = ok
         ? `COMPLETED — switching to "${slug}"`
         : `FAILED${info.error ? ": " + info.error : ""}`;
+      // Clear the running-slug so subsequent clicks of "New Audit" open a
+      // fresh form instead of landing back on this finished run's progress.
+      currentRunningSlug = null;
       if (ok) {
         const mres = await fetch("data/manifest.json", { cache: "no-store" });
         state.manifest = await mres.json();
@@ -2294,6 +2420,9 @@ function wireAuditModal() {
     sse.onerror = () => {
       statusDot.className = "w-2 h-2 rounded-full bg-red-500";
       statusLabel.textContent = "DISCONNECTED";
+      // Treat a dropped SSE the same as a finished run — let the user
+      // start a fresh audit instead of trapping them in the dead modal.
+      currentRunningSlug = null;
     };
   });
 }

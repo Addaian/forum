@@ -1,10 +1,10 @@
 {
   "values": {
     "maintainability": 1.0,
-    "correctness": 1.0,
-    "simplicity": 1.0,
     "flexibility": 1.0,
+    "simplicity": 1.0,
     "scalability": 1.0,
+    "correctness": 1.0,
     "velocity": 1.0
   },
   "items": [

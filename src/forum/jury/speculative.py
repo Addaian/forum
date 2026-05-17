@@ -83,6 +83,10 @@ async def run_tribunal_speculative(
         })
         fevents.emit("cell_start")
         async with sem:
+            # Track every failed attempt so the aggregate verdict can carry a
+            # diagnostic trail to disk — without this, all we know post-hoc is
+            # "cells_failed: 13".
+            attempt_errors: list[str] = []
             for attempt in range(3):
                 try:
                     vote = await run_cell(
@@ -97,12 +101,26 @@ async def run_tribunal_speculative(
                         max_turn_tokens=max_turn_tokens,
                     )
                     break
-                except BaseException as exc:
+                # Only catch Exception, NOT BaseException. CancelledError must
+                # propagate so speculative-stop cancellation actually stops the
+                # cell instead of getting retried, and KeyboardInterrupt should
+                # surface so Ctrl-C works.
+                except Exception as exc:
+                    attempt_errors.append(f"attempt {attempt + 1}: {exc!r}")
                     if attempt < 2:
-                        log.warning("cell %d attempt %d failed, retrying: %r", i, attempt + 1, exc)
-                        await asyncio.sleep(1 * (attempt + 1))
+                        log.warning("cell %d attempt %d failed, retrying: %r",
+                                    i, attempt + 1, exc)
+                        # Exponential backoff with jitter — Wafer rate-limit
+                        # responses often want >2s to clear.
+                        import random
+                        await asyncio.sleep(2 ** attempt + random.random())
                     else:
-                        fevents.emit("cell_failed", error=repr(exc))
+                        fevents.emit("cell_failed",
+                                     error=repr(exc),
+                                     attempts=attempt_errors)
+                        # Carry the full attempt history on the exception so the
+                        # outer task collector can persist it.
+                        exc.cell_attempts = attempt_errors  # type: ignore[attr-defined]
                         raise
             fevents.emit("cell_voted", position=vote.position, confidence=vote.confidence)
             return vote
@@ -112,7 +130,8 @@ async def run_tribunal_speculative(
     }
     completed: list[CellVote] = []
     cancelled_count = 0
-    failed: list[tuple[str, str]] = []
+    # (task_name, repr(final_exc), [per-attempt error strings])
+    failed: list[tuple[str, str, list[str]]] = []
 
     try:
         pending = tasks
@@ -126,7 +145,8 @@ async def run_tribunal_speculative(
                     continue
                 exc = task.exception()
                 if exc is not None:
-                    failed.append((task.get_name(), repr(exc)))
+                    attempts = getattr(exc, "cell_attempts", [repr(exc)])
+                    failed.append((task.get_name(), repr(exc), attempts))
                     log.warning("cell task %s failed: %r", task.get_name(), exc)
                     continue
                 vote = task.result()
@@ -162,12 +182,21 @@ async def run_tribunal_speculative(
     if failed:
         log.warning("tribunal had %d failed cells: %s",
                     len(failed),
-                    ", ".join(f"{n}:{e[:80]}" for n, e in failed))
+                    ", ".join(f"{n}:{e[:80]}" for n, e, _ in failed))
 
     log.info(
         "Tribunal done (speculative): dp=%s ran=%d cancelled=%d failed=%d",
         decision_point.id, len(completed), cancelled_count, len(failed),
     )
+
+    # Carry the full per-cell failure trail into the aggregate so verdicts.json
+    # records what actually went wrong, not just "cells_failed: N". The shape
+    # is a list of {cell, final_error, attempts}; the UI ignores it but the
+    # operator can read it post-hoc.
+    failure_trail = [
+        {"cell": name, "final_error": err, "attempts": attempts}
+        for name, err, attempts in failed
+    ]
 
     return TribunalResult(
         decision_point_id=decision_point.id,
@@ -177,6 +206,7 @@ async def run_tribunal_speculative(
             "cells_run": len(completed),
             "cells_cancelled": cancelled_count,
             "cells_failed": len(failed),
+            "failure_trail": failure_trail,
         },
         judge={},  # filled in by T4 if the caller wires it
     )

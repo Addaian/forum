@@ -60,12 +60,14 @@ def composite(dp: DecisionPoint, user_weights: dict[str, float],
 
 
 def rank(bundle: EvidenceBundle, user_weights: dict[str, float],
-         affinities: dict[str, dict[str, float]], top_n: int = 5) -> list[dict]:
+         affinities: dict[str, dict[str, float]], top_n: int = 0) -> list[dict]:
     scored = [composite(dp, user_weights, affinities) for dp in bundle.decision_points]
     scored.sort(key=lambda r: r["composite_score"], reverse=True)
-    for i, row in enumerate(scored[:top_n], start=1):
+    # top_n <= 0 means "rank everything" — every finding goes to the jury.
+    cut = scored if top_n <= 0 else scored[:top_n]
+    for i, row in enumerate(cut, start=1):
         row["rank"] = i
-    return scored[:top_n]
+    return cut
 
 
 def _values_fingerprint(weights: dict[str, float]) -> str:

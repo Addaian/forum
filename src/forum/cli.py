@@ -59,8 +59,9 @@ def main() -> None:
               default=None, help="YAML file of value weights.")
 @click.option("--value", "value_overrides", multiple=True,
               help="Single value override, e.g. --value velocity=1.8")
-@click.option("--top-n", "top_n", type=int, default=5,
-              help="Number of decision points to surface in Layer 1.5.")
+@click.option("--top-n", "top_n", type=int, default=0,
+              help="Number of decision points to surface in Layer 1.5. "
+                   "0 (default) audits every finding; pass a positive int to cap.")
 @click.option("--cache", "cache_dir", type=click.Path(path_type=Path),
               default=Path("./audits"), help="Where to write audit artifacts.")
 @click.option("--skip-jury", is_flag=True, default=False,
