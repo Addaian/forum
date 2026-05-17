@@ -89,7 +89,11 @@ class CLanguage(Language):
                     if not fname.endswith(self.extensions):
                         continue
                     fpath = (Path(dirpath) / fname).resolve()
-                    qualname = self._qualname_for(fpath, repo_root)
+                    # Use the package's parent as the qualname base so the
+                    # first segment is always the package name. This is
+                    # consistent with the Python adapter and keeps qualnames
+                    # unambiguous even when the fallback root is the repo root.
+                    qualname = self._qualname_for(fpath, pkg.parent.resolve())
                     if not qualname:
                         continue
                     existing = tentative.get(qualname)

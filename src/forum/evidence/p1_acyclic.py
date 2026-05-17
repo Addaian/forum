@@ -27,7 +27,8 @@ def check(index: RepoIndex, graph: nx.DiGraph) -> list[DecisionPoint]:
             if mi is None:
                 continue
             try:
-                num_lines = sum(1 for _ in mi.path.open(encoding="utf-8"))
+                with mi.path.open(encoding="utf-8") as _fh:
+                    num_lines = sum(1 for _ in _fh)
             except (OSError, UnicodeDecodeError):
                 num_lines = 1
             locations.append(CodeLocation(

@@ -49,21 +49,27 @@ def _render_graph_svg(graph: nx.DiGraph, out_path: Path) -> bool:
     Returns True on success. Cheap to fail — graph.svg is a nice-to-have.
     """
     try:
-        # Compact label = last package segment to keep the graph readable.
+        def _dot_quote(s: str) -> str:
+            # Escape backslashes, double-quotes, and newlines so weird module
+            # names (C qualnames carrying odd path chars, etc.) can't break DOT.
+            return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ")
         lines = ["digraph G {", '  rankdir=LR;',
                  '  node [shape=box, fontsize=9, fontname="Helvetica"];',
                  '  edge [arrowsize=0.6, color="#888888"];']
         for n in graph.nodes:
             label = n.split(".")[-1] or n
-            lines.append(f'  "{n}" [label="{label}"];')
+            lines.append(f'  "{_dot_quote(n)}" [label="{_dot_quote(label)}"];')
         for a, b in graph.edges:
-            lines.append(f'  "{a}" -> "{b}";')
+            lines.append(f'  "{_dot_quote(a)}" -> "{_dot_quote(b)}";')
         lines.append("}")
         dot_src = "\n".join(lines)
         result = subprocess.run(
             ["dot", "-Tsvg", "-o", str(out_path)],
             input=dot_src, text=True, capture_output=True, timeout=60,
         )
+        if result.returncode != 0:
+            log.warning("graphviz failed (rc=%d): %s",
+                        result.returncode, result.stderr.strip()[:200])
         return result.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired):
         return False

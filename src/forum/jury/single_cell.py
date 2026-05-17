@@ -621,14 +621,44 @@ async def run_cell(
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Vote extraction prompt]"})
     transcript.append({"role": "assistant", "speaker": "vote", "text": json.dumps(vote_data)})
 
+    # Defensive normalization — Anthropic tool-use enum is advisory, not
+    # enforced server-side, and Wafer/Qwen sometimes returns variants like
+    # "Debt", "STRUCTURAL_DEBT", "debt.", etc. Map them to the strict literal
+    # before Pydantic validates.
+    raw_pos = str(vote_data.get("position", "")).strip().lower()
+    raw_pos = raw_pos.replace("_", " ").rstrip(".")
+    if raw_pos.startswith("just"):              # "justified", "justified violation"
+        position = "justified"
+    elif raw_pos.startswith("debt") or "debt" in raw_pos:
+        position = "debt"
+    else:
+        raise RuntimeError(
+            f"cell {cell_id}: unrecognized vote position "
+            f"{vote_data.get('position')!r}; expected 'debt' or 'justified'."
+        )
+
+    # Fill any missing value_lens keys with 0.0 so probe.py and app.js see
+    # identical 6-key dicts and salience() never silently drops a dimension.
+    raw_lens = vote_data.get("value_lens", {}) or {}
+    value_lens = {v: 0.0 for v in (
+        "scalability", "maintainability", "velocity",
+        "correctness", "simplicity", "flexibility",
+    )}
+    for k, v in raw_lens.items():
+        if k in value_lens:
+            try:
+                value_lens[k] = float(v)
+            except (TypeError, ValueError):
+                pass  # keep 0.0; invalid entries shouldn't poison the cell
+
     return CellVote(
         cell_id=cell_id,
         red_persona=red.id,
         blue_persona=blue.id,
-        position=vote_data["position"],
-        confidence=float(vote_data["confidence"]),
-        key_argument=vote_data["key_argument"],
-        value_lens={k: float(v) for k, v in vote_data["value_lens"].items()},
+        position=position,
+        confidence=max(0.0, min(1.0, float(vote_data.get("confidence", 0.5)))),
+        key_argument=str(vote_data.get("key_argument", "(missing)")),
+        value_lens=value_lens,
         transcript=transcript,
     )
 

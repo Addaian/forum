@@ -17,9 +17,16 @@ const STRUCTURAL_FEATURES = ["blast_radius","recency","principle_severity","patt
 
 // ---- Whatif math (direct port of src/forum/whatif/probe.py) ----
 
+// Mirror probe.py exactly: iterate over weights' OWN keys (so non-standard
+// dims would be summed identically), not a hardcoded VALUES list.
+const INFINITY_SENTINEL = 999;  // shared with renderTribunal to avoid Infinity in sort/JSON
 function salience(lens, weights) {
-  const wNorm = VALUES.reduce((s,k) => s + Math.abs(weights[k] || 0), 0) || 1;
-  return VALUES.reduce((s,k) => s + (weights[k]||0) * (lens?.[k] || 0), 0) / wNorm;
+  let wNorm = 0;
+  for (const k of Object.keys(weights)) wNorm += Math.abs(weights[k] || 0);
+  if (wNorm === 0) wNorm = 1;
+  let num = 0;
+  for (const k of Object.keys(weights)) num += (weights[k] || 0) * (lens?.[k] || 0);
+  return num / wNorm;
 }
 
 function reweightedAggregate(cells, weights) {
@@ -87,9 +94,35 @@ const state = {
 // ---- Init: load manifest, then default audit ----
 
 async function init() {
-  state.manifest = await fetch("data/manifest.json").then(r => r.json());
+  try {
+    const res = await fetch("data/manifest.json");
+    if (!res.ok) throw new Error(`manifest.json ${res.status}`);
+    state.manifest = await res.json();
+  } catch (e) {
+    showFatal("Could not load <code>data/manifest.json</code>: " + e.message);
+    return;
+  }
   renderSwitcher();
   await loadAudit(state.manifest.default);
+}
+
+function showFatal(html) {
+  const main = document.querySelector("main") || document.body;
+  main.innerHTML = `<div class="panel" style="margin: 24px; color: var(--v-critical);">
+    <h2>UI failed to load</h2><p>${html}</p></div>`;
+}
+
+async function fetchOptional(url, asText = false) {
+  // Per-asset fallback: if any audit data file 404s, the page still loads
+  // and we render a polite "this audit is incomplete" panel instead of
+  // freezing on a rejected Promise.all.
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return asText ? await res.text() : await res.json();
+  } catch {
+    return null;
+  }
 }
 
 async function loadAudit(slug) {
@@ -101,15 +134,23 @@ async function loadAudit(slug) {
 
   const base = `data/${slug}`;
   const [evidence, prioritized, verdicts, reportMd, graphSvg] = await Promise.all([
-    fetch(`${base}/evidence.json`).then(r => r.json()),
-    fetch(`${base}/prioritized.json`).then(r => r.json()),
-    fetch(`${base}/verdicts.json`).then(r => r.json()),
-    fetch(`${base}/report.md`).then(r => r.text()),
-    fetch(`${base}/graph.svg`).then(r => r.text()),
+    fetchOptional(`${base}/evidence.json`),
+    fetchOptional(`${base}/prioritized.json`),
+    fetchOptional(`${base}/verdicts.json`),
+    fetchOptional(`${base}/report.md`, true),
+    fetchOptional(`${base}/graph.svg`, true),
   ]);
+  if (!evidence || !prioritized) {
+    showFatal(
+      `Audit <code>${slug}</code> is missing required artifacts ` +
+      `(<code>evidence.json</code> or <code>prioritized.json</code>). ` +
+      `Check <code>${base}/</code> on disk.`
+    );
+    return;
+  }
   state.evidence = evidence;
   state.prioritized = prioritized;
-  state.verdicts = verdicts;
+  state.verdicts = verdicts || [];           // tolerate missing Layer-2 artifacts
   state.baselineWeights = { ...prioritized.values };
   state.currentWeights = { ...prioritized.values };
   state.dpById = Object.fromEntries(evidence.decision_points.map(d => [d.id, d]));
@@ -118,8 +159,8 @@ async function loadAudit(slug) {
   lastRanking = null;          // reset rank-diff baseline when switching audits
   renderStats();
   renderSliders();             // re-renders with fresh baseline values
-  renderReport(reportMd);
-  renderGraph(graphSvg);
+  renderReport(reportMd || "_(no Layer-3 briefing on disk for this audit)_");
+  renderGraph(graphSvg || "<p class='hint' style='padding:20px'>No dependency graph SVG on disk for this audit.</p>");
   refresh();
   wirePresets();
   markPresetActive(document.querySelector('.preset-btn[data-preset="baseline"]'));
@@ -292,12 +333,17 @@ function renderOneTribunal(tribunal, rank) {
   const cellsWithRatio = cells.map(c => {
     const b = salience(c.value_lens, state.baselineWeights);
     const n = salience(c.value_lens, state.currentWeights);
-    const ratio = b > 0 ? n / b : (n > 0 ? Infinity : 1);
+    // Use a large sentinel instead of Infinity: Infinity-Infinity = NaN
+    // breaks stable sorting and JSON.stringify silently coerces it to null.
+    const ratio = b > 0 ? n / b : (n > 0 ? INFINITY_SENTINEL : 1);
     return { ...c, ratio };
   });
   cellsWithRatio.sort((a, b) => b.ratio - a.ratio);
 
-  const verdictKey = (judge.verdict || "").replace(/ /g, "-");
+  // Only A-Z + space allowed in a verdict label; strip anything else so we
+  // never inject odd characters into a CSS class attribute.
+  const safeVerdict = String(judge.verdict || "").replace(/[^A-Z ]/g, "");
+  const verdictKey = safeVerdict.replace(/ /g, "-");
   const overrideTag = judge.override
     ? `<span class="override-tag">override</span>`
     : "";
@@ -352,7 +398,7 @@ function renderOneTribunal(tribunal, rank) {
 
 function renderCell(c) {
   const salient = c.ratio >= SALIENCE_BUMP;
-  const ratioStr = c.ratio === Infinity ? "∞" : `${c.ratio.toFixed(2)}×`;
+  const ratioStr = c.ratio >= INFINITY_SENTINEL ? "∞" : `${c.ratio.toFixed(2)}×`;
   const persona = c.position === "debt"
     ? `red · ${c.red_persona}`
     : `blue · ${c.blue_persona}`;
