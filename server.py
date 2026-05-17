@@ -289,6 +289,10 @@ async def _run_job(job: Job) -> None:
                 cmd, job,
                 # FORUM_EVENTS=1 turns on per-token streaming in the cache layer.
                 env_extra={"NO_COLOR": "1", "FORCE_COLOR": "0", "FORUM_EVENTS": "1"},
+                # Stream partial artifacts into docs/data/<slug>/ as each
+                # tribunal/layer completes, so the live UI can re-fetch
+                # mid-audit without waiting for the whole pipeline.
+                live_cache_dir=cache_dir,
             )
             if rc != 0:
                 raise RuntimeError(f"`forum audit` exited with code {rc}")
@@ -317,7 +321,16 @@ async def _run_job(job: Job) -> None:
 
 
 async def _exec_streaming(cmd: list[str], job: Job,
-                          env_extra: dict[str, str] | None = None) -> int:
+                          env_extra: dict[str, str] | None = None,
+                          live_cache_dir: Path | None = None) -> int:
+    """Run a subprocess, fan its stdout into log and event SSE streams.
+
+    `live_cache_dir` (optional): parent of the audit's per-hash subdir.
+    When set, certain events (`tribunal_complete`, etc.) trigger a partial
+    copy of whatever artifacts exist so far into docs/data/<slug>/. The
+    actual audit subdir is discovered on each event (it's the most recently
+    modified dir under live_cache_dir).
+    """
     env = {**os.environ, **(env_extra or {})}
     proc = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT, env=env,
@@ -328,13 +341,53 @@ async def _exec_streaming(cmd: list[str], job: Job,
             line = raw.decode("utf-8", errors="replace").rstrip("\r\n")
         except Exception:  # noqa: BLE001
             continue
-        # Structured events from the CLI come through stdout with this prefix
-        # so we don't need a side channel. Everything else is rendered as log.
         if line.startswith(EVENT_PREFIX):
-            job.emit_event(line[len(EVENT_PREFIX):].lstrip())
+            payload = line[len(EVENT_PREFIX):].lstrip()
+            job.emit_event(payload)
+            if live_cache_dir is not None:
+                try:
+                    ev = json.loads(payload)
+                    if ev.get("t") in ("tribunal_complete", "layer1_done", "layer3_done"):
+                        await _publish_partial_from_cache(live_cache_dir, job)
+                except Exception:  # noqa: BLE001
+                    pass
         else:
             job.emit_log(line)
     return await proc.wait()
+
+
+async def _publish_partial_from_cache(cache_dir: Path, job: Job) -> None:
+    """Find the audit's hash-subdir under cache_dir and partial-publish it.
+
+    Idempotent — safe to call after every interesting event.
+    """
+    try:
+        subdirs = [p for p in cache_dir.iterdir() if p.is_dir()]
+    except (FileNotFoundError, OSError):
+        return
+    if not subdirs:
+        return
+    audit_out = max(subdirs, key=lambda p: p.stat().st_mtime)
+    await _publish_partial(audit_out, job)
+
+
+async def _publish_partial(audit_out: Path, job: Job) -> None:
+    """Copy whatever artifacts exist so far to docs/data/<slug>/.
+
+    Idempotent — safe to call after every interesting event. Doesn't touch
+    manifest.json; that's still _publish_audit's responsibility at the end
+    so the audit only appears in the switcher once it's complete.
+    """
+    target = DATA / job.slug
+    target.mkdir(parents=True, exist_ok=True)
+    for name in ("evidence.json", "prioritized.json", "verdicts.json",
+                 "report.md", "graph.svg"):
+        src = audit_out / name
+        if src.exists():
+            try:
+                shutil.copy2(src, target / name)
+            except OSError:
+                pass
 
 
 async def _publish_audit(audit_out: Path, job: Job) -> None:

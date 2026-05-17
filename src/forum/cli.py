@@ -228,36 +228,64 @@ def audit(repo: Path | None, values_path: Path | None,
         top_dps = [dp_by_id[r["decision_point_id"]] for r in ranked
                    if r["decision_point_id"] in dp_by_id]
 
-        verdicts: list[dict] = []
+        # Each finding's tribunal+judge is independent. Run them concurrently.
+        # On Wafer (no concurrency cap) this collapses top-N wall-clock to
+        # ~the time of one tribunal. On Anthropic Tier-1 the per-tribunal
+        # cell semaphore still protects us from the 50K TPM ceiling.
+        verdicts: list[dict] = [None] * len(top_dps)
+
+        # Import the live-event emitter so the FastAPI server (when wrapping
+        # us) can show per-tribunal progress as each one completes — not
+        # one giant batch at the end.
+        from . import events as fevents
+
+        async def _one_tribunal(i: int, dp) -> dict:
+            console.print(f"[blue]Tribunal {i + 1}/{len(top_dps)} ▸ started[/]: "
+                          f"{dp.id} ({dp.principle}) — {dp.subject[:80]}")
+            fevents.emit("tribunal_start", trib_idx=i, dp_id=dp.id,
+                         subject=dp.subject, principle=dp.principle)
+            tribunal = await run_tribunal_speculative(
+                decision_point=dp, num_cells=10,
+                codebase_summary=codebase_summary, git_summary=git_summary,
+                pc=cell_pc,
+            )
+            judge_out = await run_judge(
+                decision_point=dp, cells=tribunal.cells, pc=judge_pc,
+            )
+            console.print(
+                f"  [blue]◂ {i + 1}[/] {tribunal.aggregate_vote['cells_run']}/10 cells · "
+                f"winner={tribunal.aggregate_vote['winner']} · "
+                f"⚖  {verdict_markup(judge_out['verdict'])}"
+                f"{' [yellow](override)[/]' if judge_out.get('override') else ''}"
+            )
+            tr = tribunal.model_dump()
+            tr["judge"] = judge_out
+
+            # Save THIS finding's verdict slot immediately + flush partial
+            # verdicts.json so the live-audit UI can re-fetch and render
+            # what's done without waiting for the whole batch.
+            verdicts[i] = tr
+            (audit_dir / "verdicts.json").write_text(
+                json.dumps([v for v in verdicts if v is not None], indent=2),
+                encoding="utf-8",
+            )
+            fevents.emit("tribunal_complete", trib_idx=i, dp_id=dp.id,
+                         verdict=judge_out.get("verdict"),
+                         override=bool(judge_out.get("override")))
+            return tr
 
         async def _layer2() -> None:
-            for i, dp in enumerate(top_dps, start=1):
-                console.print(f"[blue]Tribunal {i}/{len(top_dps)}[/]: {dp.id} ({dp.principle}) — {dp.subject[:80]}")
-                tribunal = await run_tribunal_speculative(
-                    decision_point=dp,
-                    num_cells=10,
-                    codebase_summary=codebase_summary,
-                    git_summary=git_summary,
-                    pc=cell_pc,
-                )
-                console.print(
-                    f"  → {tribunal.aggregate_vote['cells_run']}/10 cells, "
-                    f"winner={tribunal.aggregate_vote['winner']} "
-                    f"margin={tribunal.aggregate_vote['margin']:.2f}"
-                )
-                judge_out = await run_judge(
-                    decision_point=dp, cells=tribunal.cells, pc=judge_pc,
-                )
-                console.print(f"  ⚖  verdict: {verdict_markup(judge_out['verdict'])}"
-                              f"{' [yellow](override)[/]' if judge_out.get('override') else ''}")
-                tr = tribunal.model_dump()
-                tr["judge"] = judge_out
-                verdicts.append(tr)
+            await asyncio.gather(*[
+                _one_tribunal(i, dp) for i, dp in enumerate(top_dps)
+            ])
 
         asyncio.run(_layer2())
 
+        # Final canonical write (in case the concurrent partial-flushes left
+        # a slot-ordering quirk; this is a no-op if all slots filled cleanly).
         (audit_dir / "verdicts.json").write_text(
-            json.dumps(verdicts, indent=2), encoding="utf-8",
+            json.dumps([v for v in verdicts if v is not None], indent=2),
+            encoding="utf-8",
         )
         cell_s = cell_pc.metrics.summary()
         judge_s = judge_pc.metrics.summary()

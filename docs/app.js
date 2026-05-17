@@ -162,6 +162,42 @@ const PRESETS = {
   },
 };
 
+// --- live-audit tracker (set when the new-audit modal kicks off a job) ---
+// Used by handleEvent so server-streamed `tribunal_complete` events can
+// re-fetch and re-render the audit-in-progress without the user clicking.
+let currentRunningSlug = null;
+let _liveRefreshPending = null;  // simple debouncer
+
+async function liveRefreshAudit(slug) {
+  // Debounce: many tribunal_complete events arriving back-to-back collapse
+  // into one refresh. ~250ms is short enough to feel live, long enough to
+  // avoid hammering loadAudit while the server's still copying files.
+  if (_liveRefreshPending) return;
+  _liveRefreshPending = setTimeout(async () => {
+    _liveRefreshPending = null;
+    try {
+      // Make sure the manifest has this slug — if the audit hasn't been
+      // published yet, inject a temporary entry so loadAudit can find it.
+      if (!state.manifest.audits.find(a => a.slug === slug)) {
+        state.manifest.audits.push({
+          slug, label: slug, version: "live", language: "python",
+          source: "(in-progress audit)", commit: "live",
+          note: "Audit running — verdicts appear as each finding's debate concludes.",
+        });
+        renderAuditSwitcher();
+      }
+      // Only re-render if the user is already on this slug (don't yank them
+      // mid-browse). If they're elsewhere, the pill will switch to this on
+      // SSE 'done' anyway.
+      if (state.activeSlug === slug) {
+        await loadAudit(slug);
+      }
+    } catch (e) {
+      console.error("liveRefreshAudit failed:", e);
+    }
+  }, 250);
+}
+
 // --- shared state ---
 const state = {
   manifest: null,
@@ -1985,6 +2021,20 @@ function wireAuditModal() {
   };
 
   const handleEvent = (ev) => {
+    // Live-publish: when the CLI streams a tribunal_complete event, the
+    // server has just copied a partial verdicts.json into docs/data/<slug>/.
+    // Re-fetch and re-render that audit's views in the background so the
+    // user watches findings populate as they're decided.
+    if (ev.t === "tribunal_complete" || ev.t === "layer1_done" || ev.t === "layer3_done") {
+      const slug = currentRunningSlug;
+      if (slug) {
+        // Already viewing this slug? Just re-render. Not viewing? Add to
+        // the switcher so they CAN view it mid-flight.
+        liveRefreshAudit(slug);
+      }
+      return;
+    }
+
     const cell = ev.cell || {};
     const turn = ev.turn || {};
     const dpId = cell.dp_id;
@@ -2089,6 +2139,25 @@ function wireAuditModal() {
       return;
     }
     const { job_id, slug } = await res.json();
+
+    // Track the slug the live-audit is writing to so handleEvent() knows
+    // whose docs/data/<slug>/ to re-fetch when partial events fire.
+    currentRunningSlug = slug;
+
+    // Pre-add the slug to the switcher (as a placeholder) and switch the
+    // main views to it RIGHT NOW. The user can watch Evidence, Jury, and
+    // Briefing populate live as each phase completes — much more dramatic
+    // than staring at the modal log.
+    if (!state.manifest.audits.find(a => a.slug === slug)) {
+      state.manifest.audits.push({
+        slug, label: slug, version: "live", language: "python",
+        source: "(in-progress audit)", commit: "live",
+        note: "Audit running — phases appear as they complete.",
+      });
+      renderAuditSwitcher();
+    }
+    state.activeSlug = slug;
+    markAuditActive(slug);
 
     form.classList.add("hidden");
     logWrap.classList.remove("hidden");

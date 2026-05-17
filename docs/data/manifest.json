@@ -45,6 +45,24 @@
       "source": "github.com/BigBodyCobain/Shadowbroker",
       "commit": "25a98a98",
       "note": "Live-audited from github.com/BigBodyCobain/Shadowbroker \u2014 226 modules."
+    },
+    {
+      "slug": "deepeval",
+      "label": "deepeval",
+      "version": "live",
+      "language": "python",
+      "source": "github.com/confident-ai/deepeval",
+      "commit": "f2acacf1",
+      "note": "Live-audited from github.com/confident-ai/deepeval \u2014 521 modules."
+    },
+    {
+      "slug": "kronos",
+      "label": "kronos",
+      "version": "live",
+      "language": "python",
+      "source": "github.com/shiyu-coder/Kronos",
+      "commit": "67b630e6",
+      "note": "Live-audited from github.com/shiyu-coder/Kronos \u2014 5 modules."
     }
   ]
 }
