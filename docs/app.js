@@ -1751,8 +1751,12 @@ function wireAuditModal() {
   };
 
   openBtn.addEventListener("click", () => {
-    reset();
+    // Open the modal first, then reset. If reset() throws on a stale/
+    // missing element, the modal still appears so the user sees *something*
+    // happen and we get a console error pinpointing the bad reference.
     modal.classList.remove("hidden");
+    try { reset(); }
+    catch (e) { console.error("audit-modal reset failed:", e); }
   });
   closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
   modal.addEventListener("click", (e) => {
