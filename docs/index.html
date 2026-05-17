@@ -236,7 +236,7 @@
 
         <nav class="flex-1 space-y-1" id="nav">
           <a
-            class="nav-item active bg-primary-container text-primary border-l-4 border-primary px-4 py-3 flex items-start gap-3 transition-all"
+            class="nav-item active text-primary border-l-4 border-primary px-4 py-3 flex items-start gap-3 transition-all"
             href="#evidence"
             data-view="evidence"
           >
@@ -405,9 +405,10 @@
                 </div>
               </section>
 
-              <div class="grid grid-cols-12 gap-gutter flex-grow min-h-0">
+              <div id="ev-grid" class="grid grid-cols-12 gap-gutter flex-grow min-h-0">
                 <!-- Layer 1 metric cards -->
                 <div
+                  id="ev-left-panel"
                   class="col-span-12 lg:col-span-4 flex flex-col gap-gutter overflow-y-auto"
                 >
                   <div
@@ -453,7 +454,8 @@
 
                 <!-- Dep graph view -->
                 <div
-                  class="col-span-12 lg:col-span-8 bg-surface-container-low border border-outline-variant relative flex flex-col min-h-0"
+                  id="ev-graph-col"
+                  class="col-span-12 lg:col-span-8 bg-surface-container border border-outline-variant relative flex flex-col min-h-0"
                 >
                   <div
                     class="p-4 flex justify-between items-center border-b border-outline-variant"
@@ -472,14 +474,29 @@
                         Each arrow = one file imports another
                       </span>
                     </div>
-                    <span
-                      class="text-[10px] text-on-surface-variant font-code-sm"
-                      id="ev-graph-stats"
-                      >—</span
-                    >
+                    <div class="flex items-center gap-3">
+                      <span
+                        class="text-[10px] text-on-surface-variant font-code-sm"
+                        id="ev-graph-stats"
+                        >—</span
+                      >
+                      <button
+                        id="btn-ev-toggle-panel"
+                        class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 font-label-caps text-[10px]"
+                        title="Collapse the findings panel and let the graph use the full width."
+                        data-collapsed="false"
+                      >
+                        <span
+                          class="material-symbols-outlined text-[16px]"
+                          id="btn-ev-toggle-icon"
+                          >fullscreen</span
+                        >
+                        <span id="btn-ev-toggle-label">EXPAND GRAPH</span>
+                      </button>
+                    </div>
                   </div>
                   <div
-                    class="flex-grow relative bg-surface-container-lowest"
+                    class="flex-grow relative bg-surface-container"
                     id="ev-graph-wrap"
                   >
                     <!-- 3D graph injected by JS -->

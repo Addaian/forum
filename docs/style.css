@@ -115,9 +115,12 @@
   display: none;
 }
 
-/* ----- Nav active state ----- */
+/* ----- Nav active state -----
+   Active background matches the surrounding sidebar so the row blends in;
+   the left border + text color do the "this is selected" work without
+   the heavy dark-box look the primary-container shade was producing. */
 .nav-item.active {
-  background-color: #0a0a0b;
+  background-color: transparent;
   color: #c8c6c7;
   border-left-color: #c8c6c7;
 }

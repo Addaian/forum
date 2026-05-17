@@ -588,6 +588,45 @@ function wireButtons() {
   document
     .getElementById("btn-reset")
     ?.addEventListener("click", () => applyPreset("baseline"));
+
+  // Evidence view: collapse "WHAT THE CHECKS FOUND" panel + expand graph.
+  // Just toggles the left column's visibility and swaps the graph col's
+  // span. After the layout change settles, rebuild the 3D graph so its
+  // canvas matches the new container width.
+  const toggleBtn  = document.getElementById("btn-ev-toggle-panel");
+  const leftPanel  = document.getElementById("ev-left-panel");
+  const graphCol   = document.getElementById("ev-graph-col");
+  const toggleIcon = document.getElementById("btn-ev-toggle-icon");
+  const toggleLbl  = document.getElementById("btn-ev-toggle-label");
+  if (toggleBtn && leftPanel && graphCol) {
+    toggleBtn.addEventListener("click", () => {
+      const isCollapsed = toggleBtn.dataset.collapsed === "true";
+      if (isCollapsed) {
+        // Restoring the panel.
+        leftPanel.classList.remove("hidden");
+        graphCol.classList.remove("lg:col-span-12");
+        graphCol.classList.add("lg:col-span-8");
+        toggleBtn.dataset.collapsed = "false";
+        toggleIcon.textContent = "fullscreen";
+        toggleLbl.textContent  = "EXPAND GRAPH";
+      } else {
+        // Collapsing — hide left, give the graph the full row.
+        leftPanel.classList.add("hidden");
+        graphCol.classList.remove("lg:col-span-8");
+        graphCol.classList.add("lg:col-span-12");
+        toggleBtn.dataset.collapsed = "true";
+        toggleIcon.textContent = "fullscreen_exit";
+        toggleLbl.textContent  = "SHOW FINDINGS";
+      }
+      // 3D-force-graph needs a rebuild against the new container width.
+      if (state.graphJson) {
+        requestAnimationFrame(() => {
+          try { renderDependencyGraph(); }
+          catch (e) { console.error("graph rebuild after panel toggle failed:", e); }
+        });
+      }
+    });
+  }
   // Copy report markdown to clipboard for pasting into an agent
   document.getElementById("btn-copy-agent")?.addEventListener("click", () => {
     const md = state.reportMd;
