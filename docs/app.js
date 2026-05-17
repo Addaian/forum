@@ -92,6 +92,18 @@ const AFFINITIES = {
   },
 };
 
+// Plain-English subtitles for each verdict label. Used wherever a verdict
+// is shown in the UI; the labels themselves are jargon the judge writes
+// verbatim and can't be changed at the source.
+const VERDICT_PLAIN = {
+  "HEALTHY":              "No problem found — don't touch it.",
+  "JUSTIFIED VIOLATION":  "Yes there's a textbook issue, but it's defensible. Leave it alone.",
+  "STRUCTURAL DEBT":      "Real problem, real cost. Worth refactoring.",
+  "CRITICAL":             "Real problem actively hurting you. Refactor urgently.",
+  "DRIFTED":              "Original design was sound; code wandered away. Restore the design.",
+  "CONTESTED":            "Panel split too badly — a human architect should weigh in.",
+};
+
 // User-friendly names + a one-line "what this means" subtitle for each check.
 const PRINCIPLE_LABELS = {
   P1: "Cycles in imports",
@@ -1166,6 +1178,7 @@ function renderCellCard(c) {
   const salient = ratio >= SALIENCE_BUMP;
   const ratioStr = ratio >= INFINITY_SENTINEL ? "∞" : `${ratio.toFixed(2)}×`;
 
+  const voteShort = voteIsDebt ? "real problem, worth fixing" : "fine as-is, defensible";
   const voteExplainer = voteIsDebt
     ? "Cell concluded: this is real debt — the personas' reading converged on harm."
     : "Cell concluded: this is justified — the personas' reading converged on serving / defensible.";
@@ -1189,11 +1202,14 @@ function renderCellCard(c) {
             ${personaPill(personaBId)}
           </div>
         </div>
-        <span class="font-label-caps text-[9px] px-2 py-0.5 border whitespace-nowrap"
-              style="color:${voteColor};border-color:${voteColor};background:${voteColor}1a"
-              title="${escapeHtml(voteExplainer)}">
-          VOTE: ${voteIsDebt ? "DEBT" : "JUSTIFIED"}
-        </span>
+        <div class="flex flex-col items-end gap-0.5">
+          <span class="font-label-caps text-[9px] px-2 py-0.5 border whitespace-nowrap"
+                style="color:${voteColor};border-color:${voteColor};background:${voteColor}1a"
+                title="${escapeHtml(voteExplainer)}">
+            VOTE: ${voteIsDebt ? "DEBT" : "JUSTIFIED"}
+          </span>
+          <span class="text-[9px] text-on-surface-variant opacity-70 italic">${voteShort}</span>
+        </div>
       </div>
       <!-- Confidence bar -->
       <div class="flex items-center gap-2 mb-3 bg-surface-container-high p-2 border border-outline-variant/30" title="How sure this cell was of its vote (0% = toss-up, 100% = decisive)">
@@ -1218,6 +1234,7 @@ function renderJudgeCard(trib, tribIdx, dp) {
   const judge = trib.judge || {};
   const v = String(judge.verdict || "—").toUpperCase();
   const vKey = v.replace(/ /g, "-");
+<<<<<<< HEAD
   const verdictExplainer =
     {
       HEALTHY: "Decision is sound — no action needed.",
@@ -1229,6 +1246,9 @@ function renderJudgeCard(trib, tribIdx, dp) {
       CONTESTED:
         "Panel split too hard to call — a human architect should weigh in.",
     }[v] || "";
+=======
+  const verdictExplainer = VERDICT_PLAIN[v] || "";
+>>>>>>> aae44fa (changes)
 
   const card = document.createElement("div");
   card.className = `bg-surface-container-low border border-outline-variant p-4`;
@@ -1387,8 +1407,15 @@ function renderBriefingBody() {
   // Wrap literal verdict labels in colored chips.
   html = html.replace(
     /<strong>\s*Verdict:\s*([A-Z][A-Z ]+[A-Z])\s*<\/strong>/g,
+<<<<<<< HEAD
     (_, v) =>
       `<span class="verdict-tag verdict-${v.replace(/ /g, "-")} verdict-bg-${v.replace(/ /g, "-")}">${v}</span>`,
+=======
+    (_, v) => {
+      const plain = VERDICT_PLAIN[v] || "";
+      return `<span class="verdict-tag verdict-${v.replace(/ /g, "-")} verdict-bg-${v.replace(/ /g, "-")}" title="${plain.replace(/"/g, "&quot;")}">${v}</span>`;
+    }
+>>>>>>> aae44fa (changes)
   );
   document.getElementById("brief-markdown").innerHTML = html;
 }
@@ -1414,6 +1441,7 @@ function renderBriefingVerbatims() {
     const block = document.createElement("div");
     block.className = "bg-surface-container-low p-6 my-4";
     block.style.borderLeft = "4px solid";
+<<<<<<< HEAD
     block.style.borderLeftColor =
       {
         HEALTHY: "#4ade80",
@@ -1423,12 +1451,25 @@ function renderBriefingVerbatims() {
         DRIFTED: "#c084fc",
         CONTESTED: "#67e8f9",
       }[v] || "#c8c6c7";
+=======
+    block.style.borderLeftColor = ({
+      "HEALTHY": "#4ade80",
+      "JUSTIFIED VIOLATION": "#facc15",
+      "STRUCTURAL DEBT": "#fb923c",
+      "CRITICAL": "#ef4444",
+      "DRIFTED": "#c084fc",
+      "CONTESTED": "#67e8f9",
+    })[v] || "#c8c6c7";
+    const plain = VERDICT_PLAIN[v] || "";
+>>>>>>> aae44fa (changes)
     block.innerHTML = `
-      <div class="flex items-center gap-2 mb-4 flex-wrap">
-        <span class="font-label-caps text-label-caps verdict-bg-${vKey} verdict-${vKey} px-2 py-1">${escapeHtml(v)}</span>
-        ${judge.override ? `<span class="font-label-caps text-[10px] text-yellow-400 bg-yellow-900/20 px-2 py-1">OVERRIDE</span>` : ""}
+      <div class="flex items-center gap-2 mb-2 flex-wrap">
+        <span class="font-label-caps text-label-caps verdict-bg-${vKey} verdict-${vKey} px-2 py-1"
+              title="${escapeHtml(plain)}">${escapeHtml(v)}</span>
+        ${judge.override ? `<span class="font-label-caps text-[10px] text-yellow-400 bg-yellow-900/20 px-2 py-1" title="Judge overrode the panel majority on this finding.">OVERRIDE</span>` : ""}
         <span class="text-on-surface-variant font-code-sm">DP ${idx + 1}/${state.verdicts.length} · ${escapeHtml(trib.decision_point_id)}</span>
       </div>
+      ${plain ? `<div class="text-[11px] text-on-surface-variant opacity-70 mb-3 leading-snug">${escapeHtml(plain)}</div>` : ""}
       <div class="font-code-sm text-on-surface-variant text-[11px] mb-3">${escapeHtml(dp?.subject || "(no subject)")}</div>
       <blockquote class="m-0 border-none p-0 text-on-surface italic font-code-md leading-relaxed">
         "${escapeHtml(judge.recommended_action || "(no recommended action)")}"
