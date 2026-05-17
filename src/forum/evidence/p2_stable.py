@@ -45,8 +45,9 @@ def check(index: RepoIndex, graph: nx.DiGraph) -> list[DecisionPoint]:
         if i_src < STABLE_THRESHOLD and i_tgt > UNSTABLE_THRESHOLD:
             violations.append((src, tgt, i_src, i_tgt))
 
-    # Rank by severity = how far the gap is.
-    violations.sort(key=lambda t: (t[3] - t[2]), reverse=True)
+    # Rank by severity = how far the gap is. Use (src, tgt) as a tie-breaker
+    # so the output order is deterministic across runs and platforms.
+    violations.sort(key=lambda t: (-(t[3] - t[2]), t[0], t[1]))
 
     decisions: list[DecisionPoint] = []
     for src, tgt, i_src, i_tgt in violations[:MAX_DECISIONS]:

@@ -30,9 +30,20 @@ SWEEP_MODEL = "GLM-5.1"
 DEEP_MODEL = "GLM-5.1"
 
 
+# Per-million-token pricing keyed by tier. Tier is decided at the call site
+# (sweep vs deep), not parsed from the model name — the model can be aliased
+# to anything (e.g. both routes pointing at "GLM-5.1") without zeroing out
+# cost reporting.
+PRICING: dict[str, dict[str, float]] = {
+    "sweep": {"input": 0.19, "output": 1.25, "cache_read": 0.02},
+    "deep":  {"input": 0.60, "output": 3.60, "cache_read": 0.06},
+}
+
+
 @dataclass
 class UsageStats:
     """Track API usage and cost."""
+    tier: str = "sweep"
     input_tokens: int = 0
     output_tokens: int = 0
     cache_read_tokens: int = 0
@@ -44,16 +55,11 @@ class UsageStats:
     def avg_latency(self) -> float:
         return self.latency_total / max(1, self.requests)
 
-    def cost(self, model: str) -> float:
-        if "35B" in model or "35b" in model:
-            return (self.input_tokens * 0.19 / 1_000_000 +
-                    self.output_tokens * 1.25 / 1_000_000 +
-                    self.cache_read_tokens * 0.02 / 1_000_000)
-        elif "397B" in model or "397b" in model:
-            return (self.input_tokens * 0.60 / 1_000_000 +
-                    self.output_tokens * 3.60 / 1_000_000 +
-                    self.cache_read_tokens * 0.06 / 1_000_000)
-        return 0.0
+    def cost(self, model: str | None = None) -> float:
+        rates = PRICING.get(self.tier, PRICING["sweep"])
+        return (self.input_tokens * rates["input"] / 1_000_000 +
+                self.output_tokens * rates["output"] / 1_000_000 +
+                self.cache_read_tokens * rates["cache_read"] / 1_000_000)
 
 
 def _extract_content(data: dict) -> str:
@@ -100,62 +106,92 @@ class WaferClient:
 
     def __init__(self, api_key: str | None = None,
                  base_url: str = WAFER_BASE,
-                 max_concurrent: int = 100):
+                 max_concurrent: int = 100,
+                 max_retries: int = 3):
         self.api_key = api_key or os.environ.get("WAFER_API_KEY", "")
         self.base_url = base_url
         self.semaphore = asyncio.Semaphore(max_concurrent)
-        self.sweep_stats = UsageStats()
-        self.deep_stats = UsageStats()
+        self.max_retries = max_retries
+        self.sweep_stats = UsageStats(tier="sweep")
+        self.deep_stats = UsageStats(tier="deep")
         self._client: httpx.AsyncClient | None = None
+        self._client_lock = asyncio.Lock()
 
     async def _get_client(self) -> httpx.AsyncClient:
-        if self._client is None or self._client.is_closed:
-            self._client = httpx.AsyncClient(
-                base_url=self.base_url,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                },
-                timeout=120.0,
-                limits=httpx.Limits(max_connections=200, max_keepalive_connections=50),
-            )
-        return self._client
+        # Guard lazy init so two concurrent first-callers don't both create
+        # (and leak) a client.
+        async with self._client_lock:
+            if self._client is None or self._client.is_closed:
+                self._client = httpx.AsyncClient(
+                    base_url=self.base_url,
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    timeout=120.0,
+                    limits=httpx.Limits(max_connections=200, max_keepalive_connections=50),
+                )
+            return self._client
 
     async def close(self) -> None:
         if self._client and not self._client.is_closed:
             await self._client.aclose()
 
     async def chat(self, model: str, messages: list[dict],
-                   max_tokens: int = 2000, temperature: float = 0.1) -> dict:
-        """Send a chat completion request to Wafer."""
+                   max_tokens: int = 2000, temperature: float = 0.1,
+                   stats: UsageStats | None = None) -> dict:
+        """Send a chat completion request to Wafer with retry on 429/5xx."""
         client = await self._get_client()
+        target_stats = stats or self.sweep_stats
 
         async with self.semaphore:
             t0 = time.perf_counter()
-            try:
-                response = await client.post("/chat/completions", json={
-                    "model": model,
-                    "messages": messages,
-                    "max_tokens": max_tokens,
-                    "temperature": temperature,
-                })
-                response.raise_for_status()
-                data = response.json()
-            except (httpx.HTTPError, Exception):
-                stats = self.sweep_stats if "35B" in model else self.deep_stats
-                stats.errors += 1
-                raise
+            payload = {
+                "model": model,
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+            }
+            data: dict | None = None
+            last_exc: BaseException | None = None
+            for attempt in range(self.max_retries + 1):
+                try:
+                    response = await client.post("/chat/completions", json=payload)
+                    # Retry on rate-limit / transient server errors.
+                    if response.status_code == 429 or 500 <= response.status_code < 600:
+                        if attempt < self.max_retries:
+                            backoff = min(30.0, 0.5 * (2 ** attempt))
+                            log.warning("Wafer %d on attempt %d; retrying in %.1fs",
+                                        response.status_code, attempt + 1, backoff)
+                            await asyncio.sleep(backoff)
+                            continue
+                    response.raise_for_status()
+                    data = response.json()
+                    break
+                except httpx.HTTPError as exc:
+                    last_exc = exc
+                    if attempt < self.max_retries:
+                        backoff = min(30.0, 0.5 * (2 ** attempt))
+                        log.warning("Wafer error %r on attempt %d; retrying in %.1fs",
+                                    exc, attempt + 1, backoff)
+                        await asyncio.sleep(backoff)
+                        continue
+                    target_stats.errors += 1
+                    raise
+
+            if data is None:
+                target_stats.errors += 1
+                raise last_exc or RuntimeError("Wafer request failed with no response")
 
             dt = time.perf_counter() - t0
 
         # Track usage
         usage = data.get("usage", {})
-        stats = self.sweep_stats if "35B" in model else self.deep_stats
-        stats.input_tokens += usage.get("prompt_tokens", 0)
-        stats.output_tokens += usage.get("completion_tokens", 0)
-        stats.cache_read_tokens += usage.get("prompt_cache_read_tokens", 0)
-        stats.requests += 1
-        stats.latency_total += dt
+        target_stats.input_tokens += usage.get("prompt_tokens", 0)
+        target_stats.output_tokens += usage.get("completion_tokens", 0)
+        target_stats.cache_read_tokens += usage.get("prompt_cache_read_tokens", 0)
+        target_stats.requests += 1
+        target_stats.latency_total += dt
 
         return data
 
@@ -169,6 +205,7 @@ class WaferClient:
             ],
             max_tokens=2000,
             temperature=0.1,
+            stats=self.sweep_stats,
         )
         return _extract_content(data)
 
@@ -182,6 +219,7 @@ class WaferClient:
             ],
             max_tokens=4000,
             temperature=0.2,
+            stats=self.deep_stats,
         )
         return _extract_content(data)
 
@@ -194,7 +232,7 @@ class WaferClient:
                 "input_tokens": self.sweep_stats.input_tokens,
                 "output_tokens": self.sweep_stats.output_tokens,
                 "avg_latency_ms": self.sweep_stats.avg_latency * 1000,
-                "cost_usd": self.sweep_stats.cost(SWEEP_MODEL),
+                "cost_usd": self.sweep_stats.cost(),
             },
             "deep": {
                 "requests": self.deep_stats.requests,
@@ -202,7 +240,7 @@ class WaferClient:
                 "input_tokens": self.deep_stats.input_tokens,
                 "output_tokens": self.deep_stats.output_tokens,
                 "avg_latency_ms": self.deep_stats.avg_latency * 1000,
-                "cost_usd": self.deep_stats.cost(DEEP_MODEL),
+                "cost_usd": self.deep_stats.cost(),
             },
-            "total_cost_usd": self.sweep_stats.cost(SWEEP_MODEL) + self.deep_stats.cost(DEEP_MODEL),
+            "total_cost_usd": self.sweep_stats.cost() + self.deep_stats.cost(),
         }

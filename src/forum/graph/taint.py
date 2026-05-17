@@ -98,7 +98,7 @@ def analyze_taint(graph: KnowledgeGraph, repo_root: Path) -> list[TaintFlow]:
         if not rel_path.endswith(".py"):
             continue
         try:
-            source = (repo_root / rel_path).read_text(encoding="utf-8")
+            source = (repo_root / rel_path).read_text(encoding="utf-8", errors="replace")
             tree = ast.parse(source)
         except (OSError, SyntaxError):
             continue
@@ -238,12 +238,15 @@ def _check_sink(call: ast.Call, state: TaintState,
     # Is this a known sink?
     risk = TAINT_SINKS.get(call_name)
     if not risk:
-        # Check partial matches (e.g., "cursor.execute" matches "*.execute")
+        # Partial match: match on exact short name against the short name of
+        # known sinks, not endswith() — endswith makes `x.system()` mistakenly
+        # match `os.system`, and any `.run()` match `subprocess.run`.
         short = call_name.split(".")[-1] if "." in call_name else None
-        for sink_name, sink_risk in TAINT_SINKS.items():
-            if short and sink_name.endswith(short):
-                risk = sink_risk
-                break
+        if short:
+            for sink_name, sink_risk in TAINT_SINKS.items():
+                if sink_name.split(".")[-1] == short:
+                    risk = sink_risk
+                    break
 
     if not risk:
         return

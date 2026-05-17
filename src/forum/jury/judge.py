@@ -126,7 +126,24 @@ def _format_cell_transcript(c: CellVote) -> str:
     return "\n\n".join(lines)
 
 
-def _build_briefing(dp: DecisionPoint, cells: list[CellVote]) -> str:
+def _build_briefing(dp: DecisionPoint, cells: list[CellVote],
+                    panel_skipped: bool = False) -> str:
+    if panel_skipped:
+        # Fast-track: Layer 1 evidence was extreme enough that the panel
+        # was bypassed entirely. Judge writes the verdict from evidence
+        # alone, skipping the "cite ≥2 cells" rule.
+        return (
+            f"# Layer 1 evidence\n\n{_format_dp(dp)}\n\n"
+            f"# Panel composition\n\n"
+            f"**No panel was convened.** This finding's measured impact "
+            f"was extreme enough (structural ≤ 0.1 or ≥ 0.9) that direct "
+            f"judgment from the Layer 1 evidence is appropriate. The "
+            f"finding was fast-tracked.\n\n"
+            f"# Now render the verdict\n\n"
+            f"Use the `submit_verdict` tool. Cite at least one piece of "
+            f"Layer 1 evidence in your reasoning. The 'cite at least two "
+            f"cells by ID' rule does not apply here (no cells)."
+        )
     n_debt = sum(1 for c in cells if c.position == "debt")
     n_just = len(cells) - n_debt
     head = (
@@ -161,15 +178,21 @@ async def run_judge(
     model: str = SONNET,
     max_tokens: int = 600,
     temperature: float = 0.3,
+    panel_skipped: bool = False,
 ) -> dict:
     """Synthesize one panel into one verdict. Returns a dict ready to drop
-    into TribunalResult.judge."""
+    into TribunalResult.judge.
+
+    When `panel_skipped=True`, the cell-debate stage was bypassed because
+    the Layer 1 evidence was extreme. The judge writes the verdict from
+    Layer 1 evidence alone (still real Sonnet judgment, just no panel).
+    """
     pc = pc or PromptCache(model=model)
-    if not cells:
+    if not cells and not panel_skipped:
         raise ValueError("judge needs at least one cell vote")
 
     system = _load_prompt("judge.md")
-    briefing = _build_briefing(decision_point, cells)
+    briefing = _build_briefing(decision_point, cells, panel_skipped=panel_skipped)
 
     msg = await pc.call_raw(
         system=system,
@@ -197,6 +220,7 @@ async def run_judge(
     verdict["verdict"] = normalized
     verdict["model"] = model
     verdict["panel_size"] = len(cells)
+    verdict["panel_skipped"] = panel_skipped
     return verdict
 
 

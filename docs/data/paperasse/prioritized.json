@@ -1,0 +1,57 @@
+{
+  "values": {
+    "simplicity": 1.0,
+    "correctness": 1.0,
+    "maintainability": 1.0,
+    "scalability": 1.0,
+    "flexibility": 1.0,
+    "velocity": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "1d74a228b4",
+      "principle": "P5",
+      "subject": "Unreachable variable 'format' in repo.evals.generate_review",
+      "structural_score": 0.5,
+      "value_affinity_score": 0.3667,
+      "composite_score": 0.5917,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "8b72bd6d86",
+      "principle": "P8",
+      "subject": "Module repo.evals.run_evals is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "structural_score": 0.58,
+      "value_affinity_score": 0.0,
+      "composite_score": 0.58,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "52946d0a8d",
+      "principle": "P8",
+      "subject": "Module repo.evals.generate_review is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "structural_score": 0.4667,
+      "value_affinity_score": 0.0,
+      "composite_score": 0.4667,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "3c25cd3136",
+      "principle": "P8",
+      "subject": "Module repo.evals.aggregate_benchmark is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "structural_score": 0.42,
+      "value_affinity_score": 0.0,
+      "composite_score": 0.42,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "b1ac6b27ef",
+      "principle": "P3",
+      "subject": "Function repo.evals.run_evals.main has cyclomatic complexity 43",
+      "structural_score": 0.3159,
+      "value_affinity_score": 0.6,
+      "composite_score": 0.4106,
+      "rank": 5
+    }
+  ]
+}

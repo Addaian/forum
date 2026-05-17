@@ -77,13 +77,18 @@ def flip_threshold(cells: list[dict], baseline_weights: dict[str, float],
         return None
     w = dict(baseline_weights)
     start = w.get(dim, 1.0)
-    x = start
-    while x <= max_weight + 1e-9:
-        w[dim] = round(x, 2)
+    # Drive the loop with integer counts so accumulated float error doesn't
+    # skip the final step (and the reported threshold matches the value that
+    # was actually tested).
+    n_steps = int((max_weight - start) / step) + 1
+    for i in range(n_steps + 1):
+        x = round(start + i * step, 2)
+        if x > max_weight + 1e-9:
+            break
+        w[dim] = x
         agg = reweighted_aggregate(cells, w)
         if agg["winner"] is not None and agg["winner"] != original_winner:
-            return round(x, 2)
-        x += step
+            return x
     return None
 
 
@@ -104,12 +109,20 @@ def _changed(baseline: dict[str, float], new: dict[str, float]) -> dict[str, tup
 
 
 def _persona_label(cell: dict) -> str:
-    # CellVote.transcript stores side:persona; we have direct fields too.
+    """Label a cell with its persona and the side it argued for.
+
+    A cell's `position` is its final *vote*, not which side it argued for —
+    cells can vote against the persona they were assigned. If the transcript
+    records the side explicitly, prefer that; otherwise label both personas
+    so we don't lie about who said what.
+    """
     blue = cell.get("blue_persona", "?")
     red = cell.get("red_persona", "?")
-    side = "blue" if cell.get("position") == "justified" else "red"
-    persona = blue if side == "blue" else red
-    return f"{persona} ({side})"
+    explicit_side = cell.get("voted_side") or cell.get("side")
+    if explicit_side in ("blue", "red"):
+        persona = blue if explicit_side == "blue" else red
+        return f"{persona} ({explicit_side})"
+    return f"red={red} / blue={blue} (vote={cell.get('position', '?')})"
 
 
 def probe(audit_dir: Path,
@@ -124,10 +137,13 @@ def probe(audit_dir: Path,
     if not prio_path.exists():
         raise FileNotFoundError(f"missing {prio_path}")
 
-    verdicts = json.loads(verdicts_path.read_text())
-    prio_data = json.loads(prio_path.read_text())
+    verdicts = json.loads(verdicts_path.read_text(encoding="utf-8"))
+    prio_data = json.loads(prio_path.read_text(encoding="utf-8"))
     if baseline_weights is None:
-        baseline_weights = prio_data.get("values") or {v: 1.0 for v in VALID_VALUES}
+        stored = prio_data.get("values")
+        # Treat empty dicts as missing too — otherwise an audit that recorded
+        # `"values": {}` silently picks up the all-1.0 default without warning.
+        baseline_weights = stored if stored else {v: 1.0 for v in VALID_VALUES}
 
     prio_by_id = {row["decision_point_id"]: row for row in prio_data["items"]}
     changed = _changed(baseline_weights, new_weights)
@@ -185,7 +201,8 @@ def probe(audit_dir: Path,
                     continue
                 b = salience(c.get("value_lens", {}), baseline_weights)
                 n = salience(c.get("value_lens", {}), new_weights)
-                ratio = (n / b) if b > 0 else (float("inf") if n > 0 else 1.0)
+                # Use abs to keep the ratio meaningful when weights flip sign.
+                ratio = (n / b) if abs(b) > 1e-12 else (float("inf") if n != 0 else 1.0)
                 dissenters.append((ratio, c))
             dissenters.sort(reverse=True, key=lambda t: t[0])
 

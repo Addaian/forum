@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 from pydantic import BaseModel
 
 # Layer 1 output
@@ -10,7 +10,7 @@ class CodeLocation(BaseModel):
 
 class DecisionPoint(BaseModel):
     id: str
-    principle: Literal["P1","P2","P3","P4","P5","P6","P7"]
+    principle: Literal["P1","P2","P3","P4","P5","P6","P7","P8","P9","P10"]
     locations: list[CodeLocation]
     subject: str
     evidence: dict

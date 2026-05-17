@@ -1,0 +1,112 @@
+[
+  {
+    "decision_point_id": "9bb7146733",
+    "cells": [],
+    "aggregate_vote": {
+      "winner": "n/a",
+      "cells_run": 0,
+      "cells_cancelled": 0,
+      "cells_failed": 0,
+      "panel_skipped": true,
+      "skip_reason": "structural=1.00"
+    },
+    "judge": {
+      "verdict": "CRITICAL",
+      "reasoning": "\u2022 SCC of 68 modules with 220 internal edges and blast_radius 1.0 means any change ripples everywhere.\\n\u2022 Cycle edges confirmed in Layer 1: vlmeval.smp.vlm \u2192 vlmeval.utils \u2192 vlmeval.utils.matching_util \u2192 vlmeval.smp forming a tight loop.\\n\u2022 All structural signals at maximum (principle_severity 1.0, pattern_violation 1.0) with no recent remediation (recency 0.0).",
+      "dissent_summary": "\u2022 Codebase may be a research/eval toolkit where monolithic coupling is an accepted trade-off.\\n\u2022 Cycle is within a single top-level package, limiting cross-repo blast radius.",
+      "recommended_action": "\u2022 Extract shared primitives (logging, file I/O, path utils) from vlmeval/smp/ into a new vlmeval/core/ module (~100 LOC), making it dependency-free.\\n\u2022 Redirect vlmeval.utils.matching_util and vlmeval.smp.vlm to import from vlmeval.core, breaking the smp\u2194utils cycle in one PR.\\n\u2022 Audit remaining 220 intra-SCC edges in vlmeval/dataset/ and vlmeval/api/base.py to introduce one-way dependency from dataset\u2192api\u2192core over a multi-week effort.",
+      "override": false,
+      "model": "claude-sonnet-4-6",
+      "panel_size": 0,
+      "panel_skipped": true
+    }
+  },
+  {
+    "decision_point_id": "f22d7df898",
+    "cells": [],
+    "aggregate_vote": {
+      "winner": "n/a",
+      "cells_run": 0,
+      "cells_cancelled": 0,
+      "cells_failed": 0,
+      "panel_skipped": true,
+      "skip_reason": "structural=0.93"
+    },
+    "judge": {
+      "verdict": "STRUCTURAL DEBT",
+      "reasoning": "\u2022 Layer 1 shows layer_drop of 5: omnilmm.train.train_utils (layer 5) imports omnilmm (layer 0).\\n\u2022 blast_radius=1.0 and principle_severity=1.0 confirm maximum structural impact from this back-edge.\\n\u2022 The import at omnilmm/train/train_utils.py:16 pulls `conversation` from the root package, a cross-cutting concern misplaced at layer 0.",
+      "dissent_summary": "\u2022 omnilmm may be a genuine cross-cutting utility, making the violation defensible.\\n\u2022 recency=0.0 suggests the violation is stable and not actively worsening.",
+      "recommended_action": "\u2022 Extract omnilmm/conversation.py (~40 LOC) into a new omnilmm/utils/conversation.py at a lower layer.\\n\u2022 Update omnilmm/train/train_utils.py line 16 to import from omnilmm.utils.conversation instead of omnilmm.\\n\u2022 Remove or re-export the conversation symbol from omnilmm/__init__.py to eliminate the upward edge.",
+      "override": false,
+      "model": "claude-sonnet-4-6",
+      "panel_size": 0,
+      "panel_skipped": true
+    }
+  },
+  {
+    "decision_point_id": "0e73d7e0b5",
+    "cells": [],
+    "aggregate_vote": {
+      "winner": "n/a",
+      "cells_run": 0,
+      "cells_cancelled": 0,
+      "cells_failed": 0,
+      "panel_skipped": true,
+      "skip_reason": "structural=0.87"
+    },
+    "judge": {
+      "verdict": "JUSTIFIED VIOLATION",
+      "reasoning": "\u2022 `vlmeval.config` acts as a model registry (cross-cutting utility), not true layer-1 infrastructure.\\n\u2022 `blast_radius` of 1.0 signals wide use, confirming config is a shared lookup table consumed at many layers.\\n\u2022 `inference_video.py:3` imports only `supported_VLM` dict \u2014 a read-only registry lookup, not an upward orchestration call.",
+      "dissent_summary": "\u2022 Layer-drop of 4 (layer 5 \u2192 layer 1) is a severe architectural inversion by P6.\\n\u2022 `vlmeval.config` itself imports `vlmeval.vlm` and `vlmeval.api`, making it a heavyweight dependency.",
+      "recommended_action": "\u2022 Extract `supported_VLM` registry dict from `vlmeval/config.py` into a new `vlmeval/registry.py` (~30 LOC).\\n\u2022 Make `vlmeval/config.py` import from `vlmeval/registry.py`, and update `inference_video.py` to import from `vlmeval/registry.py`.\\n\u2022 Verify no circular imports are introduced across `vlmeval/vlm` and `vlmeval/api` in one PR.",
+      "override": false,
+      "model": "claude-sonnet-4-6",
+      "panel_size": 0,
+      "panel_skipped": true
+    }
+  },
+  {
+    "decision_point_id": "58009c1fb4",
+    "cells": [],
+    "aggregate_vote": {
+      "winner": "n/a",
+      "cells_run": 0,
+      "cells_cancelled": 0,
+      "cells_failed": 0,
+      "panel_skipped": true,
+      "skip_reason": "structural=0.87"
+    },
+    "judge": {
+      "verdict": "JUSTIFIED VIOLATION",
+      "reasoning": "\u2022 `blast_radius: 1.0` and `recency: 0.0` indicate widespread but stable, long-standing usage.\\n\u2022 `vlmeval.utils` exports only `track_progress_rich` and matching utilities \u2014 genuinely cross-cutting concerns.\\n\u2022 `inference_video.py:4` imports `track_progress_rich`, a progress-display utility with no upward dependency itself.",
+      "dissent_summary": "\u2022 Layer drop of 4 (layer 5 \u2192 layer 1) is a severe architectural violation per P6.\\n\u2022 `blast_radius: 1.0` means any change to `vlmeval.utils` affects all dependents including inference_video.",
+      "recommended_action": "\u2022 Annotate `vlmeval/utils/__init__.py` with an explicit cross-cutting exemption comment (~5 LOC) to document the justified violation.\\n\u2022 Monitor `vlmeval.utils` for scope creep; restrict additions to stateless, side-effect-free utilities only.",
+      "override": false,
+      "model": "claude-sonnet-4-6",
+      "panel_size": 0,
+      "panel_skipped": true
+    }
+  },
+  {
+    "decision_point_id": "09b6680fff",
+    "cells": [],
+    "aggregate_vote": {
+      "winner": "n/a",
+      "cells_run": 0,
+      "cells_cancelled": 0,
+      "cells_failed": 0,
+      "panel_skipped": true,
+      "skip_reason": "structural=0.87"
+    },
+    "judge": {
+      "verdict": "STRUCTURAL DEBT",
+      "reasoning": "\u2022 `blast_radius: 1.0` and `layer_drop: 4` in measured impact signal wide structural exposure.\\n\u2022 `inference_video.py:5` uses `from vlmeval.smp import *`, a wildcard upward dependency violating P6.\\n\u2022 `vlmeval.smp` re-exports file, vlm, misc, log utilities \u2014 classic cross-cutting concern misplaced at layer 1.",
+      "dissent_summary": "\u2022 `vlmeval.smp` acts as a cross-cutting utility layer, making the dependency pragmatically defensible.\\n\u2022 `recency: 0.0` suggests the violation is stable and not actively worsening.",
+      "recommended_action": "\u2022 Extract shared utilities (file, misc, log) from `vlmeval/smp/__init__.py` into a new `vlmeval/utils/common.py` (~60 LOC).\\n\u2022 Update `vlmeval/inference_video.py` lines 1-10 to import from `vlmeval.utils.common` instead of `vlmeval.smp`.\\n\u2022 Remove the wildcard `from vlmeval.smp import *` in `inference_video.py` and replace with explicit named imports in one PR.",
+      "override": false,
+      "model": "claude-sonnet-4-6",
+      "panel_size": 0,
+      "panel_skipped": true
+    }
+  }
+]

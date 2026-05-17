@@ -1,23 +1,23 @@
 {
-  "default": "fastapi",
+  "default": null,
   "audits": [
     {
-      "slug": "fastapi",
-      "label": "fastapi",
-      "version": "0.136.1",
-      "language": "python",
-      "source": "github.com/fastapi/fastapi",
-      "commit": "ecace740",
-      "note": "Python web framework; 48 modules, 110 internal edges. Top-1 audited. Verdict: STRUCTURAL DEBT on the 18-module routing cycle."
-    },
-    {
-      "slug": "cloakbrowser",
-      "label": "cloakbrowser",
+      "slug": "paperasse",
+      "label": "paperasse",
       "version": "live",
       "language": "python",
-      "source": "github.com/CloakHQ/CloakBrowser",
-      "commit": "0437a3f1",
-      "note": "Live-audited from github.com/CloakHQ/CloakBrowser \u2014 17 modules."
+      "source": "github.com/romainsimon/paperasse",
+      "commit": "9872ce64",
+      "note": "Live-audited from github.com/romainsimon/paperasse \u2014 3 modules."
+    },
+    {
+      "slug": "ui-tars",
+      "label": "ui-tars",
+      "version": "live",
+      "language": "python",
+      "source": "github.com/bytedance/UI-TARS",
+      "commit": "582f3a7e",
+      "note": "Live-audited from github.com/bytedance/UI-TARS \u2014 3 modules."
     },
     {
       "slug": "financial-services",
@@ -29,13 +29,13 @@
       "note": "Live-audited from github.com/anthropics/financial-services \u2014 17 modules."
     },
     {
-      "slug": "shadowbroker",
-      "label": "shadowbroker",
+      "slug": "minicpm-v",
+      "label": "minicpm-v",
       "version": "live",
       "language": "python",
-      "source": "github.com/BigBodyCobain/Shadowbroker",
-      "commit": "25a98a98",
-      "note": "Live-audited from github.com/BigBodyCobain/Shadowbroker \u2014 226 modules."
+      "source": "github.com/OpenBMB/MiniCPM-V",
+      "commit": "2f67ddca",
+      "note": "Live-audited from github.com/OpenBMB/MiniCPM-V \u2014 100 modules."
     }
   ]
 }

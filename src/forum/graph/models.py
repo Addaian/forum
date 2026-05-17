@@ -262,13 +262,21 @@ class KnowledgeGraph:
     def dead_nodes(self, entry_points: set[str] | None = None) -> list[Node]:
         """Nodes unreachable from any entry point."""
         if entry_points is None:
-            # Default: exported functions/classes in top-level files
-            entry_points = {
-                nid for nid, n in self.nodes.items()
-                if n.is_exported and n.kind in (NodeKind.FUNCTION, NodeKind.CLASS)
-                and n.parent_id and self.nodes.get(n.parent_id, None)
-                and self.nodes[n.parent_id].kind == NodeKind.FILE
-            }
+            # Default: exported top-level functions/classes AND exported methods
+            # of exported classes. Without the methods, every class method would
+            # show up as dead even though its class is alive.
+            entry_points = set()
+            for nid, n in self.nodes.items():
+                if not n.is_exported:
+                    continue
+                parent = self.nodes.get(n.parent_id) if n.parent_id else None
+                if n.kind in (NodeKind.FUNCTION, NodeKind.CLASS):
+                    if parent and parent.kind == NodeKind.FILE:
+                        entry_points.add(nid)
+                elif n.kind == NodeKind.METHOD:
+                    if (parent and parent.kind == NodeKind.CLASS
+                            and parent.is_exported):
+                        entry_points.add(nid)
         reachable: set[str] = set()
         queue = list(entry_points)
         while queue:

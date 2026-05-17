@@ -20,7 +20,12 @@ MAX_DECISIONS = 5
 
 def check(index: RepoIndex, graph: nx.DiGraph) -> list[DecisionPoint]:
     # Entry points: the top-level package qualnames (e.g., "fastapi").
+    # Many real codebases never register the bare package qualname as a graph
+    # node (only its submodules are indexed), so fall back to in-degree-0
+    # nodes — modules nothing else imports are by definition entries.
     entries = [pkg.name for pkg in index.packages if pkg.name in graph]
+    if not entries:
+        entries = [n for n, d in graph.in_degree() if d == 0]
     if not entries:
         return []
 

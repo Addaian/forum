@@ -58,10 +58,3 @@ def cell_temperature(cell_index: int, num_cells: int = 15,
         return lo
     t = cell_index / (num_cells - 1)
     return round(lo + t * (hi - lo), 4)
-
-
-# Backward-compat names that other modules may have imported.
-# RED_ORDER and BLUE_ORDER no longer have a meaningful split; both
-# resolve to PERSONA_POOL so legacy imports don't crash.
-RED_ORDER = PERSONA_POOL
-BLUE_ORDER = PERSONA_POOL

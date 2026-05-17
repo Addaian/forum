@@ -1,46 +1,52 @@
-You are writing an **architectural briefing** for a real engineering team. The
-audit has already concluded. The deterministic Layer 1 evidence is established.
-A panel of AI debate cells has deliberated each prioritized decision point and
-the presiding judge has rendered a structured verdict. Your job is to write the
-report — calibrated to the team's stated engineering values.
+You are writing a **strategic synthesis** on top of an architectural audit.
+The audit has already concluded. The deterministic Layer 1 evidence is
+established. A panel of AI debate cells has deliberated each prioritized
+decision point and the presiding judge has rendered a structured verdict
+for each one. **The reader has already seen those per-finding verdicts in
+the Jury view of the UI.** Your job is NOT to re-narrate them.
+
+Your job is to do what the per-finding cards cannot:
+
+1. **Identify cross-finding patterns** — root causes that show up in
+   multiple findings, packages that concentrate the structural risk,
+   themes that explain *why* the codebase has accumulated this debt.
+2. **Sequence the work** — name the ONE thing to fix first, explain why,
+   and call out which other findings collapse or shift as a side effect.
+3. **Frame the prioritization in the team's vocabulary** — the team's
+   value weights determine which themes lead and how the cost is named.
 
 You will receive:
 
 1. The **team's value vector** — six numeric weights over `scalability`,
    `maintainability`, `velocity`, `correctness`, `simplicity`, `flexibility`.
-   Higher means the team weights that concern more heavily.
-2. The **top decision points** in prioritized order. Each one carries:
-   - Full Layer 1 evidence: file paths, line ranges, measured metrics,
-     plausible alternatives, code snippets.
-   - The aggregate panel vote (score_debt, score_justified, margin, cells_run).
-   - The judge's rendered verdict (exactly one of: HEALTHY,
-     JUSTIFIED VIOLATION, STRUCTURAL DEBT, CRITICAL, DRIFTED, CONTESTED),
-     plus `reasoning`, `dissent_summary`, `recommended_action`, and an
-     `override` flag.
+2. The **top decision points** in prioritized order, each with: full
+   Layer 1 evidence, aggregate panel vote, judge's verdict +
+   `reasoning` + `dissent_summary` + `recommended_action`, and `override` flag.
 
-Output a single markdown briefing of **1500–2000 words**.
+Output a single markdown briefing of **600–1000 words**. Tight, strategic,
+opinionated. The Jury cards already exist for detail.
 
 # Critical rules
 
-1. **Preserve every jury verdict literally.** Do not soften, retitle, or
-   re-interpret the verdict label. If a decision point's verdict is
-   `STRUCTURAL DEBT`, you write `STRUCTURAL DEBT`. The values lens shapes
-   framing, **never the verdict itself**. This rule is non-negotiable.
+1. **Do not re-list every verdict.** The Jury view shows them. You may
+   *reference* findings by their number (#1, #2, #3) and verdict, but
+   do not allocate a section per finding and do not restate the judge's
+   reasoning in prose. If you find yourself writing a section that maps
+   1-to-1 onto a Jury card, delete it and zoom out.
 
-2. **Open with the decision point whose verdict and recommended action most
-   align with the team's highest-weighted value.** For a velocity-first
-   team, lead with the verdict whose remediation most reduces ship cost.
-   For a correctness-first team, lead with the verdict that addresses the
-   largest risk surface. Same audit, different team, different headline.
+2. **Preserve verdict labels literally when you do mention them.** When
+   referencing a verdict, write `STRUCTURAL DEBT` or `CRITICAL` exactly
+   as the judge rendered it. The values lens shapes framing, **never the
+   verdict itself**.
 
-3. **Order the decision-point sections by value-alignment of their
-   recommended actions**, not by verdict severity. The team's priorities
-   decide which actions get surfaced first. CRITICAL verdicts still need
-   to appear prominently — but the team's vocabulary decides whether they
-   read as "risk surface to close" or "ship cost to eat".
+3. **Hunt for root causes across findings.** Read the file paths,
+   modules, and principles across the verdicts. If three findings live
+   in the same package or stem from the same missing seam, name that
+   pattern. If two CRITICAL findings would dissolve once one specific
+   refactor lands, say that explicitly. This is the value Opus adds.
 
-4. **Frame prose in the vocabulary of the team's top values.** Useful
-   phrasings, used naturally (do not stitch them in mechanically):
+4. **Frame the cost in the team's vocabulary.** Useful phrasings, used
+   naturally (do not stitch them in mechanically):
    - High **velocity** weight → "ship cost", "iteration drag", "PR cycle time"
    - High **correctness** weight → "risk surface", "failure modes", "incident vector"
    - High **maintainability** weight → "ramp cost", "blast radius", "cognitive load"
@@ -48,49 +54,49 @@ Output a single markdown briefing of **1500–2000 words**.
    - High **flexibility** weight → "swap cost", "migration friction"
    - High **scalability** weight → "headroom", "horizontal limits"
 
-5. **Surface dissents that match the team's values prominently.** If a
-   decision's verdict is `STRUCTURAL DEBT` but the dissent argued
-   "remediation would consume a quarter of shipping velocity" AND the team
-   weights velocity highly, that dissent appears in the body of the
-   section as a clear caveat — not buried.
+5. **Sequencing is the deliverable.** End with a clear ordered action
+   plan: step 1 is the highest-leverage fix; each subsequent step says
+   what changes about the audit once the prior step lands. If step 1
+   would cause findings #4 and #5 to dissolve, say that.
 
 6. **Do not invent facts.** Every measured value you cite must come from
    the provided evidence. Every verdict you reference must be the one
-   the judge actually rendered. Never modify the verdict text.
+   the judge actually rendered.
 
 7. **Plain markdown only.** Headings, lists, code blocks for snippets,
-   occasional bold. No HTML, no inline images, no base64, no tables of
-   contents.
-
-8. **No standalone TL;DR.** The briefing IS the deliverable — do not
-   produce a separate summary block.
+   occasional bold. No HTML, no tables of contents.
 
 # Structure
 
-The exact shape is your judgement, but a coherent briefing typically has:
+The exact shape is your judgement, but a strategic briefing typically has:
 
-- A **headline** (single H1) that hints at the verdict pattern, in the
-  team's vocabulary.
-- An **opening paragraph** (~150 words) framing the audit in that
-  vocabulary and naming the top concern.
-- **One section per decision point**, ordered by value-aligned
-  recommended action. Each section includes:
-  - A subheading naming the decision (the file/function/module and what
-    is at stake — not a re-statement of the principle).
-  - The literal verdict (e.g., "**Verdict: STRUCTURAL DEBT**").
-  - One or two paragraphs of narrative in the team's vocabulary, citing
-    specific files, lines, and measured values.
-  - The judge's reasoning, woven into your narrative (rephrase for flow,
-    do not change the substance, do not change the verdict).
-  - The dissent surfaced as a caveat — emphasized when it aligns with
-    the team's values.
-  - The recommended action, rephrased for flow; the specificity must
-    survive (what / where / how large).
-- A **closing paragraph** (~100 words) naming the one or two actions the
-  team should take first given their values.
+- A **headline** (single H1) that names the finding pattern in the
+  codebase's own terms (e.g., "The 18-Module Knot in fastapi/_compat",
+  "Three Functions Carrying 90% of the Complexity"). The headline
+  describes WHAT was found, not the audience: do NOT append a
+  values-tone suffix like "— A Velocity Briefing".
+
+- An **opening paragraph** (~120 words) that names the cross-finding
+  pattern, the root cause, and the team-vocabulary cost. This is the
+  "if you only read one paragraph" line.
+
+- **2–4 thematic sections** (NOT one per finding). Each theme groups
+  the relevant finding numbers and explains the shared cause:
+  - Theme heading (e.g., "## Three findings, one missing seam",
+    "## The complexity is concentrated in two functions")
+  - One or two paragraphs that explain the pattern, reference the
+    relevant findings by number, and frame the cost.
+  - Where useful, name the cheapest single action that addresses
+    the whole theme.
+
+- A **sequenced action plan** (`## What to do, in order`) — an ordered
+  list of 2–5 steps. Each step names the action, the file/module, an
+  estimated size (LOC or PRs), and what changes downstream once it
+  lands ("after this, #4 and #5 likely dissolve and the next audit
+  will surface different top concerns").
 
 # Word count
 
-Aim for **1500–2000 words**. Below 1200 is too thin. Above 2500 the
-briefing loses focus. This is not a comprehensive audit — it is a
-calibrated briefing a staff engineer can read in five minutes.
+Aim for **600–1000 words**. Below 500 is too thin to do the synthesis
+work. Above 1200 means you're narrating findings instead of synthesizing
+them — go back and cut.

@@ -37,8 +37,21 @@ log = logging.getLogger("forum.report.writer")
 # --- Prompt assembly ---
 
 def _load_system_prompt() -> str:
-    pkg_root = Path(__file__).resolve().parents[3]
-    return (pkg_root / "prompts" / "report.md").read_text(encoding="utf-8")
+    # parents[3] only works in the source checkout (forum/report/writer.py ->
+    # forum/ -> src/ -> repo root). Try the source layout first and fall back
+    # to a sibling 'prompts' dir for packaged installs.
+    candidates = [
+        Path(__file__).resolve().parents[3] / "prompts" / "report.md",
+        Path(__file__).resolve().parents[2] / "prompts" / "report.md",
+        Path(__file__).resolve().parent / "prompts" / "report.md",
+    ]
+    for p in candidates:
+        if p.exists():
+            return p.read_text(encoding="utf-8")
+    raise FileNotFoundError(
+        "Could not find prompts/report.md in any expected location: "
+        + ", ".join(str(c) for c in candidates)
+    )
 
 
 def _format_value_vector(values: dict[str, float]) -> str:
@@ -48,6 +61,46 @@ def _format_value_vector(values: dict[str, float]) -> str:
     return "Team value weights (descending):\n" + "\n".join(lines) + (
         f"\n\nTop-weighted values: **{top}**."
     )
+
+
+def _f(value: Any, fmt: str = ".3f", default: float = 0.0) -> str:
+    """Format a number tolerantly — coerce None/missing/non-numeric to default."""
+    try:
+        return format(float(value if value is not None else default), fmt)
+    except (TypeError, ValueError):
+        return format(default, fmt)
+
+
+def _escape_md(text: str) -> str:
+    """Escape markdown-significant characters in untrusted/LLM-generated text.
+
+    Prevents accidental bold/italic/header/fence injection from judge fields
+    that contain `*`, `_`, backticks, or leading `#`.
+    """
+    if not text:
+        return text
+    # Escape backticks first so we don't double-escape backslashes we add.
+    out = text.replace("\\", "\\\\")
+    for ch in ("`", "*", "_"):
+        out = out.replace(ch, "\\" + ch)
+    return out
+
+
+def _safe_fence(snippet: str, limit: int = 1500) -> str:
+    """Wrap a snippet in a markdown fence whose backtick count exceeds the
+    longest run of backticks inside the snippet, so embedded ``` cannot break
+    the rendering."""
+    body = snippet[:limit]
+    longest = 0
+    run = 0
+    for ch in body:
+        if ch == "`":
+            run += 1
+            longest = max(longest, run)
+        else:
+            run = 0
+    fence = "`" * max(3, longest + 1)
+    return f"{fence}python\n{body}\n{fence}"
 
 
 def _format_decision_section(rank: int, prio_row: dict, dp_dict: dict,
@@ -66,14 +119,14 @@ def _format_decision_section(rank: int, prio_row: dict, dp_dict: dict,
     snippets_str = ""
     if snippets:
         snippets_str = "\n\n**Code snippets (truncated):**\n\n" + "\n\n".join(
-            f"```python\n{s[:1500]}\n```" for s in snippets[:2]
+            _safe_fence(s) for s in snippets[:2]
         )
 
     return f"""## #{rank} — {dp_dict.get("subject", "(no subject)")}
 
 **Decision point id:** `{dp_dict.get("id")}`
 **Principle:** {dp_dict.get("principle")}
-**Prioritization:** rank={rank}, structural={prio_row.get('structural_score'):.3f}, value_affinity={prio_row.get('value_affinity_score'):+.3f}, composite={prio_row.get('composite_score'):.3f}
+**Prioritization:** rank={rank}, structural={_f(prio_row.get('structural_score'))}, value_affinity={_f(prio_row.get('value_affinity_score'), '+.3f')}, composite={_f(prio_row.get('composite_score'))}
 
 **Locations:**
 {locs_str or '  (none)'}
@@ -94,17 +147,17 @@ def _format_decision_section(rank: int, prio_row: dict, dp_dict: dict,
 
 **Aggregate panel vote:** {json.dumps(agg, indent=2)}
 
-**Judge verdict (preserve literally — do not modify):** **{judge.get("verdict", "(missing)")}**
+**Judge verdict (preserve literally — do not modify):** **{_escape_md(str(judge.get("verdict", "(missing)")))}**
 **Override flag:** {judge.get("override", False)}
 
 **Judge reasoning (you may rephrase for flow, must not change the substance):**
-{judge.get("reasoning", "(missing)")}
+{_escape_md(str(judge.get("reasoning", "(missing)")))}
 
 **Strongest dissent (surface as a caveat in the section):**
-{judge.get("dissent_summary", "(missing)")}
+{_escape_md(str(judge.get("dissent_summary", "(missing)")))}
 
 **Recommended action (rephrase for flow; specificity must survive):**
-{judge.get("recommended_action", "(missing)")}
+{_escape_md(str(judge.get("recommended_action", "(missing)")))}
 """
 
 
@@ -169,7 +222,7 @@ async def write_report(
     user_values: dict[str, float],
     pc: PromptCache | None = None,
     model: str = OPUS,
-    max_tokens: int = 8000,
+    max_tokens: int = 4000,
     temperature: float = 0.6,
 ) -> ReportArtifact:
     """Single Opus call. Returns ReportArtifact; caller persists `markdown` to disk."""
@@ -263,10 +316,10 @@ def _cli() -> None:
             print(f"missing required artifact: {p}", file=sys.stderr)
             sys.exit(2)
 
-    bundle = EvidenceBundle.model_validate_json(bundle_path.read_text())
-    prio_data = json.loads(prio_path.read_text())
+    bundle = EvidenceBundle.model_validate_json(bundle_path.read_text(encoding="utf-8"))
+    prio_data = json.loads(prio_path.read_text(encoding="utf-8"))
     prioritized = prio_data["items"]
-    verdicts = json.loads(verdicts_path.read_text())
+    verdicts = json.loads(verdicts_path.read_text(encoding="utf-8"))
     weights = load_values(args.values, tuple(args.value))
 
     pc = PromptCache(model=args.model)

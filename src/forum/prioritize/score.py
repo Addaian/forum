@@ -36,12 +36,20 @@ def structural_score(dp: DecisionPoint) -> float:
 def value_affinity_score(principle: str,
                          user_weights: dict[str, float],
                          affinities: dict[str, dict[str, float]]) -> float:
-    """Weighted average of per-value affinities. ∈ [-1, 1]."""
+    """Weighted average of per-value affinities. ∈ [-1, 1].
+
+    Plan formula: Σ w·a / Σ w. Use the signed sum so a negative weight
+    contributes opposite-sign mass instead of being treated like a positive
+    one (the old abs() denominator biased magnitudes toward 0 whenever
+    negative weights were present). Fall back to abs() if the signed sum
+    is zero so we don't divide by zero on symmetric weight vectors.
+    """
     table = affinities.get(principle, {})
     if not user_weights:
         return 0.0
     num = sum(w * table.get(v, 0.0) for v, w in user_weights.items())
-    den = sum(abs(w) for w in user_weights.values()) or 1.0
+    signed = sum(user_weights.values())
+    den = signed if signed else (sum(abs(w) for w in user_weights.values()) or 1.0)
     return num / den
 
 
@@ -71,8 +79,19 @@ def rank(bundle: EvidenceBundle, user_weights: dict[str, float],
 
 
 def _values_fingerprint(weights: dict[str, float]) -> str:
-    s = json.dumps(weights, sort_keys=True)
+    # Round to fixed precision so 1.5 / 1.50 / 1.5000000001 (artifacts of
+    # YAML vs CLI vs round-tripped JSON) all collapse to the same fingerprint.
+    rounded = {k: round(float(v), 6) for k, v in weights.items()}
+    s = json.dumps(rounded, sort_keys=True)
     return hashlib.sha1(s.encode()).hexdigest()[:8]
+
+
+def _atomic_write(path: Path, payload: str) -> None:
+    """Write payload to path via a tmpfile + replace so a killed process
+    can't leave a half-written JSON file that downstream readers crash on."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(payload, encoding="utf-8")
+    tmp.replace(path)
 
 
 def write_prioritized(audit_dir: Path, ranked: list[dict],
@@ -88,7 +107,7 @@ def write_prioritized(audit_dir: Path, ranked: list[dict],
     }
     payload = json.dumps(out, indent=2)
     canonical = audit_dir / "prioritized.json"
-    canonical.write_text(payload, encoding="utf-8")
+    _atomic_write(canonical, payload)
     sidecar = audit_dir / f"prioritized-{_values_fingerprint(user_weights)}.json"
-    sidecar.write_text(payload, encoding="utf-8")
+    _atomic_write(sidecar, payload)
     return canonical

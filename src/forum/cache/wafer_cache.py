@@ -36,6 +36,7 @@ from typing import Any, Sequence
 
 from openai import AsyncOpenAI
 
+from .. import events as fevents
 from .prompt_cache import CacheMetrics, CallRecord
 
 log = logging.getLogger("forum.cache.wafer")
@@ -159,10 +160,13 @@ class WaferCache:
         #   * max_concurrent — cap simultaneous in-flight requests
         #   * min_interval_s — minimum gap between successive request starts
         # Override via env: WAFER_MAX_CONCURRENT, WAFER_MIN_INTERVAL_S.
+        # Defaults loosened (4→10 concurrent, 0.25s→0.15s) after observing
+        # Wafer comfortably handle the burst at lower throttling — halves cell
+        # wall-clock. Dial back if 429s reappear.
         if max_concurrent is None:
-            max_concurrent = int(os.environ.get("WAFER_MAX_CONCURRENT", "4"))
+            max_concurrent = int(os.environ.get("WAFER_MAX_CONCURRENT", "10"))
         if min_interval_s is None:
-            min_interval_s = float(os.environ.get("WAFER_MIN_INTERVAL_S", "0.25"))
+            min_interval_s = float(os.environ.get("WAFER_MIN_INTERVAL_S", "0.15"))
         self._sem = asyncio.Semaphore(max(1, max_concurrent))
         self._min_interval_s = max(0.0, min_interval_s)
         self._pacer_lock = asyncio.Lock()
@@ -240,6 +244,11 @@ class WaferCache:
         cache_control).
         """
         if isinstance(system, list):
+            non_text = [b for b in system if b.get("type") != "text"]
+            if non_text:
+                log.warning("Dropping %d non-text system block(s) — Wafer "
+                            "OpenAI-compat path can't carry tool_result/image "
+                            "content", len(non_text))
             sys_text = "\n\n".join(b.get("text", "") for b in system
                                    if b.get("type") == "text")
         else:
@@ -255,7 +264,12 @@ class WaferCache:
             if isinstance(content, str):
                 full_messages.append({"role": m["role"], "content": content})
                 continue
-            # list of blocks: join their text
+            # list of blocks: join their text and warn about any drops.
+            non_text = [b for b in content if b.get("type") != "text"]
+            if non_text:
+                log.warning("Dropping %d non-text content block(s) on %s "
+                            "message — Wafer compat path is text-only",
+                            len(non_text), m["role"])
             text = "\n\n".join(b.get("text", "") for b in content
                                if b.get("type") == "text")
             full_messages.append({"role": m["role"], "content": text})
@@ -294,7 +308,14 @@ class WaferCache:
         for call in calls:
             if call.function.name == tool_name:
                 raw = call.function.arguments
-                # Strip Qwen's native end-tags wherever they appear.
+                # Try the raw payload first — only sanitize if it's actually
+                # broken. The previous version always stripped `<parameter>`
+                # tags, which corrupted code samples containing that literal
+                # text (e.g. C++/XML/Java snippets).
+                try:
+                    return json.loads(raw)
+                except json.JSONDecodeError:
+                    pass
                 clean = _re.sub(r"</?parameter\s*[^>]*>", "", raw)
                 try:
                     return json.loads(clean)
@@ -358,6 +379,7 @@ class WaferCache:
         u = msg.usage
         in_t = getattr(u, "prompt_tokens", 0) or 0
         out_t = getattr(u, "completion_tokens", 0) or 0
+        ctx = fevents.CELL_CTX.get() or {}
         record = CallRecord(
             model=model,
             input_tokens=in_t,
@@ -366,6 +388,8 @@ class WaferCache:
             output_tokens=out_t,
             latency_s=dt,
             cost_usd=_compute_cost(model, in_t, out_t),
+            cell_id=ctx.get("cell_id"),
+            dp_id=ctx.get("dp_id"),
         )
         self.metrics.record(record)
         return msg

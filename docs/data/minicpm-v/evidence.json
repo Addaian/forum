@@ -1,0 +1,1773 @@
+{
+  "repo": "/private/var/folders/zd/s7jl32v96ys2vvr589y26gqr0000gn/T/forum-minicpm-v-u8flvw4p/repo",
+  "commit_sha": "2f67ddcadd64611e8ce26a26a1565a8aabe2cfc4",
+  "decision_points": [
+    {
+      "id": "9bb7146733",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/__init__.py",
+          "line_start": 1,
+          "line_end": 16,
+          "module": "vlmeval"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/api/__init__.py",
+          "line_start": 1,
+          "line_end": 5,
+          "module": "vlmeval.api"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/api/base.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.api.base"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/api/gpt.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.api.gpt"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/config.py",
+          "line_start": 1,
+          "line_end": 20,
+          "module": "vlmeval.config"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/__init__.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/cgbench.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.cgbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/cmmmu.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.cmmmu"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/dude.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.dude"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/dynamath.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.dynamath"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_base.py",
+          "line_start": 1,
+          "line_end": 172,
+          "module": "vlmeval.dataset.image_base"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_caption.py",
+          "line_start": 1,
+          "line_end": 75,
+          "module": "vlmeval.dataset.image_caption"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_ccocr.py",
+          "line_start": 1,
+          "line_end": 197,
+          "module": "vlmeval.dataset.image_ccocr"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_mcq.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.image_mcq"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_mt.py",
+          "line_start": 1,
+          "line_end": 128,
+          "module": "vlmeval.dataset.image_mt"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_vqa.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.image_vqa"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_yorn.py",
+          "line_start": 1,
+          "line_end": 95,
+          "module": "vlmeval.dataset.image_yorn"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/longvideobench.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.longvideobench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/miabench.py",
+          "line_start": 1,
+          "line_end": 167,
+          "module": "vlmeval.dataset.miabench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/mlvu.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.mlvu"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/mmbench_video.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.mmbench_video"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/mmgenbench.py",
+          "line_start": 1,
+          "line_end": 69,
+          "module": "vlmeval.dataset.mmgenbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/mmlongbench.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.mmlongbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/mmmath.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.mmmath"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/mvbench.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.mvbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/slidevqa.py",
+          "line_start": 1,
+          "line_end": 189,
+          "module": "vlmeval.dataset.slidevqa"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/tempcompass.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.tempcompass"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/text_base.py",
+          "line_start": 1,
+          "line_end": 88,
+          "module": "vlmeval.dataset.text_base"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/text_mcq.py",
+          "line_start": 1,
+          "line_end": 123,
+          "module": "vlmeval.dataset.text_mcq"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/__init__.py",
+          "line_start": 1,
+          "line_end": 9,
+          "module": "vlmeval.dataset.utils"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/cgbench.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.utils.cgbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/hrbench.py",
+          "line_start": 1,
+          "line_end": 54,
+          "module": "vlmeval.dataset.utils.hrbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/judge_util.py",
+          "line_start": 1,
+          "line_end": 49,
+          "module": "vlmeval.dataset.utils.judge_util"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/llavabench.py",
+          "line_start": 1,
+          "line_end": 65,
+          "module": "vlmeval.dataset.utils.llavabench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/logicvista.py",
+          "line_start": 1,
+          "line_end": 150,
+          "module": "vlmeval.dataset.utils.logicvista"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/longvideobench.py",
+          "line_start": 1,
+          "line_end": 80,
+          "module": "vlmeval.dataset.utils.longvideobench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mathv.py",
+          "line_start": 1,
+          "line_end": 171,
+          "module": "vlmeval.dataset.utils.mathv"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mathverse.py",
+          "line_start": 1,
+          "line_end": 193,
+          "module": "vlmeval.dataset.utils.mathverse"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mathvista.py",
+          "line_start": 1,
+          "line_end": 164,
+          "module": "vlmeval.dataset.utils.mathvista"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mlvu.py",
+          "line_start": 1,
+          "line_end": 189,
+          "module": "vlmeval.dataset.utils.mlvu"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mmbench_video.py",
+          "line_start": 1,
+          "line_end": 70,
+          "module": "vlmeval.dataset.utils.mmbench_video"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mmdu.py",
+          "line_start": 1,
+          "line_end": 126,
+          "module": "vlmeval.dataset.utils.mmdu"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mmvet.py",
+          "line_start": 1,
+          "line_end": 106,
+          "module": "vlmeval.dataset.utils.mmvet"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/multiple_choice.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.utils.multiple_choice"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mvbench.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.utils.mvbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/qspatial.py",
+          "line_start": 1,
+          "line_end": 123,
+          "module": "vlmeval.dataset.utils.qspatial"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/tempcompass.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.utils.tempcompass"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/videomme.py",
+          "line_start": 1,
+          "line_end": 150,
+          "module": "vlmeval.dataset.utils.videomme"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/vqa_eval.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.utils.vqa_eval"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/yorn.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.utils.yorn"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/vcr.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.vcr"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/video_base.py",
+          "line_start": 1,
+          "line_end": 135,
+          "module": "vlmeval.dataset.video_base"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/video_concat_dataset.py",
+          "line_start": 1,
+          "line_end": 85,
+          "module": "vlmeval.dataset.video_concat_dataset"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/video_dataset_config.py",
+          "line_start": 1,
+          "line_end": 103,
+          "module": "vlmeval.dataset.video_dataset_config"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/videomme.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.videomme"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/vl_rewardbench.py",
+          "line_start": 1,
+          "line_end": 174,
+          "module": "vlmeval.dataset.vl_rewardbench"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/wildvision.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.dataset.wildvision"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/smp/__init__.py",
+          "line_start": 1,
+          "line_end": 4,
+          "module": "vlmeval.smp"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/smp/file.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.smp.file"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/smp/misc.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.smp.misc"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/smp/vlm.py",
+          "line_start": 1,
+          "line_end": 179,
+          "module": "vlmeval.smp.vlm"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/tools.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.tools"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/utils/__init__.py",
+          "line_start": 1,
+          "line_end": 7,
+          "module": "vlmeval.utils"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/utils/matching_util.py",
+          "line_start": 1,
+          "line_end": 69,
+          "module": "vlmeval.utils.matching_util"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/utils/mp_util.py",
+          "line_start": 1,
+          "line_end": 72,
+          "module": "vlmeval.utils.mp_util"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/vlm/__init__.py",
+          "line_start": 1,
+          "line_end": 6,
+          "module": "vlmeval.vlm"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/vlm/base.py",
+          "line_start": 1,
+          "line_end": 198,
+          "module": "vlmeval.vlm.base"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/vlm/minicpm_v.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "vlmeval.vlm.minicpm_v"
+        }
+      ],
+      "subject": "Dependency cycle across 68 modules: vlmeval \u2192 api \u2192 base \u2192 gpt\u2026",
+      "evidence": {
+        "scc_members": [
+          "vlmeval",
+          "vlmeval.api",
+          "vlmeval.api.base",
+          "vlmeval.api.gpt",
+          "vlmeval.config",
+          "vlmeval.dataset",
+          "vlmeval.dataset.cgbench",
+          "vlmeval.dataset.cmmmu",
+          "vlmeval.dataset.dude",
+          "vlmeval.dataset.dynamath",
+          "vlmeval.dataset.image_base",
+          "vlmeval.dataset.image_caption",
+          "vlmeval.dataset.image_ccocr",
+          "vlmeval.dataset.image_mcq",
+          "vlmeval.dataset.image_mt",
+          "vlmeval.dataset.image_vqa",
+          "vlmeval.dataset.image_yorn",
+          "vlmeval.dataset.longvideobench",
+          "vlmeval.dataset.miabench",
+          "vlmeval.dataset.mlvu",
+          "vlmeval.dataset.mmbench_video",
+          "vlmeval.dataset.mmgenbench",
+          "vlmeval.dataset.mmlongbench",
+          "vlmeval.dataset.mmmath",
+          "vlmeval.dataset.mvbench",
+          "vlmeval.dataset.slidevqa",
+          "vlmeval.dataset.tempcompass",
+          "vlmeval.dataset.text_base",
+          "vlmeval.dataset.text_mcq",
+          "vlmeval.dataset.utils",
+          "vlmeval.dataset.utils.cgbench",
+          "vlmeval.dataset.utils.hrbench",
+          "vlmeval.dataset.utils.judge_util",
+          "vlmeval.dataset.utils.llavabench",
+          "vlmeval.dataset.utils.logicvista",
+          "vlmeval.dataset.utils.longvideobench",
+          "vlmeval.dataset.utils.mathv",
+          "vlmeval.dataset.utils.mathverse",
+          "vlmeval.dataset.utils.mathvista",
+          "vlmeval.dataset.utils.mlvu",
+          "vlmeval.dataset.utils.mmbench_video",
+          "vlmeval.dataset.utils.mmdu",
+          "vlmeval.dataset.utils.mmvet",
+          "vlmeval.dataset.utils.multiple_choice",
+          "vlmeval.dataset.utils.mvbench",
+          "vlmeval.dataset.utils.qspatial",
+          "vlmeval.dataset.utils.tempcompass",
+          "vlmeval.dataset.utils.videomme",
+          "vlmeval.dataset.utils.vqa_eval",
+          "vlmeval.dataset.utils.yorn",
+          "vlmeval.dataset.vcr",
+          "vlmeval.dataset.video_base",
+          "vlmeval.dataset.video_concat_dataset",
+          "vlmeval.dataset.video_dataset_config",
+          "vlmeval.dataset.videomme",
+          "vlmeval.dataset.vl_rewardbench",
+          "vlmeval.dataset.wildvision",
+          "vlmeval.smp",
+          "vlmeval.smp.file",
+          "vlmeval.smp.misc",
+          "vlmeval.smp.vlm",
+          "vlmeval.tools",
+          "vlmeval.utils",
+          "vlmeval.utils.matching_util",
+          "vlmeval.utils.mp_util",
+          "vlmeval.vlm",
+          "vlmeval.vlm.base",
+          "vlmeval.vlm.minicpm_v"
+        ],
+        "scc_size": 68,
+        "cycle_edges": [
+          [
+            "vlmeval.smp",
+            "vlmeval.smp.misc"
+          ],
+          [
+            "vlmeval.smp.misc",
+            "vlmeval.smp.file"
+          ],
+          [
+            "vlmeval.smp.file",
+            "vlmeval.smp.vlm"
+          ],
+          [
+            "vlmeval.smp.vlm",
+            "vlmeval.utils"
+          ],
+          [
+            "vlmeval.utils",
+            "vlmeval.utils.matching_util"
+          ],
+          [
+            "vlmeval.utils.matching_util",
+            "vlmeval.smp"
+          ]
+        ],
+        "total_internal_edges_within_scc": 220
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# vlmeval\ntry:\n    import torch\nexcept ImportError:\n    pass\n\nfrom .smp import *\nfrom .api import *\nfrom .dataset import *\nfrom .utils import *\nfrom .vlm import *\nfrom .config import *\nfrom .tools import cli\n\nload_env()\n\n__version__ = '0.2rc1'",
+        "# vlmeval.api\nfrom .gpt import OpenAIWrapper, GPT4V\n\n__all__ = [\n    'OpenAIWrapper', 'GPT4V',\n]",
+        "# vlmeval.api.base\nimport time\nimport random as rd\nfrom abc import abstractmethod\nimport os.path as osp\nimport copy as cp\nfrom ..smp import get_logger, parse_file, concat_images_vlmeval, LMUDataRoot, md5, decode_base64_to_image_file\n\n\nclass BaseAPI:\n\n    allowed_types = ['text', 'image']\n    INTERLEAVE = True\n    INSTALL_REQ = False\n\n    def __init__(self,\n                 retry=10,\n                 wait=3,\n                 system_prompt=None,\n                 verbose=True,\n                 fail_msg='Failed to obtain answer via API.',",
+        "# vlmeval.api.gpt\nfrom ..smp import *\nimport os\nimport sys\nfrom .base import BaseAPI\n\nAPIBASES = {\n    'OFFICIAL': 'https://api.openai.com/v1/chat/completions',\n}\n\n\ndef GPT_context_window(model):\n    length_map = {\n        'gpt-4': 8192,\n        'gpt-4-0613': 8192,\n        'gpt-4-turbo-preview': 128000,\n        'gpt-4-1106-preview': 128000,\n        'gpt-4-0125-preview': 128000,\n        'gpt-4-vision-preview': 128000,\n        'gpt-4-turbo': 128000,\n        'gpt-4-turbo-2024-04-09': 128000,",
+        "# vlmeval.config\nfrom vlmeval.vlm import *\nfrom vlmeval.api import *\nfrom functools import partial\n\nminicpm_series = {\n    'MiniCPM-V': partial(MiniCPM_V, model_path='openbmb/MiniCPM-V'),\n    'MiniCPM-V-2': partial(MiniCPM_V, model_path='openbmb/MiniCPM-V-2'),\n    'MiniCPM-Llama3-V-2_5': partial(MiniCPM_Llama3_V, model_path='openbmb/MiniCPM-Llama3-V-2_5'),\n    'MiniCPM-V-2_6': partial(MiniCPM_V_2_6, model_path='openbmb/MiniCPM-V-2_6'),\n    'MiniCPM-o-2_6': partial(MiniCPM_o_2_6, model_path='openbmb/MiniCPM-o-2_6'),\n}\n\nsupported_VLM = {}\n\nmodel_groups = [\n    minicpm_series\n]\n\nfor grp in model_groups:\n    supported_VLM.update(grp)",
+        "# vlmeval.dataset\nimport warnings\n\nfrom .image_base import img_root_map, ImageBaseDataset\nfrom .image_caption import ImageCaptionDataset\nfrom .image_yorn import ImageYORNDataset\nfrom .image_mcq import (\n    ImageMCQDataset, MMMUDataset, CustomMCQDataset, MUIRDataset, GMAIMMBenchDataset, MMERealWorld, HRBenchDataset,\n    NaturalBenchDataset\n)\nfrom .image_mt import MMDUDataset\nfrom .image_vqa import (\n    ImageVQADataset, MathVision, OCRBench, MathVista, LLaVABench, MMVet, MTVQADataset, TableVQABench,\n    CustomVQADataset, CRPE, MathVerse, OlympiadBench, QSpatial, VizWiz, MMNIAH, WeMath, LogicVista\n)\n\nfrom .image_ccocr import CCOCRDataset\nfrom .text_mcq import CustomTextMCQDataset, TextMCQDataset\n\nfrom .vcr import VCRDataset\nfrom .mmlongbench import MMLongBench",
+        "# vlmeval.dataset.cgbench\nfrom huggingface_hub import snapshot_download\nfrom ..smp import *\nfrom .video_base import VideoBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom .utils.cgbench import *\nfrom ..utils import track_progress_rich\n\n\nclass CGBench_MCQ_Grounding_Mini(VideoBaseDataset):\n\n    dataset = \"CG-Bench_MCQ_Grounding_Mini\"\n\n    TYPE = \"Video-MCQ-Grounding\"\n\n    MD5 = \"54ed3e90a51a6fb375c92b319a715f72\"\n\n    SYS = {\n        \"long_acc\": (\n            \"You will be provided with sampled frames from a video, along with a \"\n            \"multiple-choice question that includes a question and several answer options.\\n\"",
+        "# vlmeval.dataset.cmmmu\nfrom .image_base import ImageBaseDataset\nimport random\nfrom collections import Counter\nimport os\nimport re\nimport tempfile\nfrom ..smp import *\n\n\ndef get_multi_choice_prediction(response, all_choices, index2ans):\n    for char in [',', '.', '!', '?', ';', ':', \"'\"]:\n        response = response.strip(char)\n    response = \" \" + response + \" \"  # add space to avoid partial match\n\n    candidates = []\n\n    for choice in all_choices:  # (A) (B) (C) (D)\n        # Add the choice to candidates each time it appears in the response\n        candidates.extend([choice for _ in range(response.count(f'({choice})'))])\n",
+        "# vlmeval.dataset.dude\nimport math\nfrom typing import List\n\nfrom .utils.judge_util import build_judge\nfrom .image_base import ImageBaseDataset\nfrom .mmlongbench import concat_images, MMLongBench_auxeval, anls_compute\nfrom ..smp import *\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef DUDE_acc(result_file):\n    data = load(result_file)\n    overall_score = 0.0\n    score_list = list()\n    for i in range(len(data)):\n        item = data.iloc[i]\n        if isinstance(item['answer'], float) and math.isnan(item['answer']):\n            item['answer'] = 'Not answerable'",
+        "# vlmeval.dataset.dynamath\nimport re\nimport json\nimport sympy as sp\nimport numpy as np\nimport pandas as pd\nfrom sympy import simplify, Eq, sympify, Pow, pi\nfrom sympy.parsing.latex import parse_latex\nimport sys\nimport math\nimport os\nimport os.path as osp\nimport argparse\n\nfrom .image_base import ImageBaseDataset\nfrom .utils import build_judge\nfrom ..utils import track_progress_rich\nfrom ..smp import load, dump, d2df, toliststr\n\n\ndef preprocess(str1):",
+        "# vlmeval.dataset.image_base\nimport pandas as pd\nfrom abc import abstractmethod\nfrom ..smp import *\n\n\ndef img_root_map(dataset):\n    if 'MM_NIAH' in dataset:\n        return 'MMNIAH'\n    if 'CRPE' in dataset:\n        return 'CRPE'\n    if 'OCRVQA' in dataset:\n        return 'OCRVQA'\n    if 'COCO_VAL' == dataset:\n        return 'COCO'\n    if 'MMMU' in dataset:\n        return 'MMMU'\n    if \"QSpatial\" in dataset:\n        return \"QSpatial\"\n\n    mmbench_root_map = {",
+        "# vlmeval.dataset.image_caption\nfrom .image_base import ImageBaseDataset\nfrom ..smp import *\n\n\nclass COCO_Caption_Scorer():\n    def __init__(self, ref, gt):\n        from pycocoevalcap.bleu.bleu import Bleu\n        from pycocoevalcap.rouge.rouge import Rouge\n        from pycocoevalcap.cider.cider import Cider\n\n        self.ref = ref\n        self.gt = gt\n        print('setting up scorers...')\n        self.scorers = [\n            (Bleu(4), ['Bleu_1', 'Bleu_2', 'Bleu_3', 'Bleu_4']),\n            (Rouge(), 'ROUGE_L'),\n            (Cider(), 'CIDEr'),\n        ]\n\n    def compute_scores(self):",
+        "# vlmeval.dataset.image_ccocr\n# flake8: noqa\n\nimport os\nimport re\nimport tempfile\nfrom functools import partial\nimport pandas as pd\n\nfrom .image_base import ImageBaseDataset\nfrom ..smp import *\n\n# should be the same as  FAIL_MSG definded in vlmeval/inference.py\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\nclass CCOCRDataset(ImageBaseDataset):\n    TYPE = 'VQA'\n    DATASET_URL_MODELSCOPE = {\n        \"CCOCR_DocParsing_DocPhotoChn\": \"https://www.modelscope.cn/datasets/Qwen/CC-OCR/resolve/master/doc_parsing/doc/doc_photo_chn_75.tsv\",\n        \"CCOCR_DocParsing_DocPhotoEng\": \"https://www.modelscope.cn/datasets/Qwen/CC-OCR/resolve/master/doc_parsing/doc/doc_photo_eng_75.tsv\",",
+        "# vlmeval.dataset.image_mcq\nimport warnings\n\nfrom .image_base import ImageBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..smp import *\nimport pandas as pd\n\nMMMB_URLS = {\n    'MMMB_ar': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmmb/mmmb_ar.tsv',\n    'MMMB_cn': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmmb/mmmb_cn.tsv',\n    'MMMB_en': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmmb/mmmb_en.tsv',\n    'MMMB_pt': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmmb/mmmb_pt.tsv',\n    'MMMB_ru': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmmb/mmmb_ru.tsv',\n    'MMMB_tr': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmmb/mmmb_tr.tsv',\n}\n\nMTL_MMBench_URLS = {\n    'MMBench_dev_ar': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmbench/mmbench_dev_ar.tsv',\n    'MMBench_dev_cn': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmbench/mmbench_dev_cn.tsv',\n    'MMBench_dev_en': 'https://huggingface.co/datasets/AIDC-AI/Parrot-dataset/resolve/main/mmbench/mmbench_dev_en.tsv',",
+        "# vlmeval.dataset.image_mt\nfrom .image_base import ImageBaseDataset\nfrom .utils.judge_util import build_judge\nfrom ..smp import *\nfrom ..utils import track_progress_rich\n\n\nclass ImageMTDataset(ImageBaseDataset):\n\n    TYPE = 'MT'\n\n    def build_prompt(self, line):\n        if isinstance(line, int):\n            line = self.data.iloc[line]\n\n        if self.meta_only:\n            tgt_path = toliststr(line['image_path'])\n        else:\n            tgt_path = self.dump_image(line)\n\n        questions = toliststr(line['question'])",
+        "# vlmeval.dataset.image_vqa\nimport os\nimport re\nimport tempfile\nfrom functools import partial\n\nimport pandas as pd\n\nfrom .image_base import ImageBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..smp import *\nfrom ..utils import track_progress_rich\n\n\nclass ImageVQADataset(ImageBaseDataset):\n    TYPE = 'VQA'\n\n    DATASET_URL = {\n        'OCRVQA_TEST': 'https://opencompass.openxlab.space/utils/VLMEval/OCRVQA_TEST.tsv',\n        'OCRVQA_TESTCORE': 'https://opencompass.openxlab.space/utils/VLMEval/OCRVQA_TESTCORE.tsv',\n        'TextVQA_VAL': 'https://opencompass.openxlab.space/utils/VLMEval/TextVQA_VAL.tsv',",
+        "# vlmeval.dataset.image_yorn\nfrom ..smp import *\nfrom ..utils import *\nfrom .image_base import ImageBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\n\n\nclass ImageYORNDataset(ImageBaseDataset):\n\n    TYPE = 'Y/N'\n\n    DATASET_URL = {\n        'MME': 'https://opencompass.openxlab.space/utils/VLMEval/MME.tsv',\n        'HallusionBench': 'https://opencompass.openxlab.space/utils/VLMEval/HallusionBench.tsv',\n        'POPE': 'https://opencompass.openxlab.space/utils/VLMEval/POPE.tsv',\n        'AMBER': 'https://huggingface.co/datasets/yifanzhang114/AMBER_base64/resolve/main/AMBER.tsv',\n    }\n\n    DATASET_MD5 = {\n        'MME': 'b36b43c3f09801f5d368627fb92187c3',\n        'HallusionBench': '0c23ac0dc9ef46832d7a24504f2a0c7c',",
+        "# vlmeval.dataset.longvideobench\nfrom huggingface_hub import snapshot_download\nfrom ..smp import *\nfrom .video_base import VideoBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom glob import glob\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef timestamp_to_seconds(timestamp):\n    # Split the timestamp into hours, minutes, and seconds\n    h, m, s = timestamp.split(\":\")\n    # Convert hours, minutes, and total seconds (including fractions) to float and compute total seconds\n    total_seconds = int(h) * 3600 + int(m) * 60 + float(s)\n    return total_seconds\n\n\ndef uniformly_subsample(lst, K):\n    n = len(lst)\n    if K >= n:",
+        "# vlmeval.dataset.miabench\nimport json\nimport os\n\nimport pandas as pd\n\nfrom .image_base import ImageBaseDataset\nfrom ..smp import *\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..utils import track_progress_rich\n\n\ndef generate_prompt(d):\n    question = d['question']\n    weights = eval(d['component_weight'])\n    components = eval(d['components'])\n    num_of_component = int(d['num_of_component'])\n    response = d['prediction']\n\n    if num_of_component == 1:\n        components = f\"The first component is: '{components[0]}'. \"",
+        "# vlmeval.dataset.mlvu\nimport huggingface_hub\nfrom huggingface_hub import snapshot_download\nfrom ..smp import *\nfrom .video_concat_dataset import ConcatVideoDataset\nfrom .video_base import VideoBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..utils import track_progress_rich\nimport torchvision.transforms as T\nfrom torchvision import transforms\nfrom torchvision.transforms.functional import InterpolationMode\nfrom decord import VideoReader, cpu\nimport pandas as pd\nimport imageio\nimport cv2\nimport zipfile\nimport os\nimport glob\nfrom .utils.mlvu import *\n\nFAIL_MSG = 'Failed to obtain answer via API.'",
+        "# vlmeval.dataset.mmbench_video\nfrom huggingface_hub import snapshot_download\nfrom ..smp import *\nfrom .video_base import VideoBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..utils import track_progress_rich\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef unwrap_hf_pkl(pth, suffix='.mp4'):\n    base_dir = os.path.join(pth, 'video_pkl/')\n    target_dir = os.path.join(pth, 'video/')\n    pickle_files = [os.path.join(base_dir, file) for file in os.listdir(base_dir)]\n    pickle_files.sort()\n\n    if not os.path.exists(target_dir):\n        os.makedirs(target_dir, exist_ok=True)\n        for pickle_file in pickle_files:\n            with open(pickle_file, 'rb') as file:",
+        "# vlmeval.dataset.mmgenbench\nimport warnings\nimport pandas as pd\nfrom abc import abstractmethod\nfrom ..smp import *\nfrom .image_base import ImageBaseDataset\n\n\nclass MMGenBench(ImageBaseDataset):\n\n    prompt_list = [\n        \"\"\"\n# Role\nYou are an expert in the field of image understanding, focusing on the \\\nunderstanding of images and generating the image caption-prompt.\n\n# Definition Explanation\nimage caption-prompt: Refers to the caption or description of an image, \\\nused to provide to a Text-to-Image model to generate a new image.\nText-to-Image model: Can generate a new image based on the provided image \\\ncaption-prompt, such as stable diffusion 3, flux, and other image generation models.",
+        "# vlmeval.dataset.mmlongbench\nimport re\nimport math\nfrom urllib.request import urlopen\nfrom PIL import Image, ImageDraw, ImageFont\nimport torchvision.transforms as transforms\n\nfrom vlmeval.dataset.utils import build_judge, levenshtein_distance\nfrom vlmeval.smp import *\nfrom .image_base import ImageBaseDataset\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef get_gpt4_ICE():\n    example_1 = \"\"\"\n---\nQuestion: List the primary questions asked about the services in this report.\nAnalysis:  The primary questions asked about the services in the report for The Limes Residential Home are:\\n\\n\n1. Is the service safe?\\n\n2. Is the service effective?\\n",
+        "# vlmeval.dataset.mmmath\nimport re\nimport json\nimport sympy as sp\nimport numpy as np\nfrom sympy import simplify, Eq, sympify, Pow, pi\nfrom sympy.parsing.latex import parse_latex\nimport sys\nimport math\nimport os\nimport argparse\n\nfrom .image_base import ImageBaseDataset\nfrom ..utils import track_progress_rich\nfrom ..smp import load, dump\n\n\nclass AutoScoringJudge:\n    def __init__(self):\n        # Map of special symbols to their replacements\n        self.special_signal_map = {",
+        "# vlmeval.dataset.mvbench\nimport huggingface_hub\nfrom huggingface_hub import snapshot_download\nfrom ..smp import *\nfrom .video_base import VideoBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..utils import track_progress_rich\nimport torchvision.transforms as T\nfrom torchvision import transforms\nfrom torchvision.transforms.functional import InterpolationMode\nfrom decord import VideoReader, cpu\nimport imageio\nimport cv2\nimport zipfile\nimport os\nimport glob\nfrom .utils.mvbench import *\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n",
+        "# vlmeval.dataset.slidevqa\nimport re\nimport math\nfrom typing import List\n\nfrom vlmeval.dataset.utils.judge_util import build_judge\nfrom vlmeval.smp import *\nfrom .image_base import ImageBaseDataset\nfrom .mmlongbench import concat_images, MMLongBench_auxeval, anls_compute\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef get_f1(gt, pred):\n    gt_bow, pred_bow = gt.strip().split(), pred.strip().split()\n    if not gt_bow or not pred_bow:\n        return 0.0\n\n    recall = len([pred_e for pred_e in pred_bow if pred_e in gt_bow]) / len(gt_bow)\n    precision = len([pred_e for pred_e in pred_bow if pred_e in gt_bow]) / len(pred_bow)",
+        "# vlmeval.dataset.tempcompass\nimport huggingface_hub\nfrom huggingface_hub import snapshot_download\nfrom ..smp import *\nfrom .video_concat_dataset import ConcatVideoDataset\nfrom .video_base import VideoBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..utils import track_progress_rich\nimport torchvision.transforms as T\nfrom torchvision import transforms\nfrom torchvision.transforms.functional import InterpolationMode\nfrom decord import VideoReader, cpu\nfrom .utils.tempcompass import *\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\nclass TempCompass(ConcatVideoDataset):\n    def __init__(self, dataset='TempCompass', nframe=0, fps=-1):\n        self.DATASET_SETS[dataset] = ['TempCompass_MCQ', 'TempCompass_Captioning', 'TempCompass_YorN']",
+        "# vlmeval.dataset.text_base\nfrom abc import abstractmethod\nfrom ..smp import *\n\n\nclass TextBaseDataset:\n    MODALITY = 'TEXT'\n    DATASET_URL = {}\n    DATASET_MD5 = {}\n\n    def __init__(self, dataset='MMBench', **kwargs):\n        self.dataset_name = dataset\n\n        data = self.load_data(dataset)\n\n        data['index'] = [str(x) for x in data['index']]\n\n        if np.all([istype(x, int) for x in data['index']]):\n            data['index'] = [int(x) for x in data['index']]\n\n        self.data = data",
+        "# vlmeval.dataset.text_mcq\nfrom .text_base import TextBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..smp import *\n\n\nclass TextMCQDataset(TextBaseDataset):\n    TYPE = 'MCQ'\n\n    DATASET_URL = {}\n\n    DATASET_MD5 = {}\n\n    def build_prompt(self, line):\n\n        if isinstance(line, int):\n            line = self.data.iloc[line]\n\n        question = line['question']\n        options = {\n            cand: line[cand]",
+        "# vlmeval.dataset.utils\nfrom .judge_util import build_judge, DEBUG_MESSAGE\nfrom .multiple_choice import extract_answer_from_item, prefetch_answer\nfrom .vqa_eval import levenshtein_distance\n\n\n__all__ = [\n    'build_judge', 'extract_answer_from_item', 'prefetch_answer',\n    'levenshtein_distance', 'DEBUG_MESSAGE',\n]",
+        "# vlmeval.dataset.utils.cgbench\nfrom ...smp import *\nfrom .multiple_choice import extract_answer_from_item\nimport pandas as pd\nimport numpy as np\nimport re\n\nFAIL_MSG = \"Failed to obtain answer via API.\"\n\nframe_tmpl = \"frame-{}-of-{}.jpg\"\n\nsys_prompt_open_eval_step_1 = (\n    \"You will be provided with a question, a model's prediction, and the ground \"\n    \"truth answer for this question.\\n\"\n    \"Your task is to judge whether the model's prediction is correct based on the \"\n    \"meaning of the two texts.\\n\"\n    \"In most cases, this can be done by determining if the meaning of the model's \"\n    \"prediction is consistent with, or contains, the ground truth answer. However, \"\n    \"in some cases where the two texts differ, it may represent different \"\n    \"descriptions of the same visual scene, in which case visual information is \"\n    \"needed for further judgment.\\n\"",
+        "# vlmeval.dataset.utils.hrbench\nfrom ...smp import *\nimport os\n\n\ndef report_acc_hrbench(df):\n    cycle_group = df.groupby('cycle_category')\n    result_dic = defaultdict(list)\n    avg_dic = defaultdict(int)\n\n    count = 0\n    for key, data_value in cycle_group:\n        count += 1\n        _, resp_dic = hrbench_score(data_value)\n\n        for task_type, accuracy in resp_dic.items():\n            result_dic['cycle'].append(key)\n            result_dic['type'].append(task_type)\n            result_dic['accuracy'].append(accuracy)\n\n            avg_dic[task_type] += accuracy",
+        "# vlmeval.dataset.utils.judge_util\nimport os\nfrom ...smp import load_env\n\nINTERNAL = os.environ.get('INTERNAL', 0)\n\n\ndef build_judge(**kwargs):\n    from ...api import OpenAIWrapper, SiliconFlowAPI\n    model = kwargs.pop('model', None)\n    kwargs.pop('nproc', None)\n    load_env()\n    LOCAL_LLM = os.environ.get('LOCAL_LLM', None)\n    if LOCAL_LLM is None:\n        model_map = {\n            'gpt-4-turbo': 'gpt-4-1106-preview',\n            'gpt-4-0613': 'gpt-4-0613',\n            'gpt-4-0125': 'gpt-4-0125-preview',\n            'gpt-4-0409': 'gpt-4-turbo-2024-04-09',\n            'chatgpt-1106': 'gpt-3.5-turbo-1106',\n            'chatgpt-0125': 'gpt-3.5-turbo-0125',",
+        "# vlmeval.dataset.utils.llavabench\nimport numpy as np\nimport pandas as pd\nfrom ...smp import *\n\nrule_dict = {\n    'llava_bench_conv': {'role': 'Assistant', 'prompt': 'We would like to request your feedback on the performance of two AI assistants in response to the user question displayed above. The user asks the question on observing an image. For your reference, the visual content in the image is represented with a few sentences describing the image. \\nPlease rate the helpfulness, relevance, accuracy, level of details of their responses. Each assistant receives an overall score on a scale of 1 to 10, where a higher score indicates better overall performance.\\nPlease first output a single line containing only two values indicating the scores for Assistant 1 and 2, respectively. The two scores are separated by a space.\\nIn the subsequent line, please provide a comprehensive explanation of your evaluation, avoiding any potential bias and ensuring that the order in which the responses were presented does not affect your judgment.'},  # noqa: E501\n    'llava_bench_detail': {'role': 'Assistant', 'prompt': 'We would like to request your feedback on the performance of two AI assistants in response to the user question displayed above. The user asks the question on observing an image. For your reference, the visual content in the image is represented with a few sentences describing the image. \\nPlease rate the helpfulness, relevance, accuracy, level of details of their responses. Each assistant receives an overall score on a scale of 1 to 10, where a higher score indicates better overall performance.\\nPlease first output a single line containing only two values indicating the scores for Assistant 1 and 2, respectively. The two scores are separated by a space.\\nIn the subsequent line, please provide a comprehensive explanation of your evaluation, avoiding any potential bias and ensuring that the order in which the responses were presented does not affect your judgment.'},  # noqa: E501\n    'llava_bench_complex': {'role': 'Assistant', 'prompt': 'We would like to request your feedback on the performance of two AI assistants in response to the user question displayed above. The user asks the question on observing an image. For your reference, the visual content in the image is represented with a few sentences describing the image. \\nPlease rate the helpfulness, relevance, accuracy, level of details of their responses. Each assistant receives an overall score on a scale of 1 to 10, where a higher score indicates better overall performance.\\nPlease first output a single line containing only two values indicating the scores for Assistant 1 and 2, respectively. The two scores are separated by a space.\\nIn the subsequent line, please provide a comprehensive explanation of your evaluation, avoiding any potential bias and ensuring that the order in which the responses were presented does not affect your judgment.'}  # noqa: E501\n}\n\n\ndef get_eval(judge, content):\n    return judge.generate(content)\n\n\ndef parse_score(review):\n    logger = get_logger('Evaluation')\n    try:\n        score_pair = review.split('\\n')[0]\n        score_pair = score_pair.replace(',', ' ')",
+        "# vlmeval.dataset.utils.logicvista\nimport pandas as pd\n\n# from colorama import Fore, Back, Style\nfrom ...smp import *\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef build_prompt_logicvista(line):\n    question = line['question']\n    prediction = str(line['prediction'])\n    tmpl = (\n        \"You are a information extractor that extracts multiple choice letter answer choices \"\n        \"from a paragraph that contains the answer choice and sometimes explaination of why that \"\n        \"choice is correct to the given question.\\n\"\n        \"What letter did the following answer choose? If the answer did not select a letter answer choice, \"\n        \"first try to infer the answer based off the given choices.\\n\"\n        \"If it does not seem like the given answer corresponds to an answer choice OR if there is no selected answer, please just respond with Z.\\n\"\n        \"Make sure you answer with ONLY the letters chosen.\\n\"",
+        "# vlmeval.dataset.utils.longvideobench\nfrom ...smp import *\nfrom .multiple_choice import extract_answer_from_item\nimport numpy as np\nimport re\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\nDURATIONS = [15, 60, 600, 3600]\nTASK_CATEGORIES = [\n    \"S2E\", \"S2O\", \"S2A\",\n    \"E2O\", \"O2E\", \"T2E\",\n    \"T2O\", \"T2A\", \"E3E\",\n    \"O3O\", \"SSS\", \"SOS\",\n    \"SAA\", \"T3E\", \"T3O\",\n    \"TOS\", \"TAA\"\n]\n\n\ndef get_dimension_rating(data_path):\n    data = load(data_path)",
+        "# vlmeval.dataset.utils.mathv\nfrom ...smp import *\nfrom ...utils import can_infer\ntry:\n    from latex2sympy2 import latex2sympy\nexcept Exception as e:\n    logging.critical(f'{type(e)}: {e}')\n    logging.critical('Please install latex2sympy2 by running \"pip install latex2sympy2\"')\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef is_equal(asw: str, gt_asw: str) -> bool:\n    if not isinstance(asw, str) != str or not isinstance(gt_asw, str):\n        print('Warning: input is not string')\n        print(asw, gt_asw)\n    asw = str(asw).lower().strip()\n    gt_asw = str(gt_asw).lower().strip()\n    if gt_asw == asw:\n        return True\n    try:",
+        "# vlmeval.dataset.utils.mathverse\nfrom ...smp import *\nfrom ...utils import can_infer\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef get_gpt4_extract_ICE():\n    example_1 = \"\"\"\n1.\nModel response: 'Rounded to two decimal places, the perimeter of the sector is approximately:\\n\\n(-2, 1)'\nExtracted Answer: (-2, 1)\n\"\"\" # noqa\n\n    example_2 = \"\"\"\n2.\nModel response: 'at those points.\\n\\nTherefore, the correct option that represents the meaning of the intersection points of the graphs is:\\n\\nD. They give the solutions to the equation $f(t)=g(t)$.\",'\nExtracted Answer: D\n\"\"\" # noqa\n",
+        "# vlmeval.dataset.utils.mathvista\nfrom ...smp import *\nfrom ...utils import can_infer\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef get_gpt4_ICE():\n    example_1 = \"\"\"\nHint: Please answer the question requiring an integer answer and provide the final value,\ne.g., 1, 2, 3, at the end.\\n\nQuestion: Which number is missing?\\n\nModel response: The number missing in the sequence is 14.\\n\nExtracted answer: 14\n\"\"\"\n\n    example_2 = \"\"\"\nHint: Please answer the question requiring a floating-point number with one decimal place and provide the final value,\ne.g., 1.2, 1.3, 1.4, at the end.\\n\nQuestion: What is the fraction of females facing the camera?\\n",
+        "# vlmeval.dataset.utils.mlvu\nfrom ...smp import *\nfrom .multiple_choice import extract_answer_from_item\nfrom PIL import Image, ImageOps\nimport numpy as np\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\nsystem_prompt_sub_scene = \"\"\"\n##TASK DESCRIPTION:\nYou are required to evaluate a respondent's answer based on a provided question, some scoring points, and the respondent's answer. You should provide two scores. The first is the accuracy score, which should range from 1 to 5. The second is the relevance score, which should also range from 1 to 5. Below are the criteria for each scoring category.\n##ACCURACY Scoring Criteria:\nEvaluate the respondent's answer against specific scoring points as follows:\nScore 1: The response completely misses the scoring point.\nScore 3: The response mentions content related to the scoring point but is not entirely correct.\nScore 5: The response accurately addresses the scoring point.\nCalculate the average score across all scoring points to determine the final accuracy score.\n##RELEVANCE Scoring Criteria:\nAssess how the respondent's answer relates to the original question:\nScore 1: The response is completely off-topic from the question.\nScore 2: The response is partially related to the question but contains a significant amount of irrelevant content.",
+        "# vlmeval.dataset.utils.mmbench_video\nfrom ...smp import *\nimport numpy as np\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\nsystem_prompt = \"\"\"\nAs an AI assistant, your task is to evaluate a candidate answer in comparison to a given correct answer.\nThe question itself, the correct 'groundtruth' answer, and the candidate answer will be provided to you.\nYour assessment should range from 0 to 3, \\\nbased solely on the semantic similarity between the groundtruth and the candidate answer, \\\ndisregarding any grammatical differences.\nA rating of 0 suggests no similarity, implying the candidate answer is entirely incorrect.\nA rating of 1 suggests low similarity, meaning the candidate answer is largely incorrect.\nA rating of 2 suggests high similarity, meaning the candidate answer is largely correct.\nLastly, a rating of 3 indicates complete similarity, which means the candidate answer is entirely correct.\nYour response should be a single integer from 0, 1, 2, or 3.\n\"\"\"\n\nMMV_DIMENSIONS = {\n    'CP': ['Video Topic', 'Video Emotion', 'Video Scene', 'Video Style'],",
+        "# vlmeval.dataset.utils.mmdu\nfrom ...smp import *\n\nmeta_prompt = \"\"\"\nYou are an assistant skilled at evaluating the quality of creative text.\nPlease act as an impartial judge and evaluate the quality of the response provided by an AI assistant to \\\nthe user question displayed below. You'll need to assess the response on the following dimensions: \\\nCreativity, Richness, Visual Perception, Logical Coherence, Answer Accuracy and Image Relationship Understanding. \\\nWe will provide you with a creative question and the AI model's response and a reference answer for your evaluation. \\\nAs you begin your assessment, follow this process:\n1. Evaluate the AI model's answers on different dimensions, pointing out its strengths or weaknesses \\\nin each dimension and assigning a score of 1 to 10 for each.\n2. Finally, based on the assessments across dimensions, \\\nprovide an overall score of 1 to 10 for the AI model's response.\n3. Your scoring should be as stringent as possible and follow the scoring rules below:\nIn general, the higher the quality of the model's response and its strict adherence to user needs, \\\nthe higher the score. Responses that do not meet user needs will receive lower scores.\nScoring rules:\nCreativity:\nScores 1-2 when there is no innovation or uniqueness in the content.\nScores 3-4 when providing partially original content but with low creative quality.",
+        "# vlmeval.dataset.utils.mmvet\nfrom ...smp import *\n\n\ndef build_mmvet_gpt4_prompt(line):\n    question = line['question']\n    gt = str(line['answer'])\n    prediction = str(line['prediction'])\n    prompt = \"\"\"\nCompare the ground truth and prediction from AI models, to give a correctness score for the prediction.\n<AND> in the ground truth means it is totally right\nonly when all elements in the ground truth are present in the prediction,\nand <OR> means it is totally right when any one element in the ground truth is present in the prediction.\nThe correctness score is 0.0 (totally wrong), 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, or 1.0 (totally right).\nJust complete the last space of the correctness score.\n\nQuestion | Ground truth | Prediction | Correctness\n--- | --- | --- | ---\nWhat is x in the equation? | -1 <AND> -5 | x = 3 | 0.0\nWhat is x in the equation? | -1 <AND> -5 | x = -1 | 0.5\nWhat is x in the equation? | -1 <AND> -5 | x = -5 | 0.5",
+        "# vlmeval.dataset.utils.multiple_choice\nimport pandas as pd\nfrom ...utils import can_infer, track_progress_rich\nfrom ...smp import *\nimport numpy as np\nimport re\n\nMMB_abbrs = {\n    'coarse_perception': 'CP',\n    'finegrained_perception (instance-level)': 'FP-S',\n    'finegrained_perception (cross-instance)': 'FP-C',\n    'logic_reasoning': 'LR',\n    'relation_reasoning': 'RR',\n    'attribute_reasoning': 'AR'\n}\n\nMMT_abbrs = {\n    'visual_recognition': 'VR',\n    'localization': 'Loc',\n    'ocr': 'OCR',\n    'counting': 'Count',",
+        "# vlmeval.dataset.utils.mvbench\nfrom ...smp import *\nfrom .multiple_choice import extract_answer_from_item\nfrom PIL import Image, ImageOps\nimport torchvision\nimport random\nimport numbers\nimport math\nimport torch\n\n\ndef get_dimension_rating(data_path):\n    data = load(data_path)\n    result_board = {}\n    for idx, item in data.iterrows():\n        if item['task_type'] not in result_board:\n            result_board[item['task_type']] = [0, 0]\n        result_board[item['task_type']][1] += 1\n        if item['score']:\n            result_board[item['task_type']][0] += 1\n",
+        "# vlmeval.dataset.utils.qspatial\nfrom ...smp import *\nfrom ...utils import can_infer\n\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef get_gpt4_ICE_for_qspatial():\n    example_1 = \"\"\"\nHint: Please answer the question requiring in a tuple format. The tuple should contain a numeric value and a unit,\ne.g., (1, m), (2.2, cm), (3.12, meter), at the end.\\n\nModel response: **Object Identification**\n\n* The object in question is a chair.\n* The chair is not visible in the image.\n\n**Conclusion**\n\nThe height of the chair cannot be determined from the provided image.\\n\nExtracted answer: (0, cm)",
+        "# vlmeval.dataset.utils.tempcompass\nfrom ...smp import *\nfrom .multiple_choice import extract_answer_from_item\nfrom PIL import Image, ImageOps\nimport numpy as np\n\nsys_prompt = \"You are an AI assistant for question answering.\"\n\nsystem_prompt_multi_choice = (\n    \"You will receive a multi-choice question, the ground-truth answer and the prediction from a question answering (QA) model. \"  # noqa\n    \"Your task is to determine whether QA model prediction is correct, based on the question and ground-truth answer. \"\n    \"If the prediction is correct, respond \\\"Correct\\\". If the prediction is incorrect, respond \\\"Incorrect\\\".\"\n)\n\nsystem_prompt_caption_matching = (\n    \"You will receive a caption matching question, the ground-truth answer and the prediction from a question answering (QA) model. \"  # noqa\n    \"Your task is to determine whether QA model prediction is correct, based on the question and ground-truth answer. \"\n    \"If the prediction is correct, respond \\\"Correct\\\". If the prediction is incorrect, respond \\\"Incorrect\\\".\"\n)\n\nsystem_prompt_captioning = \"\"\"",
+        "# vlmeval.dataset.utils.videomme\nfrom ...smp import *\nfrom .multiple_choice import extract_answer_from_item\nimport numpy as np\nimport re\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\nDURATIONS = [\n    'short',\n    'medium',\n    'long',\n]\n\nDOMAINS = [\n    'Knowledge',\n    'Film & Television',\n    'Sports Competition',\n    'Artistic Performance',\n    'Life Record',\n    'Multilingual'",
+        "# vlmeval.dataset.utils.vqa_eval\n# Copyright (c) OpenMMLab. All rights reserved.\n# Partly adopted from https://github.com/GT-Vision-Lab/VQA\n# Copyright (c) 2014, Aishwarya Agrawal\n\nfrom ...smp import *\nfrom typing import Optional\n\n\ndef _process_digit_article(inText):\n    outText = []\n    tempText = inText.lower().split()\n    articles = ['a', 'an', 'the']\n    manualMap = {\n        'none': '0',\n        'zero': '0',\n        'one': '1',\n        'two': '2',\n        'three': '3',\n        'four': '4',\n        'five': '5',",
+        "# vlmeval.dataset.utils.yorn\nfrom ...smp import *\n\n\ndef AMBER_rating(data_file):\n    data = load(data_file)\n    stats = defaultdict(dict)\n    lt = len(data)\n    category_mapping = {\n        'discriminative-attribute-state': 'Attribute',\n        'discriminative-attribute-number': 'Attribute',\n        'discriminative-attribute-action': 'Attribute',\n        'discriminative-hallucination': 'Existence',\n        'discriminative-relation': 'Relation',\n        'relation': 'Relation'\n    }\n\n    for i in range(lt):\n        item = data.iloc[i]\n        category = item['category']\n        image_path = item['image_path']",
+        "# vlmeval.dataset.vcr\nimport uuid\nfrom functools import partial\nfrom .image_base import ImageBaseDataset\nfrom ..smp import *\n\nrouge = None\nnlp_en = None\nnlp_zh = None\nnlp = None\n\n\ndef initialize():\n    import evaluate\n    import spacy\n\n    global rouge, nlp_en, nlp_zh, nlp\n\n    try:\n        rouge = evaluate.load('rouge', experiment_id=str(uuid.uuid4()))\n    except Exception as e:",
+        "# vlmeval.dataset.video_base\nfrom abc import abstractmethod\nfrom ..smp import *\n\n\nclass VideoBaseDataset:\n\n    MODALITY = 'VIDEO'\n\n    def __init__(self,\n                 dataset='MMBench-Video',\n                 pack=False,\n                 nframe=0,\n                 fps=-1):\n        try:\n            import decord\n        except Exception as e:\n            logging.critical(f'{type(e)}: {e}')\n            logging.critical('Please install decord via `pip install decord`.')\n\n        self.dataset_name = dataset",
+        "# vlmeval.dataset.video_concat_dataset\nfrom ..smp import *\nfrom .video_base import VideoBaseDataset\n\n\nclass ConcatVideoDataset(VideoBaseDataset):\n    # This dataset takes multiple dataset names as input and aggregate them into a single dataset.\n    # Each single dataset should not have a field named `SUB_DATASET`\n\n    DATASET_SETS = {}\n\n    def __init__(self, dataset, **kwargs):\n        from . import build_dataset\n        datasets = self.DATASET_SETS[dataset]\n        self.dataset_map = {}\n        # The name of the compliation\n        self.dataset_name = dataset\n        self.datasets = datasets\n        self.nframe = kwargs.get('nframe', 0)\n        self.fps = kwargs.get('fps', -1)\n        for dname in datasets:",
+        "# vlmeval.dataset.video_dataset_config\nfrom vlmeval.dataset import *\nfrom functools import partial\n\nmmbench_video_dataset = {\n    'MMBench_Video_8frame_nopack': partial(MMBenchVideo, dataset='MMBench-Video', nframe=8, pack=False),\n    'MMBench_Video_8frame_pack': partial(MMBenchVideo, dataset='MMBench-Video', nframe=8, pack=True),\n    'MMBench_Video_16frame_nopack': partial(MMBenchVideo, dataset='MMBench-Video', nframe=16, pack=False),\n    'MMBench_Video_1fps_nopack': partial(MMBenchVideo, dataset='MMBench-Video', fps=1.0, pack=False),\n    'MMBench_Video_1fps_pack': partial(MMBenchVideo, dataset='MMBench-Video', fps=1.0, pack=True)\n}\n\nmvbench_dataset = {\n    'MVBench_8frame': partial(MVBench, dataset='MVBench', nframe=8),\n    # MVBench not support fps, but MVBench_MP4 does\n    'MVBench_MP4_8frame': partial(MVBench_MP4, dataset='MVBench_MP4', nframe=8),\n    'MVBench_MP4_1fps': partial(MVBench_MP4, dataset='MVBench_MP4', fps=1.0),\n}\n\nvideomme_dataset = {\n    'Video-MME_8frame': partial(VideoMME, dataset='Video-MME', nframe=8),",
+        "# vlmeval.dataset.videomme\nfrom huggingface_hub import snapshot_download\nfrom ..smp import *\nfrom .video_base import VideoBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef unwrap_hf_pkl(pth, suffix='.mp4'):\n    base_dir = os.path.join(pth, 'video_pkl/')\n    target_dir = os.path.join(pth, 'video/')\n    pickle_files = [os.path.join(base_dir, file) for file in os.listdir(base_dir)]\n    pickle_files.sort()\n\n    if not os.path.exists(target_dir):\n        os.makedirs(target_dir, exist_ok=True)\n        for pickle_file in pickle_files:\n            with open(pickle_file, 'rb') as file:\n                video_data = pickle.load(file)\n            # For each video file in the pickle file, write its contents to a new mp4 file",
+        "# vlmeval.dataset.vl_rewardbench\nfrom ast import literal_eval\n\nfrom .image_base import ImageBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..smp import *\nfrom ..utils import track_progress_rich\n\n\nLLM_PARSE_ANSWER_PROMPT = '''\nYou are given a pairwise judgement for two responses. Please return the better response according to the judgement.\nReturn the Answer X ONLY. e.g., Answer 1 or Answer 2.\n\nJudgement: {judgement}\n'''\n\n\nPROMPT_TEMPLATE = '''\\\nYou are a highly capable multimodal AI assistant tasked with evaluating answers to visual questions.\nPlease analyze the following image and question, then determine which of the two provided answers is better.\n",
+        "# vlmeval.dataset.wildvision\nimport re\nfrom functools import partial\n\nfrom .image_base import ImageBaseDataset\nfrom .utils import build_judge, DEBUG_MESSAGE\nfrom ..smp import *\nfrom ..utils import track_progress_rich\n\n\nSYSTEM_PROMPT = \"\"\"\\\nPlease act as an impartial judge and evaluate the quality of the responses provided by two AI assistants to the user \\\nprompt displayed below. You will be given assistant A's answer and assistant B's answer. Your job is to evaluate \\\nwhich assistant's answer is better.\n\nBegin your evaluation by generating your own answer to the prompt. You must provide your answers before judging any \\\nanswers.\n\nWhen evaluating the assistants' answers, compare both assistants' answers with your answer. \\\nYou must identify and correct any mistakes or inaccurate information.\n",
+        "# vlmeval.smp\nfrom .file import *\nfrom .vlm import *\nfrom .misc import *\nfrom .log import *",
+        "# vlmeval.smp.file\nimport json\nimport pickle\nimport pandas as pd\nimport os\nimport csv\nimport hashlib\nimport os.path as osp\nimport time\nimport numpy as np\nimport validators\nimport mimetypes\nimport multiprocessing as mp\nfrom .misc import toliststr\nfrom .vlm import decode_base64_to_image_file\n\n\ndef decode_img_omni(tup):\n    root, im, p = tup\n    images = toliststr(im)\n    paths = toliststr(p)",
+        "# vlmeval.smp.misc\n# flake8: noqa: F401, F403\nimport abc\nimport argparse\nimport csv\nimport multiprocessing as mp\nimport os\nimport os.path as osp\nfrom pathlib import Path\nimport copy as cp\nimport random as rd\nimport requests\nimport shutil\nimport subprocess\nimport warnings\nimport pandas as pd\nfrom collections import OrderedDict, defaultdict\nfrom multiprocessing import Pool, current_process\nfrom tqdm import tqdm\nimport datetime\nimport matplotlib.pyplot as plt",
+        "# vlmeval.smp.vlm\nimport os\nimport io\nimport pandas as pd\nimport numpy as np\nimport string\nfrom uuid import uuid4\nimport os.path as osp\nimport base64\nfrom PIL import Image\nimport sys\n\nImage.MAX_IMAGE_PIXELS = 1e9\n\n\ndef rescale_img(img, tgt=None):\n    assert isinstance(tgt, tuple) and -1 in tgt\n    w, h = img.size\n    if tgt[0] != -1:\n        new_w, new_h = tgt[0], int(tgt[0] / w * h)\n    elif tgt[1] != -1:",
+        "# vlmeval.tools\nimport sys\nfrom vlmeval.dataset import SUPPORTED_DATASETS\nfrom vlmeval.config import *\nfrom vlmeval.smp import *\n\n# Define valid modes\nMODES = ('dlist', 'mlist', 'missing', 'circular', 'localize', 'check', 'run', 'eval', 'merge_pkl')\n\nCLI_HELP_MSG = \\\n    f\"\"\"\n    Arguments received: {str(['vlmutil'] + sys.argv[1:])}. vlmutil commands use the following syntax:\n\n        vlmutil MODE MODE_ARGS\n\n        Where   MODE (required) is one of {MODES}\n                MODE_ARG (optional) is the argument for specific mode\n\n    Some usages for xtuner commands: (See more by using -h for specific command!)\n\n        1. List all the dataset by levels: l1, l2, l3, etc.:",
+        "# vlmeval.utils\nfrom .matching_util import can_infer, can_infer_option, can_infer_text\nfrom .mp_util import track_progress_rich\n\n\n__all__ = [\n    'can_infer', 'can_infer_option', 'can_infer_text', 'track_progress_rich',\n]",
+        "# vlmeval.utils.matching_util\nimport string\nimport copy as cp\nimport os\nfrom ..smp import *\n\n\ndef can_infer_option(answer, choices):\n    verbose = os.environ.get('VERBOSE', 0)\n    # Choices is a dictionary\n    if 'Failed to obtain answer via API' in answer:\n        return False\n\n    reject_to_answer = [\n        \"Sorry, I can't help with images of people yet.\",\n        \"I can't process this file.\",\n        \"I'm sorry, but without the image provided\",\n        'Cannot determine the answer'\n    ]\n    for err in reject_to_answer:\n        if err in answer:",
+        "# vlmeval.utils.mp_util\nfrom multiprocessing import Pool\nimport os\nfrom typing import Callable, Iterable, Sized\n\nfrom rich.progress import (BarColumn, MofNCompleteColumn, Progress, Task,\n                           TaskProgressColumn, TextColumn, TimeRemainingColumn)\nfrom rich.text import Text\nimport os.path as osp\nimport time\nimport portalocker\nfrom ..smp import load, dump\n\n\ndef track_progress_rich(\n        func: Callable,\n        tasks: Iterable = tuple(),\n        nproc: int = 1,\n        save=None,\n        keys=None,\n        **kwargs) -> list:",
+        "# vlmeval.vlm\nimport torch\n\ntorch.set_grad_enabled(False)\ntorch.manual_seed(1234)\nfrom .base import BaseModel\nfrom .minicpm_v import MiniCPM_V, MiniCPM_Llama3_V, MiniCPM_V_2_6, MiniCPM_o_2_6",
+        "# vlmeval.vlm.base\nfrom ..smp import *\nfrom ..dataset import img_root_map, DATASET_TYPE\nfrom abc import abstractmethod\n\n\nclass BaseModel:\n\n    INTERLEAVE = False\n    allowed_types = ['text', 'image', 'video']\n\n    def __init__(self):\n        self.dump_image_func = None\n\n    def use_custom_prompt(self, dataset):\n        \"\"\"Whether to use custom prompt for the given dataset.\n\n        Args:\n            dataset (str): The name of the dataset.\n\n        Returns:",
+        "# vlmeval.vlm.minicpm_v\nimport math\nimport torch\nimport random\nimport numpy as np\nfrom PIL import Image\nfrom transformers import AutoModel, AutoTokenizer\n\nfrom .base import BaseModel\nfrom ..smp import *\nfrom ..dataset import DATASET_TYPE, DATASET_MODALITY\n\nimport re\n\n\nclass MiniCPM_V(BaseModel):\n\n    INSTALL_REQ = False\n    INTERLEAVE = False\n\n    def __init__(self, model_path='openbmb/MiniCPM-V', **kwargs):"
+      ]
+    },
+    {
+      "id": "e9da0718e0",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/vlm/minicpm_v.py",
+          "line_start": 320,
+          "line_end": 417,
+          "module": "vlmeval.vlm.minicpm_v"
+        }
+      ],
+      "subject": "Function vlmeval.vlm.minicpm_v.build_prompt has cyclomatic complexity 39",
+      "evidence": {
+        "function": "build_prompt",
+        "module": "vlmeval.vlm.minicpm_v",
+        "complexity": 39,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.078,
+        "principle_severity": 0.08,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def build_prompt(self, line, dataset=None):\n        if isinstance(line, int):\n            line = self.data.iloc[line]\n\n        tgt_path = self.dump_image(line, dataset)\n        system_prompt, prompt = '', ''\n\n        question = line['question']\n\n        if not self.use_cot(dataset):\n            if DATASET_TYPE(dataset) == 'MCQ':\n                options = {\n                    cand: line[cand]\n                    for cand in string.ascii_uppercase\n                    if cand in line and not pd.isna(line[cand])\n                }\n                options_prompt = 'Options:\\n'\n                for key, item in options.items():\n                    options_prompt += f'{key}. {item}\\n'\n                hint = line['hint'] if ('hint' in line and not pd.isna(line['hint'])) else None\n                if hint is not None:\n                    prompt += f'Hint: {hint}\\n'\n                prompt += f'Question: {question}\\n'\n                if len(options):\n                    prompt += options_prompt\n                    prompt += self.options_suffix_prompt\n                else:\n                    system_prompt = self.wo_options_system_prompt\n\n                if 'MMMU' in dataset:\n                    if len(system_prompt) > 0:\n                        prompt = system_prompt + '\\n' + prompt\n                        system_prompt = ''\n            elif dataset is not None and listinstr(['HallusionBench'], dataset):\n                question += ' Yes or No?'\n                prompt = question\n            elif dataset is not None and listinstr(['OCRBench'], dataset):\n                system_prompt = self.vqa_prompt\n                prompt = question\n            elif DATASET_TYPE(dataset) == 'VQA':\n                if listinstr(['LLaVABench'], dataset):\n                    system_prompt = ''\n                elif listinstr(['MMVet'], dataset):\n                    system_prompt = self.detail_system_prompt\n                else:\n                    system_prompt = self.vqa_prompt\n                prompt = question\n            else:\n                prompt = question\n        else:"
+      ]
+    },
+    {
+      "id": "b7992e7913",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/vlm/minicpm_v.py",
+          "line_start": 549,
+          "line_end": 646,
+          "module": "vlmeval.vlm.minicpm_v"
+        }
+      ],
+      "subject": "Function vlmeval.vlm.minicpm_v.build_prompt has cyclomatic complexity 39",
+      "evidence": {
+        "function": "build_prompt",
+        "module": "vlmeval.vlm.minicpm_v",
+        "complexity": 39,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.078,
+        "principle_severity": 0.08,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def build_prompt(self, line, dataset=None):\n        if isinstance(line, int):\n            line = self.data.iloc[line]\n\n        tgt_path = self.dump_image(line, dataset)\n        system_prompt, prompt = '', ''\n\n        question = line['question']\n\n        if not self.use_cot(dataset):\n            if DATASET_TYPE(dataset) == 'MCQ':\n                options = {\n                    cand: line[cand]\n                    for cand in string.ascii_uppercase\n                    if cand in line and not pd.isna(line[cand])\n                }\n                options_prompt = 'Options:\\n'\n                for key, item in options.items():\n                    options_prompt += f'{key}. {item}\\n'\n                hint = line['hint'] if ('hint' in line and not pd.isna(line['hint'])) else None\n                if hint is not None:\n                    prompt += f'Hint: {hint}\\n'\n                prompt += f'Question: {question}\\n'\n                if len(options):\n                    prompt += options_prompt\n                    prompt += self.options_suffix_prompt\n                else:\n                    system_prompt = self.wo_options_system_prompt\n\n                if 'MMMU' in dataset:\n                    if len(system_prompt) > 0:\n                        prompt = system_prompt + '\\n' + prompt\n                        system_prompt = ''\n            elif dataset is not None and listinstr(['HallusionBench'], dataset):\n                question += ' Yes or No?'\n                prompt = question\n            elif dataset is not None and listinstr(['OCRBench'], dataset):\n                system_prompt = self.vqa_prompt\n                prompt = question\n            elif DATASET_TYPE(dataset) == 'VQA':\n                if listinstr(['LLaVABench'], dataset):\n                    system_prompt = ''\n                elif listinstr(['MMVet'], dataset):\n                    system_prompt = self.detail_system_prompt\n                else:\n                    system_prompt = self.vqa_prompt\n                prompt = question\n            else:\n                prompt = question\n        else:"
+      ]
+    },
+    {
+      "id": "cc34008f25",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/inference_video.py",
+          "line_start": 51,
+          "line_end": 129,
+          "module": "vlmeval.inference_video"
+        }
+      ],
+      "subject": "Function vlmeval.inference_video.infer_data has cyclomatic complexity 35",
+      "evidence": {
+        "function": "infer_data",
+        "module": "vlmeval.inference_video",
+        "complexity": 35,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.07,
+        "principle_severity": 0.06666666666666667,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def infer_data(model, model_name, work_dir, dataset, out_file, verbose=False, api_nproc=4):\n    res = load(out_file) if osp.exists(out_file) else {}\n    rank, world_size = get_rank_and_world_size()\n    dataset_name = dataset.dataset_name\n\n    sample_indices = list(dataset.videos) if getattr(dataset, 'pack', False) else list(dataset.data['index'])\n    samples = list(dataset.videos) if getattr(dataset, 'pack', False) else list(range(len(dataset.data)))\n    sample_map = {i: s for i, s in zip(sample_indices, samples)}\n\n    sample_indices_sub = sample_indices[rank::world_size]\n    if np.all([idx in res for idx in sample_indices_sub]):\n        return model\n    sample_indices_subrem = [x for x in sample_indices_sub if x not in res]\n\n    model = supported_VLM[model_name]() if isinstance(model, str) else model\n\n    is_api = getattr(model, 'is_api', False)\n    if is_api:\n        assert world_size == 1\n        supp = infer_data_api(\n            model=model,\n            work_dir=work_dir,\n            model_name=model_name,\n            dataset=dataset,\n            samples_dict={k: sample_map[k] for k in sample_indices_subrem},\n            api_nproc=api_nproc)\n        for k in sample_indices_subrem:\n            assert k in supp\n        res.update(supp)\n        dump(res, out_file)\n        return model\n\n    assert not getattr(dataset, 'pack', False), 'Current model not supported pack mode!'\n    for i, idx in tqdm(enumerate(sample_indices_subrem)):\n        if idx in res:\n            continue\n        if getattr(model, 'nframe', None) is not None and getattr(model, 'nframe', 0) > 0:\n            if dataset.nframe > 0:\n                if getattr(model, 'nframe', 0) != dataset.nframe:\n                    print(f'{model_name} is a video-llm model, nframe is set to {dataset.nframe}, not using default')\n                    setattr(model, 'nframe', dataset.nframe)\n            elif getattr(model, 'fps', 0) == 0:\n                raise ValueError(f'fps is not suitable for {model_name}')\n            else:\n                setattr(model, 'nframe', None)\n        if getattr(model, 'fps', None) is not None and getattr(model, 'fps', 0) > 0:\n            if dataset.fps > 0:\n                if getattr(model, 'fps', 0) != dataset.fps:\n                    print(f'{model_name} is a video-llm model, fps is set to {dataset.fps}, not using default')\n                    setattr(model, 'fps', dataset.fps)"
+      ]
+    },
+    {
+      "id": "cab211bddd",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_vqa.py",
+          "line_start": 263,
+          "line_end": 365,
+          "module": "vlmeval.dataset.image_vqa"
+        }
+      ],
+      "subject": "Function vlmeval.dataset.image_vqa.MathVerse has cyclomatic complexity 34",
+      "evidence": {
+        "function": "MathVerse",
+        "module": "vlmeval.dataset.image_vqa",
+        "complexity": 34,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.068,
+        "principle_severity": 0.06333333333333334,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class MathVerse(ImageBaseDataset):\n    TYPE = 'VQA'\n    DATASET_URL = {\n        'MathVerse_MINI': 'http://opencompass.openxlab.space/utils/benchmarks/MathVerse/MathVerse_MINIV.tsv', # noqa\n        'MathVerse_MINI_Vision_Only': 'http://opencompass.openxlab.space/utils/benchmarks/MathVerse/MathVerse_MINIVOnly.tsv', # noqa\n        'MathVerse_MINI_Vision_Dominant': 'http://opencompass.openxlab.space/utils/benchmarks/MathVerse/MathVerse_MINIVDom.tsv', # noqa\n        'MathVerse_MINI_Vision_Intensive': 'http://opencompass.openxlab.space/utils/benchmarks/MathVerse/MathVerse_MINIVInt.tsv', # noqa\n        'MathVerse_MINI_Text_Lite': 'http://opencompass.openxlab.space/utils/benchmarks/MathVerse/MathVerse_MINITLite.tsv', # noqa\n        'MathVerse_MINI_Text_Dominant': 'http://opencompass.openxlab.space/utils/benchmarks/MathVerse/MathVerse_MINITDom.tsv', # noqa\n    }\n    DATASET_MD5 = {\n        'MathVerse_MINI': '5017caca32b7fa110c350a1bea861b65',\n        'MathVerse_MINI_Vision_Only': '68a11d4680014ac881fa37adeadea3a4',\n        'MathVerse_MINI_Vision_Dominant': 'b8fb63852d261ab2aaefba29cc2414d3',\n        'MathVerse_MINI_Vision_Intensive': '01cbd35be202bb0c4873a4186a63bc19',\n        'MathVerse_MINI_Text_Lite': '19e4b13bdd30b89a03b2e358bcfefa04',\n        'MathVerse_MINI_Text_Dominant': '4f5cd2fa6630ea00bb11d6fde1f6fe6a',\n    }\n\n    # It returns a DataFrame\n    @classmethod\n    def evaluate(self, eval_file, **judge_kwargs):\n        from .utils.mathverse import MathVerse_auxeval_extract, MathVerse_auxeval_score, MathVerse_acc\n\n        model = judge_kwargs['model']\n        suffix = eval_file.split('.')[-1]\n        storage_extract = eval_file.replace(f'.{suffix}', f'_{model}_extract.xlsx')\n        tmp_file_extract = eval_file.replace(f'.{suffix}', f'_{model}_extract.pkl')\n        storage_score = eval_file.replace(f'.{suffix}', f'_{model}_score.xlsx')\n        tmp_file_score = eval_file.replace(f'.{suffix}', f'_{model}_score.pkl')\n        nproc = judge_kwargs.pop('nproc', 4)\n        # stage1: extract the answer\n        if not osp.exists(storage_extract):\n            data = load(eval_file)\n            model = build_judge(max_tokens=128, **judge_kwargs)\n            assert model.working(), ('MathVerse evaluation requires a working OPENAI API\\n' + DEBUG_MESSAGE)\n            lt = len(data)\n            lines = [data.iloc[i] for i in range(lt)]\n            tups = [(model, line) for line in lines]\n            indices = [line['index'] for line in lines]\n\n            ans = {}\n            if osp.exists(tmp_file_extract):\n                ans = load(tmp_file_extract)\n            tups = [x for x, i in zip(tups, indices) if i not in ans]\n            indices = [i for i in indices if i not in ans]\n\n            if len(indices):\n                new_results = track_progress_rich(\n                    MathVerse_auxeval_extract,"
+      ]
+    },
+    {
+      "id": "3d470dce77",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/cgbench.py",
+          "line_start": 240,
+          "line_end": 347,
+          "module": "vlmeval.dataset.cgbench"
+        }
+      ],
+      "subject": "Function vlmeval.dataset.cgbench.build_prompt has cyclomatic complexity 33",
+      "evidence": {
+        "function": "build_prompt",
+        "module": "vlmeval.dataset.cgbench",
+        "complexity": 33,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.066,
+        "principle_severity": 0.06,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def build_prompt(self, line, video_llm):\n\n        if isinstance(line, int):\n            assert line < len(self)\n            line = self.data.iloc[line]\n\n        task_mode = line[\"task_mode\"]\n\n        message = []\n\n        origin_use_subtitle_time = self.use_subtitle_time\n\n        try:\n            if task_mode in [\"long_acc\", \"clue_acc\"]:\n                system_prompt = self.SYS[task_mode]\n            elif task_mode == \"miou\":\n                if self.use_frame_time and not video_llm:\n                    system_prompt = self.SYS[task_mode]\n                else:\n                    system_prompt = self.SYS[\"miou_wo_frame_time\"]\n                    if self.use_subtitle_time is True:\n                        self.use_subtitle_time = False\n\n            user_prompt = \"\"\n\n            if task_mode in [\"long_acc\", \"miou\"]:\n                video_path = line[\"video\"]\n\n                if video_llm:\n                    message.append(dict(type=\"video\", value=osp.join(self.data_root, video_path)))\n\n                    if self.use_subtitle and line[\"subtitle_path\"] and not pd.isna(line[\"subtitle_path\"]):\n                        if self.nframe:\n                            image_paths, frame_indices, vid_fps = self.save_video_frames(\n                                video_path, uid=line[\"video_uid\"], num_frames=self.nframe, fps=self.fps\n                            )\n                            user_prompt += self.get_subtitles(line[\"subtitle_path\"], frame_indices=frame_indices,\n                                                              fps=vid_fps, sub_time=self.use_subtitle_time)\n                        else:\n                            user_prompt += self.get_subtitles(line[\"subtitle_path\"], sub_time=self.use_subtitle_time)\n                else:\n                    image_paths, frame_indices, vid_fps = self.save_video_frames(\n                        video_path, uid=line[\"video_uid\"], num_frames=self.nframe, fps=self.fps\n                    )\n                    message.extend(dict(type=\"image\", value=im) for im in image_paths)\n\n                    if self.use_frame_time:\n                        user_prompt += get_timestampes(frame_indices, vid_fps)\n\n                    if self.use_subtitle and line[\"subtitle_path\"] and not pd.isna(line[\"subtitle_path\"]):"
+      ]
+    },
+    {
+      "id": "55f535063a",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/ccocr_evaluator/doc_parsing_evaluator.py",
+          "line_start": 159,
+          "line_end": 252,
+          "module": "vlmeval.dataset.utils.ccocr_evaluator.doc_parsing_evaluator"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.utils.ccocr_evaluator.doc_parsing_evaluator.ParsingEvaluator has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "ParsingEvaluator",
+        "module": "vlmeval.dataset.utils.ccocr_evaluator.doc_parsing_evaluator",
+        "lcom": 1.0,
+        "num_methods": 5,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.25,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class ParsingEvaluator(BaseMetric):\n    def response_post_func(self, response_text, **kwargs):\n        return response_text\n\n    def evaluate(self, response_info, gt_info, **kwargs):\n        op = kwargs['op']\n        if op == 'doc':\n            score = self.eval_doc(response_info, gt_info)\n        elif op == 'table':\n            score = self.eval_table(response_info, gt_info)\n        elif op in ['molecular', \"formula\"]:\n            score = self.eval_formula(response_info, gt_info, op_name=op)\n        else:\n            raise ValueError(f'doc parsing unsupported op: {op}')\n\n        # summary info\n        eval_info = {\"summary\": {\"score\": score}}\n        return eval_info\n\n    def eval_doc(self, response_info, gt_info):\n        results = []\n        for img_name, gt in tqdm(gt_info.items()):\n            if img_name not in response_info:\n                results.append(0)\n                continue\n\n            pred = response_info[img_name]\n            for pattern in patterns:\n                pred = re.sub(pattern, '', pred)\n\n            try:"
+      ]
+    },
+    {
+      "id": "59a344478f",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/ccocr_evaluator/common.py",
+          "line_start": 69,
+          "line_end": 119,
+          "module": "vlmeval.dataset.utils.ccocr_evaluator.common"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.utils.ccocr_evaluator.common.BaseMetric has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "BaseMetric",
+        "module": "vlmeval.dataset.utils.ccocr_evaluator.common",
+        "lcom": 1.0,
+        "num_methods": 4,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class BaseMetric(object):\n    \"\"\" BaseMetric \"\"\"\n    \"\"\" OCRMetric \"\"\"\n    def __init__(self, group_name, **kwargs):\n        self.group_name = group_name\n        self.kwargs = kwargs\n\n    def response_post_func(self, response_text, **kwargs):\n        return response_text\n\n    @abstractmethod\n    # Given the prediction and gt, return the evaluation results in the format of a dictionary\n    # results should contain a 'summary' key, for example:\n    # {\n    #     \"summary\": {\n    #         \"f1-score\": 99.99,\n    #         \"metric_name\": \"metric_value\"  # used for summary\uff0conly metric info could be placed in this dict.\n    #     },\n    #     \"your other info\": \"xxx\"\n    # }\n    def evaluate(self, response_info, gt_info, normalize_func=None, **kwargs):\n        pass\n\n    def __call__(self, pdt_res_dir, gt_info, with_response_ratio=True, **kwargs):\n        if isinstance(pdt_res_dir, dict):\n            raw_response_info = pdt_res_dir\n        elif os.path.exists(pdt_res_dir) and os.path.isdir(pdt_res_dir):\n            raw_response_info = load_response_from_dir(pdt_res_dir)\n        else:\n            return ValueError(\"invalid input: response dict or folder are required, but got {}\".format(pdt_res_dir))\n"
+      ]
+    },
+    {
+      "id": "c3c1674bb0",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_mcq.py",
+          "line_start": 556,
+          "line_end": 754,
+          "module": "vlmeval.dataset.image_mcq"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.image_mcq.MMERealWorld has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "MMERealWorld",
+        "module": "vlmeval.dataset.image_mcq",
+        "lcom": 1.0,
+        "num_methods": 5,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.25,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class MMERealWorld(ImageMCQDataset):\n\n    TYPE = 'MMERealWorld'\n\n    DATASET_MD5 = {\n        'MME-RealWorld': '271c33ec814c39533c467ec6fb8a6f36',\n        'MME-RealWorld-Lite': '4c17057d7d3b6c4a0d4397c3dae0881c',\n        'MME-RealWorld-CN': 'daaa763d52a760a38606d5dedb3fe444',\n    }\n    SYS = {\n        'MME-RealWorld': (\n            'Select the best answer to the above multiple-choice question based on the image. '\n            'Respond with only the letter (A, B, C, D, or E) of the correct option. \\n'\n            'The best answer is:'\n        ),\n        'MME-RealWorld-Lite': (\n            'Select the best answer to the above multiple-choice question based on the image. '\n            'Respond with only the letter (A, B, C, D, or E) of the correct option. \\n'\n            'The best answer is:'\n        ),\n        'MME-RealWorld-CN': (\n            '\u6839\u636e\u56fe\u50cf\u9009\u62e9\u4e0a\u8ff0\u591a\u9879\u9009\u62e9\u9898\u7684\u6700\u4f73\u7b54\u6848\u3002\u53ea\u9700\u56de\u7b54\u6b63\u786e\u9009\u9879\u7684\u5b57\u6bcd\uff08A, B, C, D \u6216 E\uff09\u3002\\n'\n            '\u6700\u4f73\u7b54\u6848\u4e3a\uff1a'\n        ),\n    }\n\n    @classmethod\n    def supported_datasets(cls):\n        return ['MME-RealWorld', 'MME-RealWorld-CN', 'MME-RealWorld-Lite',]\n\n    def load_data("
+      ]
+    },
+    {
+      "id": "64b886d9b8",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/image_mcq.py",
+          "line_start": 405,
+          "line_end": 553,
+          "module": "vlmeval.dataset.image_mcq"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.image_mcq.GMAIMMBenchDataset has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "GMAIMMBenchDataset",
+        "module": "vlmeval.dataset.image_mcq",
+        "lcom": 1.0,
+        "num_methods": 4,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class GMAIMMBenchDataset(ImageMCQDataset):\n\n    DATASET_URL = {\n        'GMAI-MMBench_VAL': 'https://huggingface.co/datasets/VLMEval/GMAI-MMBench/resolve/main/GMAI-MMBench_VAL.tsv',\n        'GMAI_mm_bench_TEST_part_1': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_1.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_2': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_2.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_3': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_3.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_4': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_4.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_5': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_5.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_6': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_6.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_7': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_7.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_8': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_8.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_9': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_9.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_10': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_10.tsv',  # noqa: E501\n        'GMAI_mm_bench_TEST_part_11': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_TEST_part_11.tsv',  # noqa: E501\n    }\n\n    DATASET_MD5 = {\n        'GMAI-MMBench_VAL': '254bd581627866f1c499d3d6b4422324',\n        'GMAI_mm_bench_TEST_part_1': '900d735231230a63f4ed45665c078ef4',\n        'GMAI_mm_bench_TEST_part_2': '1b27ab621386945d7e4a765ad2d22b0e',\n        'GMAI_mm_bench_TEST_part_3': '44bdc2b6267dd505d529b8cad06f0fb2',\n        'GMAI_mm_bench_TEST_part_4': '5a04a04fcac9f1466709f242fdb80acb',\n        'GMAI_mm_bench_TEST_part_5': 'c70baf8909eda9af0ddeab275c721336',\n        'GMAI_mm_bench_TEST_part_6': '825abc39596b644dead9350d0cfa3b96',\n        'GMAI_mm_bench_TEST_part_7': 'defb8aed2fb77365a76b6b9abd6a2701',\n        'GMAI_mm_bench_TEST_part_8': 'ff490d60b85f2bb0abb67a435b298c65',\n        'GMAI_mm_bench_TEST_part_9': 'ff67c86f40da93b09139ac1d1ba5dc6b',\n        'GMAI_mm_bench_TEST_part_10': '3dae94627b9ac0fe00180d4780fbf6dc',\n        'GMAI_mm_bench_TEST_part_11': 'd08dc813f0eb6bbab63cae2a9d113c4b',\n    }"
+      ]
+    },
+    {
+      "id": "35b63f88d7",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/tempcompass.py",
+          "line_start": 449,
+          "line_end": 639,
+          "module": "vlmeval.dataset.tempcompass"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.tempcompass.TempCompass_YorN has low cohesion (LCOM \u2248 0.93)",
+      "evidence": {
+        "class": "TempCompass_YorN",
+        "module": "vlmeval.dataset.tempcompass",
+        "lcom": 0.929,
+        "num_methods": 8,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.4,
+        "principle_severity": 0.9285714285714286,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class TempCompass_YorN(VideoBaseDataset):\n\n    MD5 = 'c72c046d7fa0e82c8cd7462f2e844ea8'\n    TYPE = 'Video-Y/N'\n\n    def __init__(self, dataset='TempCompass_YorN', nframe=0, fps=-1):\n        self.type_data_list = {\n            'yes_no': ('yes_no.json', './videos', '.mp4'),\n        }\n        super().__init__(dataset=dataset, nframe=nframe, fps=fps)\n\n    @classmethod\n    def supported_datasets(cls):\n        return ['TempCompass_YorN']\n\n    def prepare_dataset(self, dataset_name='TempCompass_YorN', repo_id='lmms-lab/TempCompass'):\n        def check_integrity(pth):\n            data_file = osp.join(pth, f'{dataset_name}.tsv')\n\n            if not osp.exists(data_file):\n                return False\n\n            if md5(data_file) != self.MD5:\n                return False\n\n            data = load(data_file)\n            for idx, item in data.iterrows():\n                if not osp.exists(osp.join(pth, item['prefix'], item['video'] + item['suffix'])):\n                    return False\n            return True\n"
+      ]
+    },
+    {
+      "id": "0ad2a51731",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/olympiadbench.py",
+          "line_start": 531,
+          "line_end": 531,
+          "module": "vlmeval.dataset.utils.olympiadbench"
+        }
+      ],
+      "subject": "Unreachable variable 'reference_dir' in vlmeval.dataset.utils.olympiadbench",
+      "evidence": {
+        "name": "reference_dir",
+        "type": "variable",
+        "module": "vlmeval.dataset.utils.olympiadbench",
+        "confidence": 100,
+        "first_line": 531,
+        "last_line": 531,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def calculate_merged_accuracy(reference_dir, text_only):"
+      ]
+    },
+    {
+      "id": "6c8b48f0e7",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/olympiadbench.py",
+          "line_start": 531,
+          "line_end": 531,
+          "module": "vlmeval.dataset.utils.olympiadbench"
+        }
+      ],
+      "subject": "Unreachable variable 'text_only' in vlmeval.dataset.utils.olympiadbench",
+      "evidence": {
+        "name": "text_only",
+        "type": "variable",
+        "module": "vlmeval.dataset.utils.olympiadbench",
+        "confidence": 100,
+        "first_line": 531,
+        "last_line": 531,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def calculate_merged_accuracy(reference_dir, text_only):"
+      ]
+    },
+    {
+      "id": "8494ac2df7",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "finetune/dataset.py",
+          "line_start": 89,
+          "line_end": 89,
+          "module": "finetune.dataset"
+        }
+      ],
+      "subject": "Unreachable variable 'batch_first' in finetune.dataset",
+      "evidence": {
+        "name": "batch_first",
+        "type": "variable",
+        "module": "finetune.dataset",
+        "confidence": 100,
+        "first_line": 89,
+        "last_line": 89,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def trim_and_pad(seq, batch_first, padding_value):"
+      ]
+    },
+    {
+      "id": "112e7c423a",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "finetune/trainer.py",
+          "line_start": 173,
+          "line_end": 173,
+          "module": "finetune.trainer"
+        }
+      ],
+      "subject": "Unreachable variable 'num_items_in_batch' in finetune.trainer",
+      "evidence": {
+        "name": "num_items_in_batch",
+        "type": "variable",
+        "module": "finetune.trainer",
+        "confidence": 100,
+        "first_line": 173,
+        "last_line": 173,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def training_step(self, model: nn.Module, inputs: Dict[str, Union[torch.Tensor, Any]], num_items_in_batch=None) -> torch.Tensor:"
+      ]
+    },
+    {
+      "id": "16fbd6a445",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "omnilmm/model/omnilmm.py",
+          "line_start": 59,
+          "line_end": 59,
+          "module": "omnilmm.model.omnilmm"
+        }
+      ],
+      "subject": "Unreachable variable 'mm_hidden_size' in omnilmm.model.omnilmm",
+      "evidence": {
+        "name": "mm_hidden_size",
+        "type": "variable",
+        "module": "omnilmm.model.omnilmm",
+        "confidence": 100,
+        "first_line": 59,
+        "last_line": 59,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def __init__(self, config: OmniLMMConfig, mm_vision_tower=None, mm_hidden_size=None, tune_clip=True):"
+      ]
+    },
+    {
+      "id": "f22d7df898",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "omnilmm/train/train_utils.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "omnilmm.train.train_utils"
+        },
+        {
+          "file": "omnilmm/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "omnilmm"
+        }
+      ],
+      "subject": "Layering violation: omnilmm.train.train_utils (layer 5) imports omnilmm (layer 0)",
+      "evidence": {
+        "source": "omnilmm.train.train_utils",
+        "target": "omnilmm",
+        "source_layer": 5,
+        "target_layer": 0,
+        "layer_drop": 5,
+        "entry_points": [
+          "finetune",
+          "omnilmm",
+          "vlmeval",
+          "datasets"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from omnilmm into a lower layer that omnilmm.train.train_utils can depend on.",
+        "Invert the dependency: have omnilmm accept what it needs as an argument from omnilmm.train.train_utils.",
+        "Accept the violation if omnilmm is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# omnilmm.train.train_utils\nimport os\nimport gc\nimport copy\nimport time\n\nimport torch\nimport warnings\nimport transformers\n\nimport numpy as np\n\nfrom typing import Dict, Optional, Sequence\nfrom omnilmm import conversation as conversation_lib\n\nIGNORE_INDEX = -100\nDEFAULT_IMAGE_TOKEN = \"<image>\"\nDEFAULT_IMAGE_PATCH_TOKEN = \"<im_patch>\"\nDEFAULT_IM_START_TOKEN = \"<im_start>\"\nDEFAULT_IM_END_TOKEN = \"<im_end>\"\n",
+        "# omnilmm\n"
+      ]
+    },
+    {
+      "id": "0e73d7e0b5",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/inference_video.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.inference_video"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/config.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.config"
+        }
+      ],
+      "subject": "Layering violation: vlmeval.inference_video (layer 5) imports vlmeval.config (layer 1)",
+      "evidence": {
+        "source": "vlmeval.inference_video",
+        "target": "vlmeval.config",
+        "source_layer": 5,
+        "target_layer": 1,
+        "layer_drop": 4,
+        "entry_points": [
+          "finetune",
+          "omnilmm",
+          "vlmeval",
+          "datasets"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from vlmeval.config into a lower layer that vlmeval.inference_video can depend on.",
+        "Invert the dependency: have vlmeval.config accept what it needs as an argument from vlmeval.inference_video.",
+        "Accept the violation if vlmeval.config is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 0.8,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# vlmeval.inference_video\nimport torch\nimport torch.distributed as dist\nfrom vlmeval.config import supported_VLM\nfrom vlmeval.utils import track_progress_rich\nfrom vlmeval.smp import *\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef parse_args():\n    parser = argparse.ArgumentParser()\n    parser.add_argument('--data', type=str, nargs='+', required=True)\n    parser.add_argument('--model', type=str, nargs='+', required=True)\n    parser.add_argument('--nproc', type=int, default=4, required=True)\n    parser.add_argument('--verbose', action='store_true')\n    args = parser.parse_args()\n    return args\n\n\n# Only API model is accepted",
+        "# vlmeval.config\nfrom vlmeval.vlm import *\nfrom vlmeval.api import *\nfrom functools import partial\n\nminicpm_series = {\n    'MiniCPM-V': partial(MiniCPM_V, model_path='openbmb/MiniCPM-V'),\n    'MiniCPM-V-2': partial(MiniCPM_V, model_path='openbmb/MiniCPM-V-2'),\n    'MiniCPM-Llama3-V-2_5': partial(MiniCPM_Llama3_V, model_path='openbmb/MiniCPM-Llama3-V-2_5'),\n    'MiniCPM-V-2_6': partial(MiniCPM_V_2_6, model_path='openbmb/MiniCPM-V-2_6'),\n    'MiniCPM-o-2_6': partial(MiniCPM_o_2_6, model_path='openbmb/MiniCPM-o-2_6'),\n}\n\nsupported_VLM = {}\n\nmodel_groups = [\n    minicpm_series\n]\n\nfor grp in model_groups:\n    supported_VLM.update(grp)"
+      ]
+    },
+    {
+      "id": "58009c1fb4",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/inference_video.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.inference_video"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/utils/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.utils"
+        }
+      ],
+      "subject": "Layering violation: vlmeval.inference_video (layer 5) imports vlmeval.utils (layer 1)",
+      "evidence": {
+        "source": "vlmeval.inference_video",
+        "target": "vlmeval.utils",
+        "source_layer": 5,
+        "target_layer": 1,
+        "layer_drop": 4,
+        "entry_points": [
+          "finetune",
+          "omnilmm",
+          "vlmeval",
+          "datasets"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from vlmeval.utils into a lower layer that vlmeval.inference_video can depend on.",
+        "Invert the dependency: have vlmeval.utils accept what it needs as an argument from vlmeval.inference_video.",
+        "Accept the violation if vlmeval.utils is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 0.8,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# vlmeval.inference_video\nimport torch\nimport torch.distributed as dist\nfrom vlmeval.config import supported_VLM\nfrom vlmeval.utils import track_progress_rich\nfrom vlmeval.smp import *\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef parse_args():\n    parser = argparse.ArgumentParser()\n    parser.add_argument('--data', type=str, nargs='+', required=True)\n    parser.add_argument('--model', type=str, nargs='+', required=True)\n    parser.add_argument('--nproc', type=int, default=4, required=True)\n    parser.add_argument('--verbose', action='store_true')\n    args = parser.parse_args()\n    return args\n\n\n# Only API model is accepted",
+        "# vlmeval.utils\nfrom .matching_util import can_infer, can_infer_option, can_infer_text\nfrom .mp_util import track_progress_rich\n\n\n__all__ = [\n    'can_infer', 'can_infer_option', 'can_infer_text', 'track_progress_rich',\n]"
+      ]
+    },
+    {
+      "id": "09b6680fff",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/inference_video.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.inference_video"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/smp/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.smp"
+        }
+      ],
+      "subject": "Layering violation: vlmeval.inference_video (layer 5) imports vlmeval.smp (layer 1)",
+      "evidence": {
+        "source": "vlmeval.inference_video",
+        "target": "vlmeval.smp",
+        "source_layer": 5,
+        "target_layer": 1,
+        "layer_drop": 4,
+        "entry_points": [
+          "finetune",
+          "omnilmm",
+          "vlmeval",
+          "datasets"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from vlmeval.smp into a lower layer that vlmeval.inference_video can depend on.",
+        "Invert the dependency: have vlmeval.smp accept what it needs as an argument from vlmeval.inference_video.",
+        "Accept the violation if vlmeval.smp is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 0.8,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# vlmeval.inference_video\nimport torch\nimport torch.distributed as dist\nfrom vlmeval.config import supported_VLM\nfrom vlmeval.utils import track_progress_rich\nfrom vlmeval.smp import *\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef parse_args():\n    parser = argparse.ArgumentParser()\n    parser.add_argument('--data', type=str, nargs='+', required=True)\n    parser.add_argument('--model', type=str, nargs='+', required=True)\n    parser.add_argument('--nproc', type=int, default=4, required=True)\n    parser.add_argument('--verbose', action='store_true')\n    args = parser.parse_args()\n    return args\n\n\n# Only API model is accepted",
+        "# vlmeval.smp\nfrom .file import *\nfrom .vlm import *\nfrom .misc import *\nfrom .log import *"
+      ]
+    },
+    {
+      "id": "d73ba002d8",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/inference_mt.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.inference_mt"
+        },
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/config.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.config"
+        }
+      ],
+      "subject": "Layering violation: vlmeval.inference_mt (layer 5) imports vlmeval.config (layer 1)",
+      "evidence": {
+        "source": "vlmeval.inference_mt",
+        "target": "vlmeval.config",
+        "source_layer": 5,
+        "target_layer": 1,
+        "layer_drop": 4,
+        "entry_points": [
+          "finetune",
+          "omnilmm",
+          "vlmeval",
+          "datasets"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from vlmeval.config into a lower layer that vlmeval.inference_mt can depend on.",
+        "Invert the dependency: have vlmeval.config accept what it needs as an argument from vlmeval.inference_mt.",
+        "Accept the violation if vlmeval.config is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 0.8,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# vlmeval.inference_mt\nimport torch\nimport torch.distributed as dist\nfrom vlmeval.config import supported_VLM\nfrom vlmeval.utils import track_progress_rich\nfrom vlmeval.smp import *\n\nFAIL_MSG = 'Failed to obtain answer via API.'\n\n\ndef parse_args():\n    parser = argparse.ArgumentParser()\n    parser.add_argument('--data', type=str, nargs='+', required=True)\n    parser.add_argument('--model', type=str, nargs='+', required=True)\n    parser.add_argument('--nproc', type=int, default=4, required=True)\n    parser.add_argument('--verbose', action='store_true')\n    args = parser.parse_args()\n    return args\n\n\ndef chat_mt(model, messages, dataset_name):",
+        "# vlmeval.config\nfrom vlmeval.vlm import *\nfrom vlmeval.api import *\nfrom functools import partial\n\nminicpm_series = {\n    'MiniCPM-V': partial(MiniCPM_V, model_path='openbmb/MiniCPM-V'),\n    'MiniCPM-V-2': partial(MiniCPM_V, model_path='openbmb/MiniCPM-V-2'),\n    'MiniCPM-Llama3-V-2_5': partial(MiniCPM_Llama3_V, model_path='openbmb/MiniCPM-Llama3-V-2_5'),\n    'MiniCPM-V-2_6': partial(MiniCPM_V_2_6, model_path='openbmb/MiniCPM-V-2_6'),\n    'MiniCPM-o-2_6': partial(MiniCPM_o_2_6, model_path='openbmb/MiniCPM-o-2_6'),\n}\n\nsupported_VLM = {}\n\nmodel_groups = [\n    minicpm_series\n]\n\nfor grp in model_groups:\n    supported_VLM.update(grp)"
+      ]
+    },
+    {
+      "id": "b4b3876db5",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/wemath.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.dataset.utils.wemath"
+        }
+      ],
+      "subject": "Module vlmeval.dataset.utils.wemath is in Zone of PAIN (A=0.00, I=0.00, distance from sequence=1.00)",
+      "evidence": {
+        "module": "vlmeval.dataset.utils.wemath",
+        "abstractness": 0.0,
+        "instability": 0.0,
+        "main_sequence_distance": 1.0,
+        "abstract_methods": 0,
+        "total_methods": 12,
+        "zone": "PAIN",
+        "explanation": "stable, concrete code \u2014 many modules depend on it but it has no abstractions to extend. Every change ripples."
+      },
+      "alternatives": [
+        "Introduce a Protocol or ABC seam that consumers can target instead of the concrete module, allowing alternate implementations.",
+        "Move the concrete details behind a one-way dependency: the abstract interface becomes the import target, the concrete module imports it.",
+        "Accept the score if this module is a stable third-party-style adapter and the team commits to never extending it."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.4,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# pylint: skip-file\n\nimport pandas as pd\nimport json\nimport numpy as np\nimport os\nimport argparse\n\n# four_dimensional_metrics.py\n\n\n# Function to evaluate steps\ndef evaluate_evaluate_steps(json, steps):  # noqa\n    jokers = [json[[f'joker_{i}', f'knowledge concept_{i}']] for i in range(1, steps + 1)]\n    for i in range(steps):\n        jokers[i].rename(\n            columns={f'joker_{i + 1}': 'joker', f'knowledge concept_{i + 1}': 'knowledge_concept'},\n            inplace=True,\n        )\n    concatenated_steps = pd.concat(jokers, axis=0)\n    return concatenated_steps\n\n\n# Function to load and process JSON data\ndef load_and_process_data(filepath):\n    df = pd.read_excel(filepath)\n    if 'hit' not in df.columns:\n        df['processed_answer'] = (\n            df['prediction']\n            .str.split('Answer')"
+      ]
+    },
+    {
+      "id": "64bc1d7698",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/olympiadbench.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.dataset.utils.olympiadbench"
+        }
+      ],
+      "subject": "Module vlmeval.dataset.utils.olympiadbench is in Zone of PAIN (A=0.00, I=0.00, distance from sequence=1.00)",
+      "evidence": {
+        "module": "vlmeval.dataset.utils.olympiadbench",
+        "abstractness": 0.0,
+        "instability": 0.0,
+        "main_sequence_distance": 1.0,
+        "abstract_methods": 0,
+        "total_methods": 17,
+        "zone": "PAIN",
+        "explanation": "stable, concrete code \u2014 many modules depend on it but it has no abstractions to extend. Every change ripples."
+      },
+      "alternatives": [
+        "Introduce a Protocol or ABC seam that consumers can target instead of the concrete module, allowing alternate implementations.",
+        "Move the concrete details behind a one-way dependency: the abstract interface becomes the import target, the concrete module imports it.",
+        "Accept the score if this module is a stable third-party-style adapter and the team commits to never extending it."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.5666666666666667,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "import re\nimport json\nfrom math import isclose\nimport sympy as sp\nfrom sympy import simplify, Eq, sympify, evalf, Pow\nfrom sympy.parsing.latex import parse_latex\nimport antlr4\nfrom decimal import Decimal, getcontext\nfrom fractions import Fraction\nimport sys\nimport math\n\n\nchinese_answer_type_dict = {\n    'Numerical': '\u6570\u503c',\n    'Expression': '\u8868\u8fbe\u5f0f',\n    'Equation': '\u65b9\u7a0b',\n    'Interval': '\u533a\u95f4'\n}\nenglish_answer_type_dict = {\n    'Numerical': 'a numerical value',\n    'Expression': 'an expression',\n    'Equation': 'an equation',\n    'Interval': 'an interval'\n}\n\n\ndef get_single_answer_type_text(answer_type, is_chinese):\n    if '-' in answer_type:  # No need now\n        answer_type = answer_type[:answer_type.find('-')]"
+      ]
+    },
+    {
+      "id": "f145870072",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/mmniah.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "vlmeval.dataset.utils.mmniah"
+        }
+      ],
+      "subject": "Module vlmeval.dataset.utils.mmniah is in Zone of PAIN (A=0.00, I=0.00, distance from sequence=1.00)",
+      "evidence": {
+        "module": "vlmeval.dataset.utils.mmniah",
+        "abstractness": 0.0,
+        "instability": 0.0,
+        "main_sequence_distance": 1.0,
+        "abstract_methods": 0,
+        "total_methods": 7,
+        "zone": "PAIN",
+        "explanation": "stable, concrete code \u2014 many modules depend on it but it has no abstractions to extend. Every change ripples."
+      },
+      "alternatives": [
+        "Introduce a Protocol or ABC seam that consumers can target instead of the concrete module, allowing alternate implementations.",
+        "Move the concrete details behind a one-way dependency: the abstract interface becomes the import target, the concrete module imports it.",
+        "Accept the score if this module is a stable third-party-style adapter and the team commits to never extending it."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.23333333333333334,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "import re\nimport json\n\n\ndef has_word(sentence, word):\n    pattern = r'\\b' + re.escape(word) + r'\\b'\n    match = re.search(pattern, sentence)\n    if match:\n        return True\n    else:\n        return False\n\n\nclass VQAEval:\n    def __init__(self):\n        self.contractions = {\n            'aint': \"ain't\",\n            'arent': \"aren't\",\n            'cant': \"can't\",\n            'couldve': \"could've\",\n            'couldnt': \"couldn't\",\n            \"couldn'tve\": \"couldn't've\",\n            \"couldnt've\": \"couldn't've\",\n            'didnt': \"didn't\",\n            'doesnt': \"doesn't\",\n            'dont': \"don't\",\n            'hadnt': \"hadn't\",\n            \"hadnt've\": \"hadn't've\",\n            \"hadn'tve\": \"hadn't've\",\n            'hasnt': \"hasn't\","
+      ]
+    },
+    {
+      "id": "0b895e07d8",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "omnilmm/model/utils.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "omnilmm.model.utils"
+        }
+      ],
+      "subject": "Module omnilmm.model.utils is in Zone of PAIN (A=0.00, I=0.00, distance from sequence=1.00)",
+      "evidence": {
+        "module": "omnilmm.model.utils",
+        "abstractness": 0.0,
+        "instability": 0.0,
+        "main_sequence_distance": 1.0,
+        "abstract_methods": 0,
+        "total_methods": 40,
+        "zone": "PAIN",
+        "explanation": "stable, concrete code \u2014 many modules depend on it but it has no abstractions to extend. Every change ripples."
+      },
+      "alternatives": [
+        "Introduce a Protocol or ABC seam that consumers can target instead of the concrete module, allowing alternate implementations.",
+        "Move the concrete details behind a one-way dependency: the abstract interface becomes the import target, the concrete module imports it.",
+        "Accept the score if this module is a stable third-party-style adapter and the team commits to never extending it."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "from torchvision import transforms\nfrom timm.data.transforms import RandomResizedCropAndInterpolation\nfrom timm.data.constants import IMAGENET_INCEPTION_MEAN, IMAGENET_INCEPTION_STD\nfrom transformers import AutoConfig\nfrom PIL import Image\nfrom io import BytesIO\nimport torch.distributed as dist\nimport numpy as np\nimport pickle\nimport base64\nimport cv2\nimport os\nimport torch\nfrom transformers import AutoConfig, StoppingCriteria\n\ntry:\n    from timm.data.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD\nexcept ImportError:\n    OPENAI_CLIP_MEAN = (0.48145466, 0.4578275, 0.40821073)\n    OPENAI_CLIP_STD = (0.26862954, 0.26130258, 0.27577711)\n\n\ndef auto_upgrade(config):\n    cfg = AutoConfig.from_pretrained(config)\n    if 'llava' in config and cfg.model_type != 'llava':\n        print(\"You are using newer LLaVA code base, while the checkpoint of v0 is from older code base.\")\n        print(\"You must upgrade the checkpoint to the new code base (this can be done automatically).\")\n        confirm = input(\n            \"Please confirm that you want to upgrade the checkpoint. [Y/N]\")\n        if confirm.lower() in [\"y\", \"yes\"]:"
+      ]
+    },
+    {
+      "id": "65ff1eecd8",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "omnilmm/model/resampler.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "omnilmm.model.resampler"
+        }
+      ],
+      "subject": "Module omnilmm.model.resampler is in Zone of PAIN (A=0.00, I=0.00, distance from sequence=1.00)",
+      "evidence": {
+        "module": "omnilmm.model.resampler",
+        "abstractness": 0.0,
+        "instability": 0.0,
+        "main_sequence_distance": 1.0,
+        "abstract_methods": 0,
+        "total_methods": 8,
+        "zone": "PAIN",
+        "explanation": "stable, concrete code \u2014 many modules depend on it but it has no abstractions to extend. Every change ripples."
+      },
+      "alternatives": [
+        "Introduce a Protocol or ABC seam that consumers can target instead of the concrete module, allowing alternate implementations.",
+        "Move the concrete details behind a one-way dependency: the abstract interface becomes the import target, the concrete module imports it.",
+        "Accept the score if this module is a stable third-party-style adapter and the team commits to never extending it."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.26666666666666666,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# Copyright (c) Alibaba Cloud.\n#\n# This source code is licensed under the license found in the\n# LICENSE file in the root directory of this source tree.\n\nfrom collections import OrderedDict\nimport math\nimport requests\nfrom io import BytesIO\nfrom functools import partial\nfrom PIL import Image\nfrom typing import Callable, Optional, Sequence, Tuple, List, Union\nimport numpy as np\n\nimport torch\nfrom torch import nn\nfrom torch.nn import functional as F\nfrom torch.nn.init import trunc_normal_\nfrom torchvision import transforms\nfrom torchvision.transforms import InterpolationMode\n\n\ndef get_abs_pos(abs_pos, tgt_size):\n    # abs_pos: L, C\n    # tgt_size: M\n    # return: M, C\n    src_size = int(math.sqrt(abs_pos.size(0)))\n    tgt_size = int(math.sqrt(tgt_size))\n    dtype = abs_pos.dtype\n"
+      ]
+    },
+    {
+      "id": "21e95e8143",
+      "principle": "P9",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/utils/cgbench.py",
+          "line_start": 128,
+          "line_end": 279,
+          "module": "vlmeval.dataset.utils.cgbench"
+        }
+      ],
+      "subject": "Function vlmeval.dataset.utils.cgbench.get_dimention_rating_mcq_grouding is a god function (152 LOC)",
+      "evidence": {
+        "function": "get_dimention_rating_mcq_grouding",
+        "module": "vlmeval.dataset.utils.cgbench",
+        "loc": 152,
+        "threshold": 150,
+        "analyzer": "ast"
+      },
+      "alternatives": [
+        "Extract internal sections into named helper functions.",
+        "Replace nested branching with table/dispatch if it's a parser/interpreter.",
+        "Accept the size if the function is generated code or a domain-mandated long sequence."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.152,
+        "principle_severity": 0.25333333333333335,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def get_dimention_rating_mcq_grouding(data_path):\n\n    # \u8bfb\u53d6\u6570\u636e\n    df = load(data_path)\n\n    # df.loc[(df['task_mode'] == 'miou') & (df['score'] == -1), 'score'] = 0\n\n    df = df[df[\"score\"] != -1]\n\n    # \u5c06\u79d2\u8f6c\u6362\u4e3a\u5206\u949f\u5e76\u5206\u914d\u5230\u5bf9\u5e94\u533a\u95f4\n    df[\"duration_minutes\"] = df[\"duration\"] / 60\n    df[\"duration_range\"] = pd.cut(\n        df[\"duration_minutes\"], bins=[-np.inf, 10, 20, 30, 40, 50, 60, np.inf], labels=DURATIONS\n    )\n\n    # \u521d\u59cb\u5316\u7ed3\u679c\u5b57\u5178\n    result = {\n        metric: {\n            \"overall\": 0,\n            \"duration\": {k: 0 for k in DURATIONS},\n            \"domain\": {k: 0 for k in DOMAINS},\n            \"sub_category\": {k: 0 for k in SUB_CATEGORIES},\n        }\n        for metric in [\"long_acc\", \"clue_acc\", \"miou\", \"CRR\", \"acc@iou\", \"rec@iou\"]\n    }\n\n    # \u8ba1\u7b97\u57fa\u7840\u6307\u6807\n    for metric in [\"long_acc\", \"clue_acc\", \"miou\"]:\n        metric_df = df[df[\"task_mode\"] == metric]\n\n        # Overall\n        result[metric][\"overall\"] = round(metric_df[\"score\"].mean(), 4)\n\n        # Duration\n        for dur in DURATIONS:\n            dur_scores = metric_df[metric_df[\"duration_range\"] == dur][\"score\"]\n            result[metric][\"duration\"][dur] = round(dur_scores.mean(), 4) if not dur_scores.empty else 0\n\n        # Domain\n        for domain in DOMAINS:"
+      ]
+    },
+    {
+      "id": "b17216d0ff",
+      "principle": "P9",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/mmmath.py",
+          "line_start": 17,
+          "line_end": 395,
+          "module": "vlmeval.dataset.mmmath"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.mmmath.AutoScoringJudge is a god class (2 of 4 size thresholds tripped)",
+      "evidence": {
+        "class": "AutoScoringJudge",
+        "module": "vlmeval.dataset.mmmath",
+        "num_methods": 15,
+        "loc": 379,
+        "num_instance_attrs": 16,
+        "cc_sum": 93,
+        "triggers": [
+          "attrs=16",
+          "cc_sum=93"
+        ]
+      },
+      "alternatives": [
+        "Split the class along attribute clusters \u2014 methods that share state belong together.",
+        "Extract orchestration into a coordinator; keep the original as a focused unit.",
+        "Accept the size if the class is a deliberate fa\u00e7ade exposing a coherent capability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.379,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class AutoScoringJudge:\n    def __init__(self):\n        # Map of special symbols to their replacements\n        self.special_signal_map = {\n            \"\\\\left\": \"\",\n            \"\\\\right\": \"\",\n            \"\u5398\u7c73\":\"\",\n            # \"\u2236\": \":\",\n            \"\uff0c\": \",\",\n            \"$\": \"\",\n            \"\uff08\":\"(\",\n            \"\uff09\":\")\",\n            \"\\\\infty\":\"oo\",\n            \"\\\\colon \":\":\",\n            # \"\\\\approx\": \"=\",\n            # \"\\\\simeq\": \"=\",\n            # \"\\\\sim\": \"=\",\n            # \"^\\\\prime\": \"'\",\n            # \"^{\\\\prime}\": \"'\",\n            \"\uff0b\":\"+\",\n            \"\\\\, \": \"\",\n            \"\\\\,\":\"\",\n            \"^\\\\circ\": \"\",\n            \"^{\\\\circ}\": \"\",\n            # \"%\": \"\",\n        }\n        self.pi = parse_latex(\"\\\\pi\")\n        # MM-Math default precision\n        self.precision = 1e-2\n\n    def trans_greater_sign_to_interval(self, expr:str):\n        expr_tmp = expr.split(\"<\")\n        return \"(\" + expr_tmp[0] + \", \" + expr_tmp[-1] + \")\"\n\n    def split_by_comma(self, expr: str):\n        # Splits expressions by commas outside of brackets\n        in_bracket_num = 0\n        splitted_expr = []\n        start_idx = 0\n        for i, char in enumerate(expr):"
+      ]
+    },
+    {
+      "id": "2caadb859c",
+      "principle": "P9",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/cgbench.py",
+          "line_start": 9,
+          "line_end": 473,
+          "module": "vlmeval.dataset.cgbench"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.cgbench.CGBench_MCQ_Grounding_Mini is a god class (2 of 4 size thresholds tripped)",
+      "evidence": {
+        "class": "CGBench_MCQ_Grounding_Mini",
+        "module": "vlmeval.dataset.cgbench",
+        "num_methods": 9,
+        "loc": 465,
+        "num_instance_attrs": 19,
+        "cc_sum": 80,
+        "triggers": [
+          "attrs=19",
+          "cc_sum=80"
+        ]
+      },
+      "alternatives": [
+        "Split the class along attribute clusters \u2014 methods that share state belong together.",
+        "Extract orchestration into a coordinator; keep the original as a focused unit.",
+        "Accept the size if the class is a deliberate fa\u00e7ade exposing a coherent capability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.465,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class CGBench_MCQ_Grounding_Mini(VideoBaseDataset):\n\n    dataset = \"CG-Bench_MCQ_Grounding_Mini\"\n\n    TYPE = \"Video-MCQ-Grounding\"\n\n    MD5 = \"54ed3e90a51a6fb375c92b319a715f72\"\n\n    SYS = {\n        \"long_acc\": (\n            \"You will be provided with sampled frames from a video, along with a \"\n            \"multiple-choice question that includes a question and several answer options.\\n\"\n            \"Your task is to analyze the provided frames, infer the most plausible \"\n            \"answer based on the visual information.\\n\"\n            \"If the video does not provide enough information, infer the answer based \"\n            \"on the options available and still provide a result. \"\n            \"Therefore, In all cases, an answer must be given.\\n\"\n            \"Only output the answer in the following format:\\n\\n\"\n            '```json\\n{\"result\": \"option\"}\\n```\\n\\n'\n            'The \"option\" is the uppercase letter corresponding to your answer.\\n\\n'\n        ),\n        \"clue_acc\": (\n            \"You will be provided with sampled frames from a video, along with a \"\n            \"multiple-choice question that includes a question and several answer options.\\n\"\n            \"Your task is to analyze the provided frames, infer the most plausible \"\n            \"answer based on the visual information.\\n\"\n            \"If the video does not provide enough information, infer the answer based \"\n            \"on the options available and still provide a result. \"\n            \"Therefore, In all cases, an answer must be given.\\n\"\n            \"Only output the answer in the following format:\\n\\n\"\n            '```json\\n{\"result\": \"option\"}\\n```\\n\\n'\n            \"The 'option' is the uppercase letter corresponding to your answer.\\n\\n\"\n        ),\n        \"miou\": (\n            \"You will be provided with uniformly sampled frames from a video and their \"\n            \"timestamps, along with a multiple-choice question that includes a question \"\n            \"and several answer options.\\n\"\n            \"Your task is to determine in which intervals the 'clue intervals' exist \"\n            \"that contain visual information needed to answer the question.\\n\"\n            \"Only output the answer in the following format:\\n\\n\""
+      ]
+    },
+    {
+      "id": "7b7b067060",
+      "principle": "P9",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/cgbench.py",
+          "line_start": 477,
+          "line_end": 883,
+          "module": "vlmeval.dataset.cgbench"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.cgbench.CGBench_OpenEnded_Mini is a god class (2 of 4 size thresholds tripped)",
+      "evidence": {
+        "class": "CGBench_OpenEnded_Mini",
+        "module": "vlmeval.dataset.cgbench",
+        "num_methods": 8,
+        "loc": 407,
+        "num_instance_attrs": 19,
+        "cc_sum": 63,
+        "triggers": [
+          "attrs=19",
+          "cc_sum=63"
+        ]
+      },
+      "alternatives": [
+        "Split the class along attribute clusters \u2014 methods that share state belong together.",
+        "Extract orchestration into a coordinator; keep the original as a focused unit.",
+        "Accept the size if the class is a deliberate fa\u00e7ade exposing a coherent capability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.407,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class CGBench_OpenEnded_Mini(VideoBaseDataset):\n\n    TYPE = \"Video-OpenEnded\"\n\n    dataset = \"CG-Bench_OpenEnded_Mini\"\n\n    MD5 = \"9175791b11afdfa305fdb3e525b7a4ee\"\n\n    SYS = (\n        \"You will be provided with sampled frames from a video, along with a \"\n        \"question.\\n\"\n        \"Your task is to analyze the provided frames and infer the most plausible \"\n        \"answer based on the visual information.\\n\"\n        \"If the visual information is ambiguous or insufficient, use the available \"\n        \"context to reason your answer.\\n\"\n        \"Only output the answer in the following format:\\n\\n\"\n        '```json\\n{\"result\": \"answer\"}\\n```\\n\\n'\n        'The \"answer\" can be a word, phrase, or sentence that directly responds to '\n        \"the question.\\n\\n\"\n    )\n\n    def __init__(\n        self,\n        dataset=\"CG-Bench_OpenEnded_Mini\",\n        use_subtitle=False,\n        use_subtitle_time=False,\n        use_frame_time=False,\n        nframe=0,\n        fps=-1,\n    ):\n        super().__init__(dataset=dataset, nframe=nframe, fps=fps)\n        self.use_subtitle = use_subtitle\n        self.use_subtitle_time = use_subtitle_time\n        self.use_frame_time = use_frame_time\n        self.dataset_name = dataset\n        lmu_root = LMUDataRoot()\n        self.clue_frame_root = osp.join(lmu_root, \"clue_images\", dataset)\n\n    @classmethod\n    def supported_datasets(cls):"
+      ]
+    },
+    {
+      "id": "ed9bb88893",
+      "principle": "P9",
+      "locations": [
+        {
+          "file": "eval_mm/vlmevalkit/vlmeval/dataset/cgbench.py",
+          "line_start": 886,
+          "line_end": 1353,
+          "module": "vlmeval.dataset.cgbench"
+        }
+      ],
+      "subject": "Class vlmeval.dataset.cgbench.CGBench_MCQ_Grounding is a god class (2 of 4 size thresholds tripped)",
+      "evidence": {
+        "class": "CGBench_MCQ_Grounding",
+        "module": "vlmeval.dataset.cgbench",
+        "num_methods": 9,
+        "loc": 468,
+        "num_instance_attrs": 19,
+        "cc_sum": 85,
+        "triggers": [
+          "attrs=19",
+          "cc_sum=85"
+        ]
+      },
+      "alternatives": [
+        "Split the class along attribute clusters \u2014 methods that share state belong together.",
+        "Extract orchestration into a coordinator; keep the original as a focused unit.",
+        "Accept the size if the class is a deliberate fa\u00e7ade exposing a coherent capability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.468,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class CGBench_MCQ_Grounding(VideoBaseDataset):\n\n    TYPE = \"Video-MCQ-Grounding\"\n\n    MD5 = \"eaead3d978a689269fefce4ae29c86df\"\n\n    SYS = {\n        \"long_acc\": (\n            \"You will be provided with sampled frames from a video, along with a \"\n            \"multiple-choice question that includes a question and several answer options.\\n\"\n            \"Your task is to analyze the provided frames, infer the most plausible \"\n            \"answer based on the visual information.\\n\"\n            \"If the video does not provide enough information, infer the answer based \"\n            \"on the options available and still provide a result. \"\n            \"Therefore, In all cases, an answer must be given.\\n\"\n            \"Only output the answer in the following format:\\n\\n\"\n            '```json\\n{\"result\": \"option\"}\\n```\\n\\n'\n            'The \"option\" is the uppercase letter corresponding to your answer.\\n\\n'\n        ),\n        \"clue_acc\": (\n            \"You will be provided with sampled frames from a video, along with a \"\n            \"multiple-choice question that includes a question and several answer options.\\n\"\n            \"Your task is to analyze the provided frames, infer the most plausible \"\n            \"answer based on the visual information.\\n\"\n            \"If the video does not provide enough information, infer the answer based \"\n            \"on the options available and still provide a result. \"\n            \"Therefore, In all cases, an answer must be given.\\n\"\n            \"Only output the answer in the following format:\\n\\n\"\n            '```json\\n{\"result\": \"option\"}\\n```\\n\\n'\n            \"The 'option' is the uppercase letter corresponding to your answer.\\n\\n\"\n        ),\n        \"miou\": (\n            \"You will be provided with uniformly sampled frames from a video and their \"\n            \"timestamps, along with a multiple-choice question that includes a question \"\n            \"and several answer options.\\n\"\n            \"Your task is to determine in which intervals the 'clue intervals' exist \"\n            \"that contain visual information needed to answer the question.\\n\"\n            \"Only output the answer in the following format:\\n\\n\"\n            '```json\\n{\"result\": [[start1, end1], [start2, end2], ...]}\\n```\\n\\n'\n            \"In this output format, each 'start' and 'end' represents the beginning and \""
+      ]
+    }
+  ],
+  "graph_summary": {
+    "num_modules": 100,
+    "num_edges": 256,
+    "num_packages": 4
+  },
+  "git_summary": {
+    "commit_sha": "2f67ddcadd64611e8ce26a26a1565a8aabe2cfc4",
+    "branch": "main",
+    "recent_commits": 1
+  }
+}

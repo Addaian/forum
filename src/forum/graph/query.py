@@ -111,6 +111,8 @@ def find_circular_imports(graph: KnowledgeGraph) -> list[QueryResult]:
     visited: set[str] = set()
 
     def _find_cycle(start: str, path: list[str], seen: set[str]) -> list[str] | None:
+        # Check by membership in the current DFS path (not seen-on-this-run)
+        # so we detect actual back-edges and don't crash on self-loops.
         if start in seen:
             cycle_start = path.index(start)
             return path[cycle_start:]
@@ -118,13 +120,17 @@ def find_circular_imports(graph: KnowledgeGraph) -> list[QueryResult]:
             return None
         seen.add(start)
         path.append(start)
-        for neighbor in file_imports.get(start, []):
-            cycle = _find_cycle(neighbor, path, seen)
-            if cycle:
-                return cycle
-        path.pop()
-        seen.discard(start)
-        visited.add(start)
+        try:
+            for neighbor in file_imports.get(start, []):
+                cycle = _find_cycle(neighbor, path, seen)
+                if cycle:
+                    return cycle
+        finally:
+            # Always pop on return so `path`/`seen` stay consistent regardless
+            # of which branch returned.
+            path.pop()
+            seen.discard(start)
+            visited.add(start)
         return None
 
     for file in file_imports:

@@ -39,11 +39,8 @@ import json
 import logging
 import os
 import sys
-from importlib import resources
 from pathlib import Path
-from typing import Any
-
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from .. import events as fevents
 from ..cache.prompt_cache import HAIKU, PromptCache
@@ -52,10 +49,6 @@ from ..types import CellVote, CodeLocation, DecisionPoint
 
 if TYPE_CHECKING:
     from ..cache.wafer_cache import WaferCache
-
-# Backend-agnostic cache type. Anything that exposes call_multiturn,
-# extract_text, extract_tool_input, and a `metrics` attribute works.
-CacheBackend = "PromptCache | WaferCache"
 
 log = logging.getLogger("forum.jury.single_cell")
 
@@ -133,6 +126,9 @@ PRINCIPLE_DEFS = {
     "P5": "Reachability. Symbols that no execution path can reach are dead code. Beyond the trivial cleanliness argument, dead branches lie about the system's surface area and complicate audits.",
     "P6": "Layering. Higher-level orchestration should depend on lower-level utilities, never the other way around. Edges that travel from a deeper module back up toward the entry point break the directed nature of the architecture.",
     "P7": "Common Closure (Martin). Things that change together belong together. Files that consistently appear in the same commits across packages signal that the package boundary is mis-cut relative to the actual reason-to-change.",
+    "P8": "Stable Abstractions (Martin). Each module sits on the (instability I, abstractness A) plane. A = abstract_methods / total_methods. The main sequence A + I = 1 says abstract modules should be stable and concrete modules should be unstable. Distance from the sequence > 0.5 puts a module in the Zone of Pain (low A, low I — stable concrete code that's hard to change) or Zone of Uselessness (high A, high I — abstract code nobody depends on).",
+    "P9": "God class / God function. A single class or function that exceeds multiple size/complexity thresholds simultaneously: ≥20 methods, ≥500 LOC, ≥15 instance attrs, cumulative CC ≥60 (any 2 for class); ≥150 LOC (function). What P3 catches as a complexity problem and P4 catches as a cohesion problem, P9 catches as a sheer-size problem — one unit doing far too much.",
+    "P10": "Code duplication. A block of code (≥30 lines, ≥70 tokens) that appears in more than one file. Detected with jscpd. Duplicates usually mean the abstraction was never extracted; one site silently drifts from the other when either is changed.",
 }
 
 
@@ -568,8 +564,8 @@ async def run_cell(
 ) -> CellVote:
     """Run one debate cell (2-turn exchange + vote) and return the structured vote."""
     pc = pc or PromptCache(model=HAIKU)
-    red = get("red", red_persona_id)
-    blue = get("blue", blue_persona_id)
+    red = get(red_persona_id)
+    blue = get(blue_persona_id)
     red_intro = _render_persona(_load_prompt("red.md"), red)
     blue_intro = _render_persona(_load_prompt("blue.md"), blue)
 

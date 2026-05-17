@@ -86,38 +86,3 @@ def rel_path(p: Path, repo_root: Path) -> str:
         return str(p)
 
 
-# ----------------------------------------------------------------------
-# Convenience re-exports for backward-compat. New code should use
-# `forum.evidence.languages` directly.
-# ----------------------------------------------------------------------
-
-def build_repo_index(repo_root: Path) -> RepoIndex:
-    """Backward-compat shim: auto-detect language and build the index.
-
-    New callers should pick a Language explicitly:
-        from .languages import get_language
-        lang = get_language("python")
-        index = lang.build_repo_index(repo_root)
-    """
-    from .languages import detect_language
-    return detect_language(repo_root).build_repo_index(repo_root)
-
-
-def parse_imports(module_path: Path, qualname: str) -> list[str]:
-    """Backward-compat shim — Python only. New code should use
-    `Language.parse_imports(...)` via the Language for the audited repo."""
-    from .languages.python import PythonLanguage
-    return PythonLanguage().parse_imports(module_path, qualname)
-
-
-def internal_imports(module_qualname: str, raw_imports: list[str],
-                     index: RepoIndex) -> set[str]:
-    """Backward-compat shim — dispatches by index.language."""
-    from .languages import get_language
-    return get_language(index.language).internal_imports(
-        module_qualname, raw_imports, index,
-    )
-
-
-# Public alias kept for old direct imports.
-SKIP_DIRS = BASE_SKIP_DIRS

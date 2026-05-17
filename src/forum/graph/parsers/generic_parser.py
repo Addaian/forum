@@ -78,11 +78,12 @@ def parse_c_file(path: Path, rel_path: str, source: str) -> FileGraph:
         # Find function end
         end_line = _find_c_block_end(lines, line_num - 1)
 
-        # Compute complexity
+        # Compute complexity. Use word-boundary regex so "if" doesn't match
+        # inside notify/verify/lift and "for" doesn't match format/before.
         func_body = "\n".join(lines[line_num - 1:end_line])
-        complexity = 1 + func_body.count("if") + func_body.count("for") + \
-                     func_body.count("while") + func_body.count("case") + \
-                     func_body.count("&&") + func_body.count("||")
+        kw_hits = len(re.findall(r"\b(?:if|for|while|case)\b", func_body))
+        op_hits = func_body.count("&&") + func_body.count("||")
+        complexity = 1 + kw_hits + op_hits
 
         fg.nodes.append(Node(
             id=node_id, name=name, qualname=qualname,

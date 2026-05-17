@@ -1,0 +1,57 @@
+{
+  "values": {
+    "scalability": 1.0,
+    "maintainability": 1.0,
+    "velocity": 1.0,
+    "flexibility": 1.0,
+    "simplicity": 1.0,
+    "correctness": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "9bb7146733",
+      "principle": "P1",
+      "subject": "Dependency cycle across 68 modules: vlmeval \u2192 api \u2192 base \u2192 gpt\u2026",
+      "structural_score": 0.7,
+      "value_affinity_score": 0.3333,
+      "composite_score": 0.8167,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "f22d7df898",
+      "principle": "P6",
+      "subject": "Layering violation: omnilmm.train.train_utils (layer 5) imports omnilmm (layer 0)",
+      "structural_score": 0.64,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.7627,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "0e73d7e0b5",
+      "principle": "P6",
+      "subject": "Layering violation: vlmeval.inference_video (layer 5) imports vlmeval.config (layer 1)",
+      "structural_score": 0.6,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.715,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "58009c1fb4",
+      "principle": "P6",
+      "subject": "Layering violation: vlmeval.inference_video (layer 5) imports vlmeval.utils (layer 1)",
+      "structural_score": 0.6,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.715,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "09b6680fff",
+      "principle": "P6",
+      "subject": "Layering violation: vlmeval.inference_video (layer 5) imports vlmeval.smp (layer 1)",
+      "structural_score": 0.6,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.715,
+      "rank": 5
+    }
+  ]
+}

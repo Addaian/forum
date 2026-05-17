@@ -1,0 +1,48 @@
+{
+  "values": {
+    "flexibility": 1.0,
+    "simplicity": 1.0,
+    "correctness": 1.0,
+    "scalability": 1.0,
+    "velocity": 1.0,
+    "maintainability": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "147c7675ff",
+      "principle": "P8",
+      "subject": "Module ui_tars.action_parser is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "structural_score": 0.4533,
+      "value_affinity_score": 0.0,
+      "composite_score": 0.4533,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "3041cc43ab",
+      "principle": "P3",
+      "subject": "Function ui_tars.action_parser.parsing_response_to_pyautogui_code has cyclomatic complexity 61",
+      "structural_score": 0.3351,
+      "value_affinity_score": 0.6,
+      "composite_score": 0.4356,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "cca36f8abc",
+      "principle": "P9",
+      "subject": "Function ui_tars.action_parser.parsing_response_to_pyautogui_code is a god function (221 LOC)",
+      "structural_score": 0.3979,
+      "value_affinity_score": 0.0,
+      "composite_score": 0.3979,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "2eb52ad45d",
+      "principle": "P3",
+      "subject": "Function ui_tars.action_parser.parse_action_to_structure_output has cyclomatic complexity 30",
+      "structural_score": 0.302,
+      "value_affinity_score": 0.6,
+      "composite_score": 0.3926,
+      "rank": 4
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "repo": "/private/var/folders/zd/s7jl32v96ys2vvr589y26gqr0000gn/T/forum-ui-tars-89z2bsc3/repo",
+  "commit_sha": "582f3a7ea5d285ee8ed9e2e84048d1ab01453c49",
+  "decision_points": [
+    {
+      "id": "3041cc43ab",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "codes/ui_tars/action_parser.py",
+          "line_start": 279,
+          "line_end": 499,
+          "module": "ui_tars.action_parser"
+        }
+      ],
+      "subject": "Function ui_tars.action_parser.parsing_response_to_pyautogui_code has cyclomatic complexity 61",
+      "evidence": {
+        "function": "parsing_response_to_pyautogui_code",
+        "module": "ui_tars.action_parser",
+        "complexity": 61,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.122,
+        "principle_severity": 0.15333333333333332,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def parsing_response_to_pyautogui_code(responses,\n                                       image_height: int,\n                                       image_width: int,\n                                       input_swap: bool = True) -> str:\n    '''\n    \u5c06M\u6a21\u578b\u7684\u8f93\u51fa\u89e3\u6790\u4e3aOSWorld\u4e2d\u7684action\uff0c\u751f\u6210pyautogui\u4ee3\u7801\u5b57\u7b26\u4e32\n    \u53c2\u6570:\n        response: \u5305\u542b\u6a21\u578b\u8f93\u51fa\u7684\u5b57\u5178\uff0c\u7ed3\u6784\u7c7b\u4f3c\u4e8e\uff1a\n        {\n            \"action_type\": \"hotkey\",\n            \"action_inputs\": {\n                \"hotkey\": \"v ctrl\",\n                \"start_box\": None,\n                \"end_box\": None\n            }\n        }\n    \u8fd4\u56de:\n        \u751f\u6210\u7684pyautogui\u4ee3\u7801\u5b57\u7b26\u4e32\n    '''\n\n    pyautogui_code = f\"import pyautogui\\nimport time\\n\"\n    if isinstance(responses, dict):\n        responses = [responses]\n    for response_id, response in enumerate(responses):\n        if \"observation\" in response:\n            observation = response[\"observation\"]\n        else:\n            observation = \"\"\n\n        if \"thought\" in response:\n            thought = response[\"thought\"]\n        else:\n            thought = \"\"\n\n        if response_id == 0:\n            pyautogui_code += f\"'''\\nObservation:\\n{observation}\\n\\nThought:\\n{thought}\\n'''\\n\"\n        else:\n            pyautogui_code += f\"\\ntime.sleep(1)\\n\"\n\n        action_dict = response\n        action_type = action_dict.get(\"action_type\")\n        action_inputs = action_dict.get(\"action_inputs\", {})\n\n        if action_type == \"hotkey\":\n            # Parsing hotkey action\n            if \"key\" in action_inputs:\n                hotkey = action_inputs.get(\"key\", \"\")\n            else:\n                hotkey = action_inputs.get(\"hotkey\", \"\")\n"
+      ]
+    },
+    {
+      "id": "2eb52ad45d",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "codes/ui_tars/action_parser.py",
+          "line_start": 146,
+          "line_end": 276,
+          "module": "ui_tars.action_parser"
+        }
+      ],
+      "subject": "Function ui_tars.action_parser.parse_action_to_structure_output has cyclomatic complexity 30",
+      "evidence": {
+        "function": "parse_action_to_structure_output",
+        "module": "ui_tars.action_parser",
+        "complexity": 30,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.06,
+        "principle_severity": 0.05,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def parse_action_to_structure_output(text,\n                                     factor,\n                                     origin_resized_height,\n                                     origin_resized_width,\n                                     model_type=\"qwen25vl\",\n                                     max_pixels=16384 * 28 * 28,\n                                     min_pixels=100 * 28 * 28):\n    text = text.strip()\n\n    if \"<point>\" in text:\n        text = convert_point_to_coordinates(text)\n    if \"start_point=\" in text:\n        text = text.replace(\"start_point=\", \"start_box=\")\n    if \"end_point=\" in text:\n        text = text.replace(\"end_point=\", \"end_box=\")\n    if \"point=\" in text:\n        text = text.replace(\"point=\", \"start_box=\")\n\n    if model_type == \"qwen25vl\":\n        smart_resize_height, smart_resize_width = smart_resize(\n            origin_resized_height,\n            origin_resized_width,\n            factor=IMAGE_FACTOR,\n            min_pixels=min_pixels,\n            max_pixels=max_pixels)\n\n    # \u6b63\u5219\u8868\u8fbe\u5f0f\u5339\u914d Action \u5b57\u7b26\u4e32\n    if text.startswith(\"Thought:\"):\n        thought_pattern = r\"Thought: (.+?)(?=\\s*Action: |$)\"\n        thought_hint = \"Thought: \"\n    elif text.startswith(\"Reflection:\"):\n        thought_pattern = r\"Reflection: (.+?)Action_Summary: (.+?)(?=\\s*Action: |$)\"\n        thought_hint = \"Reflection: \"\n    elif text.startswith(\"Action_Summary:\"):\n        thought_pattern = r\"Action_Summary: (.+?)(?=\\s*Action: |$)\"\n        thought_hint = \"Action_Summary: \"\n    else:\n        thought_pattern = r\"Thought: (.+?)(?=\\s*Action: |$)\"\n        thought_hint = \"Thought: \"\n    reflection, thought = None, None\n    thought_match = re.search(thought_pattern, text, re.DOTALL)\n    if thought_match:\n        if len(thought_match.groups()) == 1:\n            thought = thought_match.group(1).strip()\n        elif len(thought_match.groups()) == 2:\n            thought = thought_match.group(2).strip()\n            reflection = thought_match.group(1).strip()\n    assert \"Action:\" in text\n    action_str = text.split(\"Action: \")[-1]\n"
+      ]
+    },
+    {
+      "id": "147c7675ff",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "codes/ui_tars/action_parser.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "ui_tars.action_parser"
+        }
+      ],
+      "subject": "Module ui_tars.action_parser is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "evidence": {
+        "module": "ui_tars.action_parser",
+        "abstractness": 0.0,
+        "instability": 0.5,
+        "main_sequence_distance": 0.5,
+        "abstract_methods": 0,
+        "total_methods": 11,
+        "zone": "OFF-SEQUENCE",
+        "explanation": "out of balance \u2014 its abstractness doesn't match its position in the dependency graph."
+      },
+      "alternatives": [
+        "Re-evaluate whether the abstractness matches the module's role.",
+        "Restructure so the module sits closer to (A + I = 1)."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.36666666666666664,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# Copyright (c) 2025 Bytedance Ltd. and/or its affiliates\n# SPDX-License-Identifier: Apache-2.0\nimport re\nimport ast\nimport math\n\nIMAGE_FACTOR = 28\nMIN_PIXELS = 100 * 28 * 28\nMAX_PIXELS = 16384 * 28 * 28\nMAX_RATIO = 200\n\n\ndef convert_point_to_coordinates(text, is_answer=False):\n    # \u5339\u914d <bbox> \u540e\u9762\u7684\u56db\u4e2a\u6570\u5b57\n    pattern = r\"<point>(\\d+)\\s+(\\d+)</point>\"\n\n    def replace_match(match):\n        x1, y1 = map(int, match.groups())\n        x = (x1 + x1) // 2  # \u4f7f\u7528\u622a\u65ad\u53d6\u6574\n        y = (y1 + y1) // 2  # \u4f7f\u7528\u622a\u65ad\u53d6\u6574\n        if is_answer:\n            return f\"({x},{y})\"  # \u53ea\u8fd4\u56de (x, y) \u683c\u5f0f\n        return f\"({x},{y})\"  # \u8fd4\u56de\u5e26\u6807\u7b7e\u7684\u683c\u5f0f\n\n    # \u53bb\u6389 [EOS] \u5e76\u66ff\u6362 <bbox> \u5750\u6807\n    text = re.sub(r\"\\[EOS\\]\", \"\", text)\n    return re.sub(pattern, replace_match, text).strip()\n\n\n# \u5b9a\u4e49\u4e00\u4e2a\u51fd\u6570\u6765\u89e3\u6790\u6bcf\u4e2a action"
+      ]
+    },
+    {
+      "id": "cca36f8abc",
+      "principle": "P9",
+      "locations": [
+        {
+          "file": "codes/ui_tars/action_parser.py",
+          "line_start": 279,
+          "line_end": 499,
+          "module": "ui_tars.action_parser"
+        }
+      ],
+      "subject": "Function ui_tars.action_parser.parsing_response_to_pyautogui_code is a god function (221 LOC)",
+      "evidence": {
+        "function": "parsing_response_to_pyautogui_code",
+        "module": "ui_tars.action_parser",
+        "loc": 221,
+        "threshold": 150,
+        "analyzer": "ast"
+      },
+      "alternatives": [
+        "Extract internal sections into named helper functions.",
+        "Replace nested branching with table/dispatch if it's a parser/interpreter.",
+        "Accept the size if the function is generated code or a domain-mandated long sequence."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.221,
+        "principle_severity": 0.36833333333333335,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def parsing_response_to_pyautogui_code(responses,\n                                       image_height: int,\n                                       image_width: int,\n                                       input_swap: bool = True) -> str:\n    '''\n    \u5c06M\u6a21\u578b\u7684\u8f93\u51fa\u89e3\u6790\u4e3aOSWorld\u4e2d\u7684action\uff0c\u751f\u6210pyautogui\u4ee3\u7801\u5b57\u7b26\u4e32\n    \u53c2\u6570:\n        response: \u5305\u542b\u6a21\u578b\u8f93\u51fa\u7684\u5b57\u5178\uff0c\u7ed3\u6784\u7c7b\u4f3c\u4e8e\uff1a\n        {\n            \"action_type\": \"hotkey\",\n            \"action_inputs\": {\n                \"hotkey\": \"v ctrl\",\n                \"start_box\": None,\n                \"end_box\": None\n            }\n        }\n    \u8fd4\u56de:\n        \u751f\u6210\u7684pyautogui\u4ee3\u7801\u5b57\u7b26\u4e32\n    '''\n\n    pyautogui_code = f\"import pyautogui\\nimport time\\n\"\n    if isinstance(responses, dict):\n        responses = [responses]\n    for response_id, response in enumerate(responses):\n        if \"observation\" in response:\n            observation = response[\"observation\"]\n        else:\n            observation = \"\"\n\n        if \"thought\" in response:\n            thought = response[\"thought\"]\n        else:\n            thought = \"\"\n\n        if response_id == 0:\n            pyautogui_code += f\"'''\\nObservation:\\n{observation}\\n\\nThought:\\n{thought}\\n'''\\n\"\n        else:\n            pyautogui_code += f\"\\ntime.sleep(1)\\n\"\n\n        action_dict = response"
+      ]
+    }
+  ],
+  "graph_summary": {
+    "num_modules": 3,
+    "num_edges": 0,
+    "num_packages": 1
+  },
+  "git_summary": {
+    "commit_sha": "582f3a7ea5d285ee8ed9e2e84048d1ab01453c49",
+    "branch": "main",
+    "recent_commits": 1
+  }
+}

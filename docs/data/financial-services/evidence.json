@@ -1,0 +1,561 @@
+{
+  "repo": "/private/var/folders/zd/s7jl32v96ys2vvr589y26gqr0000gn/T/forum-financial-services-141w_gde/repo",
+  "commit_sha": "379e414f981521d751727611804e1bf0f2f89e1f",
+  "decision_points": [
+    {
+      "id": "1ac986f7d7",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "plugins/agent-plugins/model-builder/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 189,
+          "line_end": 232,
+          "module": "repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Function repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf._check_terminal_value_proportion has cyclomatic complexity 22",
+      "evidence": {
+        "function": "_check_terminal_value_proportion",
+        "module": "repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf",
+        "complexity": 22,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.044,
+        "principle_severity": 0.023333333333333334,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def _check_terminal_value_proportion(self):\n        \"\"\"Check if terminal value is reasonable proportion of enterprise value\"\"\"\n        try:\n            dcf_sheet = self.workbook_values['DCF']\n\n            terminal_value = None\n            enterprise_value = None\n\n            for row in dcf_sheet.iter_rows(max_row=200, max_col=20):\n                for cell in row:\n                    if cell.value and isinstance(cell.value, str):\n                        cell_str = cell.value.lower()\n                        if 'terminal' in cell_str and 'value' in cell_str and 'pv' in cell_str:\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and adjacent > 0:\n                                    terminal_value = adjacent\n                                    break\n                        if 'enterprise' in cell_str and 'value' in cell_str:\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and adjacent > 0:\n                                    enterprise_value = adjacent\n                                    break\n\n            if terminal_value is not None and enterprise_value is not None and enterprise_value > 0:\n                proportion = terminal_value / enterprise_value\n                if proportion > 0.80:\n                    self.warnings.append(\n                        f\"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). \"\n                        \"Model may be over-reliant on terminal assumptions.\"\n                    )\n                elif proportion < 0.40:\n                    self.warnings.append(\n                        f\"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). \"\n                        \"Check if terminal assumptions are too conservative.\"\n                    )\n                else:\n                    self.info.append(f\"\u2713 Terminal value is {proportion:.1%} of EV\")\n            else:\n                self.warnings.append(\"Could not locate terminal value and enterprise value\")\n\n        except Exception as e:\n            self.warnings.append(f\"Could not validate terminal value proportion: {str(e)}\")"
+      ]
+    },
+    {
+      "id": "8e716b583b",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "plugins/agent-plugins/pitch-agent/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 189,
+          "line_end": 232,
+          "module": "repo.plugins.agent-plugins.pitch-agent.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Function repo.plugins.agent-plugins.pitch-agent.skills.dcf-model.scripts.validate_dcf._check_terminal_value_proportion has cyclomatic complexity 22",
+      "evidence": {
+        "function": "_check_terminal_value_proportion",
+        "module": "repo.plugins.agent-plugins.pitch-agent.skills.dcf-model.scripts.validate_dcf",
+        "complexity": 22,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.044,
+        "principle_severity": 0.023333333333333334,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def _check_terminal_value_proportion(self):\n        \"\"\"Check if terminal value is reasonable proportion of enterprise value\"\"\"\n        try:\n            dcf_sheet = self.workbook_values['DCF']\n\n            terminal_value = None\n            enterprise_value = None\n\n            for row in dcf_sheet.iter_rows(max_row=200, max_col=20):\n                for cell in row:\n                    if cell.value and isinstance(cell.value, str):\n                        cell_str = cell.value.lower()\n                        if 'terminal' in cell_str and 'value' in cell_str and 'pv' in cell_str:\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and adjacent > 0:\n                                    terminal_value = adjacent\n                                    break\n                        if 'enterprise' in cell_str and 'value' in cell_str:\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and adjacent > 0:\n                                    enterprise_value = adjacent\n                                    break\n\n            if terminal_value is not None and enterprise_value is not None and enterprise_value > 0:\n                proportion = terminal_value / enterprise_value\n                if proportion > 0.80:\n                    self.warnings.append(\n                        f\"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). \"\n                        \"Model may be over-reliant on terminal assumptions.\"\n                    )\n                elif proportion < 0.40:\n                    self.warnings.append(\n                        f\"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). \"\n                        \"Check if terminal assumptions are too conservative.\"\n                    )\n                else:\n                    self.info.append(f\"\u2713 Terminal value is {proportion:.1%} of EV\")\n            else:\n                self.warnings.append(\"Could not locate terminal value and enterprise value\")\n\n        except Exception as e:\n            self.warnings.append(f\"Could not validate terminal value proportion: {str(e)}\")"
+      ]
+    },
+    {
+      "id": "2c56e34250",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "plugins/vertical-plugins/financial-analysis/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 189,
+          "line_end": 232,
+          "module": "repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Function repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf._check_terminal_value_proportion has cyclomatic complexity 22",
+      "evidence": {
+        "function": "_check_terminal_value_proportion",
+        "module": "repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf",
+        "complexity": 22,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.044,
+        "principle_severity": 0.023333333333333334,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def _check_terminal_value_proportion(self):\n        \"\"\"Check if terminal value is reasonable proportion of enterprise value\"\"\"\n        try:\n            dcf_sheet = self.workbook_values['DCF']\n\n            terminal_value = None\n            enterprise_value = None\n\n            for row in dcf_sheet.iter_rows(max_row=200, max_col=20):\n                for cell in row:\n                    if cell.value and isinstance(cell.value, str):\n                        cell_str = cell.value.lower()\n                        if 'terminal' in cell_str and 'value' in cell_str and 'pv' in cell_str:\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and adjacent > 0:\n                                    terminal_value = adjacent\n                                    break\n                        if 'enterprise' in cell_str and 'value' in cell_str:\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and adjacent > 0:\n                                    enterprise_value = adjacent\n                                    break\n\n            if terminal_value is not None and enterprise_value is not None and enterprise_value > 0:\n                proportion = terminal_value / enterprise_value\n                if proportion > 0.80:\n                    self.warnings.append(\n                        f\"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). \"\n                        \"Model may be over-reliant on terminal assumptions.\"\n                    )\n                elif proportion < 0.40:\n                    self.warnings.append(\n                        f\"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). \"\n                        \"Check if terminal assumptions are too conservative.\"\n                    )\n                else:\n                    self.info.append(f\"\u2713 Terminal value is {proportion:.1%} of EV\")\n            else:\n                self.warnings.append(\"Could not locate terminal value and enterprise value\")\n\n        except Exception as e:\n            self.warnings.append(f\"Could not validate terminal value proportion: {str(e)}\")"
+      ]
+    },
+    {
+      "id": "5a94e1fc25",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "plugins/vertical-plugins/financial-analysis/skills/skill-creator/scripts/quick_validate.py",
+          "line_start": 12,
+          "line_end": 86,
+          "module": "repo.plugins.vertical-plugins.financial-analysis.skills.skill-creator.scripts.quick_validate"
+        }
+      ],
+      "subject": "Function repo.plugins.vertical-plugins.financial-analysis.skills.skill-creator.scripts.quick_validate.validate_skill has cyclomatic complexity 21",
+      "evidence": {
+        "function": "validate_skill",
+        "module": "repo.plugins.vertical-plugins.financial-analysis.skills.skill-creator.scripts.quick_validate",
+        "complexity": 21,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.042,
+        "principle_severity": 0.02,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "def validate_skill(skill_path):\n    \"\"\"Basic validation of a skill\"\"\"\n    skill_path = Path(skill_path)\n\n    # Check SKILL.md exists\n    skill_md = skill_path / 'SKILL.md'\n    if not skill_md.exists():\n        return False, \"SKILL.md not found\"\n\n    # Read and validate frontmatter\n    content = skill_md.read_text()\n    if not content.startswith('---'):\n        return False, \"No YAML frontmatter found\"\n\n    # Extract frontmatter\n    match = re.match(r'^---\\n(.*?)\\n---', content, re.DOTALL)\n    if not match:\n        return False, \"Invalid frontmatter format\"\n\n    frontmatter_text = match.group(1)\n\n    # Parse YAML frontmatter\n    try:\n        frontmatter = yaml.safe_load(frontmatter_text)\n        if not isinstance(frontmatter, dict):\n            return False, \"Frontmatter must be a YAML dictionary\"\n    except yaml.YAMLError as e:\n        return False, f\"Invalid YAML in frontmatter: {e}\"\n\n    # Define allowed properties\n    ALLOWED_PROPERTIES = {'name', 'description', 'license', 'allowed-tools', 'metadata'}\n\n    # Check for unexpected properties (excluding nested keys under metadata)\n    unexpected_keys = set(frontmatter.keys()) - ALLOWED_PROPERTIES\n    if unexpected_keys:\n        return False, (\n            f\"Unexpected key(s) in SKILL.md frontmatter: {', '.join(sorted(unexpected_keys))}. \"\n            f\"Allowed properties are: {', '.join(sorted(ALLOWED_PROPERTIES))}\"\n        )\n\n    # Check required fields\n    if 'name' not in frontmatter:\n        return False, \"Missing 'name' in frontmatter\"\n    if 'description' not in frontmatter:\n        return False, \"Missing 'description' in frontmatter\"\n\n    # Extract name for validation\n    name = frontmatter.get('name', '')\n    if not isinstance(name, str):\n        return False, f\"Name must be a string, got {type(name).__name__}\""
+      ]
+    },
+    {
+      "id": "2d1162fc25",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "plugins/agent-plugins/model-builder/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 115,
+          "line_end": 158,
+          "module": "repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Function repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf._check_terminal_growth_vs_wacc has cyclomatic complexity 20",
+      "evidence": {
+        "function": "_check_terminal_growth_vs_wacc",
+        "module": "repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf",
+        "complexity": 20,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.04,
+        "principle_severity": 0.016666666666666666,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def _check_terminal_growth_vs_wacc(self):\n        \"\"\"Critical check: Terminal growth must be less than WACC\"\"\"\n        try:\n            dcf_sheet = self.workbook_values['DCF']\n\n            terminal_growth = None\n            wacc = None\n\n            # Search for terminal growth and WACC values\n            for row in dcf_sheet.iter_rows(max_row=100, max_col=20):\n                for cell in row:\n                    if cell.value and isinstance(cell.value, str):\n                        cell_str = cell.value.lower()\n                        if 'terminal' in cell_str and 'growth' in cell_str:\n                            # Look for value in adjacent cells\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and 0 < adjacent < 1:\n                                    terminal_growth = adjacent\n                                    break\n                        if 'wacc' in cell_str and wacc is None:\n                            for offset in range(1, 5):\n                                adjacent = dcf_sheet.cell(cell.row, cell.column + offset).value\n                                if isinstance(adjacent, (int, float)) and 0 < adjacent < 1:\n                                    wacc = adjacent\n                                    break\n\n            if terminal_growth is not None and wacc is not None:\n                if terminal_growth >= wacc:\n                    self.errors.append(\n                        f\"CRITICAL: Terminal growth ({terminal_growth:.2%}) >= WACC ({wacc:.2%}). \"\n                        \"This creates infinite value and is mathematically invalid.\"\n                    )\n                else:\n                    self.info.append(\n                        f\"\u2713 Terminal growth ({terminal_growth:.2%}) < WACC ({wacc:.2%})\"\n                    )\n            else:\n                self.warnings.append(\"Could not locate terminal growth and WACC values\")\n\n        except KeyError:\n            self.warnings.append(\"DCF sheet not found\")\n        except Exception as e:\n            self.warnings.append(f\"Could not validate terminal growth vs WACC: {str(e)}\")"
+      ]
+    },
+    {
+      "id": "e85d76f350",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "plugins/agent-plugins/model-builder/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 10,
+          "line_end": 10,
+          "module": "repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Unreachable import 'Optional' in repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf",
+      "evidence": {
+        "name": "Optional",
+        "type": "import",
+        "module": "repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf",
+        "confidence": 90,
+        "first_line": 10,
+        "last_line": 10,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.9,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "from typing import Optional"
+      ]
+    },
+    {
+      "id": "8e3b83b77f",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "plugins/agent-plugins/pitch-agent/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 10,
+          "line_end": 10,
+          "module": "repo.plugins.agent-plugins.pitch-agent.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Unreachable import 'Optional' in repo.plugins.agent-plugins.pitch-agent.skills.dcf-model.scripts.validate_dcf",
+      "evidence": {
+        "name": "Optional",
+        "type": "import",
+        "module": "repo.plugins.agent-plugins.pitch-agent.skills.dcf-model.scripts.validate_dcf",
+        "confidence": 90,
+        "first_line": 10,
+        "last_line": 10,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.9,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "from typing import Optional"
+      ]
+    },
+    {
+      "id": "8d483523d9",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "plugins/agent-plugins/pitch-agent/skills/ib-check-deck/scripts/extract_numbers.py",
+          "line_start": 20,
+          "line_end": 20,
+          "module": "repo.plugins.agent-plugins.pitch-agent.skills.ib-check-deck.scripts.extract_numbers"
+        }
+      ],
+      "subject": "Unreachable import 'Optional' in repo.plugins.agent-plugins.pitch-agent.skills.ib-check-deck.scripts.extract_numbers",
+      "evidence": {
+        "name": "Optional",
+        "type": "import",
+        "module": "repo.plugins.agent-plugins.pitch-agent.skills.ib-check-deck.scripts.extract_numbers",
+        "confidence": 90,
+        "first_line": 20,
+        "last_line": 20,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.9,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "from typing import Optional"
+      ]
+    },
+    {
+      "id": "03ecd64549",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "plugins/vertical-plugins/financial-analysis/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 10,
+          "line_end": 10,
+          "module": "repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Unreachable import 'Optional' in repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf",
+      "evidence": {
+        "name": "Optional",
+        "type": "import",
+        "module": "repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf",
+        "confidence": 90,
+        "first_line": 10,
+        "last_line": 10,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.9,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "from typing import Optional"
+      ]
+    },
+    {
+      "id": "f89fdb3ae0",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "plugins/vertical-plugins/financial-analysis/skills/ib-check-deck/scripts/extract_numbers.py",
+          "line_start": 20,
+          "line_end": 20,
+          "module": "repo.plugins.vertical-plugins.financial-analysis.skills.ib-check-deck.scripts.extract_numbers"
+        }
+      ],
+      "subject": "Unreachable import 'Optional' in repo.plugins.vertical-plugins.financial-analysis.skills.ib-check-deck.scripts.extract_numbers",
+      "evidence": {
+        "name": "Optional",
+        "type": "import",
+        "module": "repo.plugins.vertical-plugins.financial-analysis.skills.ib-check-deck.scripts.extract_numbers",
+        "confidence": 90,
+        "first_line": 20,
+        "last_line": 20,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.9,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "from typing import Optional"
+      ]
+    },
+    {
+      "id": "832ba26a02",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "scripts/version_bump.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "repo.scripts.version_bump"
+        }
+      ],
+      "subject": "Module repo.scripts.version_bump is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "evidence": {
+        "module": "repo.scripts.version_bump",
+        "abstractness": 0.0,
+        "instability": 0.5,
+        "main_sequence_distance": 0.5,
+        "abstract_methods": 0,
+        "total_methods": 15,
+        "zone": "OFF-SEQUENCE",
+        "explanation": "out of balance \u2014 its abstractness doesn't match its position in the dependency graph."
+      },
+      "alternatives": [
+        "Re-evaluate whether the abstractness matches the module's role.",
+        "Restructure so the module sits closer to (A + I = 1)."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.5,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "#!/usr/bin/env python3\n\"\"\"\nSingle source of truth for plugin version-bump enforcement.\n\nA plugin's `.claude-plugin/plugin.json` `version` gates update delivery to\nalready-installed users (Claude Code only re-delivers a plugin when its\nversion changes). This script guarantees that any plugin modified on a\nbranch ends up exactly one patch ahead of `main` \u2014 bumped once, not once\nper commit.\n\nModes\n  --apply   Mutating. For every plugin with staged changes whose version is\n            not yet ahead of the base ref, patch-bump it (base + 1) and\n            `git add` the result. Idempotent: a plugin already ahead of base\n            is left untouched, so repeated commits on a branch bump once.\n            Used by .githooks/pre-commit.\n\n  --check   Read-only. For every plugin changed between the base ref and\n            HEAD, fail (exit 1) if its version is not strictly greater than\n            the base ref's version. Used by .github/workflows/version-bump.yml\n            as a backstop for contributors without the local hook.\n\nBase ref resolution (in order): explicit --base, origin/main, main.\nExit 0 clean, 1 on a --check violation, 2 on an internal error.\nRequires: git, python3 (stdlib only).\n\"\"\"\nfrom __future__ import annotations\n\nimport argparse\nimport json"
+      ]
+    },
+    {
+      "id": "808603fb5c",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "scripts/check.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "repo.scripts.check"
+        }
+      ],
+      "subject": "Module repo.scripts.check is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "evidence": {
+        "module": "repo.scripts.check",
+        "abstractness": 0.0,
+        "instability": 0.5,
+        "main_sequence_distance": 0.5,
+        "abstract_methods": 0,
+        "total_methods": 4,
+        "zone": "OFF-SEQUENCE",
+        "explanation": "out of balance \u2014 its abstractness doesn't match its position in the dependency graph."
+      },
+      "alternatives": [
+        "Re-evaluate whether the abstractness matches the module's role.",
+        "Restructure so the module sits closer to (A + I = 1)."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.13333333333333333,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "#!/usr/bin/env python3\n\"\"\"\nLint all plugin + managed-agent manifests and verify cross-file references.\n\nChecks:\n  1. Every *.yaml under managed-agents/ parses.\n  2. Every plugin.json / marketplace.json / steering-examples.json parses.\n  3. Every <vertical>/agents/*.md has valid YAML frontmatter with name + description.\n  4. Every system.file, skills[].path, callable_agents[].manifest in agent.yaml\n     and subagent yamls resolves to an existing file/dir.\n  5. Every managed-agents/<slug>/ has agent.yaml, README.md, steering-examples.json.\n\nExit 0 if clean, 1 otherwise. Requires: pyyaml.\n\"\"\"\nimport json\nimport subprocess\nimport sys\nfrom pathlib import Path\n\nROOT = Path(__file__).resolve().parents[1]\nPLUGINS = ROOT / \"plugins\"\nMANAGED = ROOT / \"managed-agent-cookbooks\"\nerrors: list[str] = []\nchecked = 0\n\n\ndef ensure_hooks_installed() -> None:\n    \"\"\"Point git at .githooks so the version-bump pre-commit runs.\n\n    Native equivalent of Husky's `prepare`, piggybacked on the script"
+      ]
+    },
+    {
+      "id": "71baeec849",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "plugins/vertical-plugins/financial-analysis/skills/ib-check-deck/scripts/extract_numbers.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "repo.plugins.vertical-plugins.financial-analysis.skills.ib-check-deck.scripts.extract_numbers"
+        }
+      ],
+      "subject": "Module repo.plugins.vertical-plugins.financial-analysis.skills.ib-check-deck.scripts.extract_numbers is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "evidence": {
+        "module": "repo.plugins.vertical-plugins.financial-analysis.skills.ib-check-deck.scripts.extract_numbers",
+        "abstractness": 0.0,
+        "instability": 0.5,
+        "main_sequence_distance": 0.5,
+        "abstract_methods": 0,
+        "total_methods": 5,
+        "zone": "OFF-SEQUENCE",
+        "explanation": "out of balance \u2014 its abstractness doesn't match its position in the dependency graph."
+      },
+      "alternatives": [
+        "Re-evaluate whether the abstractness matches the module's role.",
+        "Restructure so the module sits closer to (A + I = 1)."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.16666666666666666,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "#!/usr/bin/env python3\n\"\"\"\nExtract numerical values from presentation content for consistency checking.\n\nUsage:\n    python extract_numbers.py presentation-content.md\n    python extract_numbers.py presentation-content.md --output numbers.json\n\nThis script parses markdown-formatted presentation content (from markitdown)\nand extracts all numerical values with their context and slide references.\n\"\"\"\n\nimport argparse\nimport json\nimport re\nimport sys\nfrom collections import defaultdict\nfrom dataclasses import dataclass, asdict\nfrom pathlib import Path\nfrom typing import Optional\n\n\n@dataclass\nclass NumberInstance:\n    \"\"\"A numerical value found in the presentation.\"\"\"\n    value: str           # Original string representation\n    normalized: float    # Normalized numeric value\n    unit: str           # Detected unit (M, B, K, %, bps, x, etc.)\n    slide: int          # Slide number (0 if unknown)\n    context: str        # Surrounding text for context"
+      ]
+    },
+    {
+      "id": "da96b666b6",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "plugins/vertical-plugins/financial-analysis/skills/dcf-model/scripts/validate_dcf.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf"
+        }
+      ],
+      "subject": "Module repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "evidence": {
+        "module": "repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf",
+        "abstractness": 0.0,
+        "instability": 0.5,
+        "main_sequence_distance": 0.5,
+        "abstract_methods": 0,
+        "total_methods": 10,
+        "zone": "OFF-SEQUENCE",
+        "explanation": "out of balance \u2014 its abstractness doesn't match its position in the dependency graph."
+      },
+      "alternatives": [
+        "Re-evaluate whether the abstractness matches the module's role.",
+        "Restructure so the module sits closer to (A + I = 1)."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.3333333333333333,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "#!/usr/bin/env python3\n\"\"\"\nDCF Model Validation Script\nValidates Excel DCF models for formula errors and common DCF mistakes\n\"\"\"\n\nimport sys\nimport json\nfrom pathlib import Path\nfrom typing import Optional\n\n\nclass DCFModelValidator:\n    \"\"\"Validates DCF models for errors and quality issues\"\"\"\n\n    def __init__(self, excel_path: str):\n        try:\n            import openpyxl\n        except ImportError:\n            raise ImportError(\"openpyxl not installed. Run: pip install openpyxl\")\n\n        self.excel_path = excel_path\n        self.openpyxl = openpyxl\n\n        if not Path(excel_path).exists():\n            raise FileNotFoundError(f\"File not found: {excel_path}\")\n\n        self.workbook_formulas = openpyxl.load_workbook(excel_path, data_only=False)\n        self.workbook_values = openpyxl.load_workbook(excel_path, data_only=True)\n        self.errors = []"
+      ]
+    },
+    {
+      "id": "b09a39fdf3",
+      "principle": "P8",
+      "locations": [
+        {
+          "file": "plugins/agent-plugins/pitch-agent/skills/ib-check-deck/scripts/extract_numbers.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "repo.plugins.agent-plugins.pitch-agent.skills.ib-check-deck.scripts.extract_numbers"
+        }
+      ],
+      "subject": "Module repo.plugins.agent-plugins.pitch-agent.skills.ib-check-deck.scripts.extract_numbers is in Zone of OFF-SEQUENCE (A=0.00, I=0.50, distance from sequence=0.50)",
+      "evidence": {
+        "module": "repo.plugins.agent-plugins.pitch-agent.skills.ib-check-deck.scripts.extract_numbers",
+        "abstractness": 0.0,
+        "instability": 0.5,
+        "main_sequence_distance": 0.5,
+        "abstract_methods": 0,
+        "total_methods": 5,
+        "zone": "OFF-SEQUENCE",
+        "explanation": "out of balance \u2014 its abstractness doesn't match its position in the dependency graph."
+      },
+      "alternatives": [
+        "Re-evaluate whether the abstractness matches the module's role.",
+        "Restructure so the module sits closer to (A + I = 1)."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.16666666666666666,
+        "principle_severity": 0.5,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "#!/usr/bin/env python3\n\"\"\"\nExtract numerical values from presentation content for consistency checking.\n\nUsage:\n    python extract_numbers.py presentation-content.md\n    python extract_numbers.py presentation-content.md --output numbers.json\n\nThis script parses markdown-formatted presentation content (from markitdown)\nand extracts all numerical values with their context and slide references.\n\"\"\"\n\nimport argparse\nimport json\nimport re\nimport sys\nfrom collections import defaultdict\nfrom dataclasses import dataclass, asdict\nfrom pathlib import Path\nfrom typing import Optional\n\n\n@dataclass\nclass NumberInstance:\n    \"\"\"A numerical value found in the presentation.\"\"\"\n    value: str           # Original string representation\n    normalized: float    # Normalized numeric value\n    unit: str           # Detected unit (M, B, K, %, bps, x, etc.)\n    slide: int          # Slide number (0 if unknown)\n    context: str        # Surrounding text for context"
+      ]
+    }
+  ],
+  "graph_summary": {
+    "num_modules": 17,
+    "num_edges": 0,
+    "num_packages": 1
+  },
+  "git_summary": {
+    "commit_sha": "379e414f981521d751727611804e1bf0f2f89e1f",
+    "branch": "main",
+    "recent_commits": 1
+  }
+}

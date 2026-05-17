@@ -11,6 +11,7 @@ time. Run with: `uvicorn server:app --reload`. Visit http://localhost:8000/.
 from __future__ import annotations
 
 import asyncio
+import hmac
 import json
 import os
 import re
@@ -45,6 +46,9 @@ API_TOKEN = os.environ.get("FORUM_API_TOKEN")
 _JOBS: dict[str, "Job"] = {}
 _active_job_id: str | None = None
 _lock = asyncio.Lock()
+
+# Hold strong refs to running job tasks so asyncio doesn't GC them mid-run.
+_RUNNING_TASKS: set[asyncio.Task] = set()
 
 
 EVENT_PREFIX = "__FORUM_EVENT__"  # mirrors forum.events.EVENT_PREFIX
@@ -88,16 +92,27 @@ class AuditRequest(BaseModel):
     slug: str | None = None
     language: str | None = Field(None, pattern="^(python|c|auto)$")
     top_n: int = Field(5, ge=1, le=20)
+    # True when the user explicitly re-runs an existing audit. Skips the
+    # "slug already exists" collision check and wipes the old artifacts
+    # so the rerun overwrites in place.
+    overwrite: bool = False
 
 
 app = FastAPI(title="Forum local backend")
 
-# CORS — frontend on github.io needs to call this server cross-origin. We
-# accept any origin because the bearer-token check is the actual gate;
-# without the token, every request is rejected regardless of origin.
+# CORS — frontend on github.io needs to call this server cross-origin when
+# the bearer-token gate is enabled. Without a token, restrict to localhost
+# so a random visited page can't make the local server clone arbitrary repos.
+if API_TOKEN is None:
+    _allowed_origins = [
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
+else:
+    _allowed_origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -120,7 +135,7 @@ def require_token(request: Request, token: str | None = Query(default=None)) -> 
         presented = auth.split(None, 1)[1].strip()
     elif token:
         presented = token
-    if presented != API_TOKEN:
+    if not hmac.compare_digest((presented or "").encode(), API_TOKEN.encode()):
         raise HTTPException(401, "Missing or invalid bearer token.")
 
 
@@ -135,8 +150,20 @@ async def start_audit(req: AuditRequest) -> dict:
         slug = (req.slug or _derive_slug(req.repo_url)).strip().lower()
         if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,40}", slug):
             raise HTTPException(400, "Slug must be lowercase alphanum + hyphens, ≤41 chars.")
-        if (DATA / slug).exists():
-            raise HTTPException(409, f"docs/data/{slug}/ already exists — pick a new slug.")
+        target = DATA / slug
+        if target.exists():
+            if not req.overwrite:
+                raise HTTPException(409, f"docs/data/{slug}/ already exists — pick a new slug.")
+            # Explicit re-run: wipe the old artifacts so this audit starts
+            # from a clean slate. Symlink-escape guard: only wipe if the
+            # resolved path stays inside DATA.
+            try:
+                resolved = target.resolve()
+                if resolved.is_relative_to(DATA.resolve()):
+                    shutil.rmtree(resolved)
+            except (OSError, ValueError):
+                # Couldn't wipe — surface a real error rather than racing the writer.
+                raise HTTPException(500, f"Couldn't clear {target} for overwrite.")
 
         job_id = uuid.uuid4().hex[:12]
         job = Job(
@@ -146,7 +173,9 @@ async def start_audit(req: AuditRequest) -> dict:
         )
         _JOBS[job_id] = job
         _active_job_id = job_id
-        asyncio.create_task(_run_job(job))
+        task = asyncio.create_task(_run_job(job))
+        _RUNNING_TASKS.add(task)
+        task.add_done_callback(_RUNNING_TASKS.discard)
         return {"job_id": job_id, "slug": slug}
 
 
@@ -195,7 +224,12 @@ async def stream_audit(job_id: str) -> StreamingResponse:
 
 @app.get("/api/manifest", dependencies=[Depends(require_token)])
 async def get_manifest() -> dict:
-    return json.loads(MANIFEST.read_text())
+    try:
+        return json.loads(MANIFEST.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {"audits": [], "default": None}
+    except json.JSONDecodeError as exc:
+        raise HTTPException(500, f"manifest.json is malformed: {exc}") from exc
 
 
 # Slug shape validation — must match the slug rules used by submit_audit so
@@ -234,14 +268,20 @@ async def delete_audit(slug: str) -> dict:
         removed_dir = True
 
     # Drop from manifest. Idempotent — safe to call on already-deleted slug.
-    manifest = json.loads(MANIFEST.read_text())
-    before = len(manifest.get("audits", []))
-    manifest["audits"] = [a for a in manifest.get("audits", []) if a.get("slug") != slug]
+    try:
+        manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        manifest = {"audits": [], "default": None}
+    except json.JSONDecodeError as exc:
+        raise HTTPException(500, f"manifest.json is malformed: {exc}") from exc
+    audits = manifest.setdefault("audits", [])
+    before = len(audits)
+    manifest["audits"] = [a for a in audits if a.get("slug") != slug]
     removed_entry = (len(manifest["audits"]) != before)
     # If the deleted slug was the default, fall back to whatever's left.
     if manifest.get("default") == slug:
         manifest["default"] = manifest["audits"][0]["slug"] if manifest["audits"] else None
-    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n")
+    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     return {
         "slug": slug,
@@ -381,36 +421,66 @@ async def _publish_partial(audit_out: Path, job: Job) -> None:
     target = DATA / job.slug
     target.mkdir(parents=True, exist_ok=True)
     for name in ("evidence.json", "prioritized.json", "verdicts.json",
-                 "report.md", "graph.svg"):
+                 "report.md", "graph.svg", "metrics.json"):
         src = audit_out / name
         if src.exists():
             try:
                 shutil.copy2(src, target / name)
             except OSError:
                 pass
+    # Also derive graph.json from graph.svg so the Evidence view's
+    # dependency graph renders for in-progress / crashed audits. Without
+    # this, partial-published audits show "No dependency graph on disk
+    # for this audit" even though graph.svg is right there.
+    if (target / "graph.svg").exists():
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                sys.executable, str(SVG_TO_JSON),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            await proc.communicate()
+        except OSError:
+            pass
 
 
 async def _publish_audit(audit_out: Path, job: Job) -> None:
     """Copy artifacts into docs/data/<slug>/, derive graph.json, update manifest."""
     target = DATA / job.slug
     target.mkdir(parents=True, exist_ok=True)
-    for name in ("evidence.json", "prioritized.json", "verdicts.json", "report.md", "graph.svg"):
+    for name in ("evidence.json", "prioritized.json", "verdicts.json", "report.md", "graph.svg", "metrics.json"):
         src = audit_out / name
         if src.exists():
             shutil.copy2(src, target / name)
 
     if (target / "graph.svg").exists():
-        rc = subprocess.run([sys.executable, str(SVG_TO_JSON)], capture_output=True)
-        if rc.returncode != 0:
-            job.emit(f"[forum-server] svg→json warning: {rc.stderr.decode().strip()[:200]}")
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, str(SVG_TO_JSON),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        _, stderr = await proc.communicate()
+        if proc.returncode != 0:
+            job.emit_log(f"[forum-server] svg→json warning: {stderr.decode(errors='replace').strip()[:200]}")
 
-    evidence = json.loads((target / "evidence.json").read_text())
+    try:
+        evidence = json.loads((target / "evidence.json").read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        job.emit_log("[forum-server] evidence.json missing — skipping manifest update.")
+        return
+    except json.JSONDecodeError as exc:
+        job.emit_log(f"[forum-server] evidence.json malformed ({exc}) — skipping manifest update.")
+        return
     commit_sha = (evidence.get("git_summary", {}) or {}).get("commit_sha") or evidence.get("commit_sha") or ""
     language = (evidence.get("language") or evidence.get("git_summary", {}).get("language") or "python")
     num_modules = (evidence.get("graph_summary") or {}).get("num_modules", "?")
 
-    manifest = json.loads(MANIFEST.read_text())
-    manifest["audits"] = [a for a in manifest["audits"] if a["slug"] != job.slug]
+    try:
+        manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        manifest = {"audits": [], "default": None}
+    audits = manifest.setdefault("audits", [])
+    manifest["audits"] = [a for a in audits if a.get("slug") != job.slug]
     manifest["audits"].append({
         "slug": job.slug,
         "label": job.slug,
@@ -420,13 +490,16 @@ async def _publish_audit(audit_out: Path, job: Job) -> None:
         "commit": commit_sha[:8] if commit_sha else "",
         "note": f"Live-audited from {_strip_git_url(job.repo_url)} — {num_modules} modules.",
     })
-    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n")
+    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
 def _derive_slug(repo_url: str) -> str:
     # github.com/foo/bar(.git) → bar
     last = repo_url.rstrip("/").split("/")[-1]
-    return re.sub(r"\.git$", "", last).lower()
+    derived = re.sub(r"\.git$", "", last).lower()
+    if not derived:
+        raise HTTPException(400, f"Could not derive a slug from {repo_url!r} — pass --slug.")
+    return derived
 
 
 def _strip_git_url(url: str) -> str:

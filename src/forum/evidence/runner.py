@@ -13,6 +13,7 @@ from ..types import EvidenceBundle
 from . import (
     p1_acyclic, p2_stable, p3_complexity, p4_cohesion,
     p5_reachability, p6_layering, p7_common_closure,
+    p8_stable_abstractions, p9_god_class, p10_duplication,
 )
 from .graph import build_import_graph, graph_summary
 from .languages import Language, detect_language, get_language
@@ -38,7 +39,7 @@ def _git_summary(repo_root: Path) -> dict:
             ["git", "rev-list", "--count", f"--since={since}", "HEAD"],
             cwd=repo_root, text=True,
         ).strip() or 0)
-    except (subprocess.CalledProcessError, ValueError):
+    except (subprocess.CalledProcessError, ValueError, FileNotFoundError):
         pass
     return out
 
@@ -102,30 +103,57 @@ def run(repo_path: Path, audit_dir: Path,
     log.info("Rendering graph.svg…")
     _render_graph_svg(graph, audit_dir / "graph.svg")
 
-    want = run_checkers or {"P1","P2","P3","P4","P5","P6","P7"}
+    # Default set excludes P10 (jscpd duplication) — it's the heaviest
+    # checker (~30-60s shelling out to Node) and adds a runtime dependency.
+    # Opt in with `--only P1,P2,...,P10` or by passing run_checkers explicitly.
+    want = run_checkers or {"P1","P2","P3","P4","P5","P6","P7","P8","P9"}
     all_decisions = []
 
-    if "P1" in want:
-        log.info("P1: cycles…")
-        all_decisions += p1_acyclic.check(index, graph)
-    if "P2" in want:
-        log.info("P2: stable dependencies…")
-        all_decisions += p2_stable.check(index, graph)
-    if "P3" in want:
-        log.info("P3: complexity…")
-        all_decisions += p3_complexity.check(index, lang)
-    if "P4" in want:
-        log.info("P4: cohesion…")
-        all_decisions += p4_cohesion.check(index, lang)
-    if "P5" in want:
-        log.info("P5: reachability…")
-        all_decisions += p5_reachability.check(index, lang)
-    if "P6" in want:
-        log.info("P6: layering…")
-        all_decisions += p6_layering.check(index, graph)
-    if "P7" in want:
-        log.info("P7: common closure…")
-        all_decisions += p7_common_closure.check(index, lang)
+    # Run all enabled checkers in parallel via a thread pool. Most are
+    # AST/IO-bound (radon, vulture, pydriller, jscpd, file walks) and
+    # release the GIL during their heavy work; the few that are pure-Python
+    # CPU still benefit from overlapping with I/O-waiting peers. Per-checker
+    # wall-clocks land in the logs so the operator can see where the time
+    # actually goes on a given repo.
+    import concurrent.futures as _cf
+    import time as _time
+
+    checker_specs: list[tuple[str, str, callable]] = []
+    if "P1"  in want: checker_specs.append(("P1",  "cycles",                 lambda: p1_acyclic.check(index, graph)))
+    if "P2"  in want: checker_specs.append(("P2",  "stable dependencies",    lambda: p2_stable.check(index, graph)))
+    if "P3"  in want: checker_specs.append(("P3",  "complexity",             lambda: p3_complexity.check(index, lang)))
+    if "P4"  in want: checker_specs.append(("P4",  "cohesion",               lambda: p4_cohesion.check(index, lang)))
+    if "P5"  in want: checker_specs.append(("P5",  "reachability",           lambda: p5_reachability.check(index, lang)))
+    if "P6"  in want: checker_specs.append(("P6",  "layering",               lambda: p6_layering.check(index, graph)))
+    if "P7"  in want: checker_specs.append(("P7",  "common closure",         lambda: p7_common_closure.check(index, lang)))
+    if "P8"  in want: checker_specs.append(("P8",  "stable abstractions",    lambda: p8_stable_abstractions.check(index, graph, lang)))
+    if "P9"  in want: checker_specs.append(("P9",  "god class / function",   lambda: p9_god_class.check(index, lang)))
+    if "P10" in want: checker_specs.append(("P10", "code duplication (jscpd)", lambda: p10_duplication.check(index, lang)))
+
+    def _timed(code: str, label: str, fn) -> tuple[str, list, float]:
+        t0 = _time.perf_counter()
+        try:
+            decisions = fn()
+        except Exception as exc:
+            log.warning("%s (%s) raised: %r", code, label, exc)
+            decisions = []
+        return code, decisions, _time.perf_counter() - t0
+
+    layer1_t0 = _time.perf_counter()
+    log.info("Layer 1 dispatching %d checkers in parallel: %s",
+             len(checker_specs), ", ".join(c[0] for c in checker_specs))
+    with _cf.ThreadPoolExecutor(max_workers=min(len(checker_specs), 6)) as ex:
+        futures = [ex.submit(_timed, code, label, fn) for code, label, fn in checker_specs]
+        results = []
+        for f in _cf.as_completed(futures):
+            code, decisions, dt = f.result()
+            results.append((code, decisions, dt))
+            log.info("  %s: %.1fs (%d findings)", code, dt, len(decisions))
+    # Stable order regardless of completion timing.
+    results.sort(key=lambda r: int(r[0][1:]))
+    for _, decisions, _dt in results:
+        all_decisions += decisions
+    log.info("Layer 1 total wall-clock: %.1fs", _time.perf_counter() - layer1_t0)
 
     git = _git_summary(repo_path)
     bundle = EvidenceBundle(

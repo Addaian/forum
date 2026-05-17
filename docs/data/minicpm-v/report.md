@@ -1,0 +1,35 @@
+# The vlmeval Package Has Collapsed Into a 68-Module Ball
+
+Five of the top findings point at the same physical address: `eval_mm/vlmevalkit/vlmeval/`. One is a 68-module strongly-connected component covering nearly every file in the package (#1, **CRITICAL**). Three more are upward imports from `vlmeval/inference_video.py` into `vlmeval/config`, `vlmeval/utils`, and `vlmeval/smp` (#3, #4, #5). The fifth lives in a sibling package, `omnilmm`, but it is the same shape: a deep training module reaching back up into the root package (#2, **STRUCTURAL DEBT**). With all six team values weighted equally, the binding constraint here is not correctness or flexibility individually — it is that *every* axis is being taxed simultaneously by one structural fact: there are no stable low-level seams in `vlmeval`. Until that changes, ramp cost, blast radius, swap cost, and horizontal headroom all stay pinned where they are.
+
+## The same missing seam shows up four times
+
+Findings #1, #3, #4, and #5 are not four problems. They are one problem viewed from four angles.
+
+Look at the cycle edges in #1: `vlmeval.smp → vlmeval.smp.misc → vlmeval.smp.file → vlmeval.smp.vlm → vlmeval.utils → vlmeval.utils.matching_util → vlmeval.smp`. The two packages that *should* be the foundation of everything else — `smp` (shared misc/file/log/vlm helpers) and `utils` (matching, progress) — import each other. That mutual import is what pulls all 68 modules into a single SCC with 220 internal edges. And it is exactly the same `smp` and `utils` that `inference_video.py` reaches up into in findings #4 and #5, and the same shape as `config.py` (a model registry that itself imports `vlmeval.vlm` and `vlmeval.api`) being reached for in #3.
+
+The judge ruled #4 a **JUSTIFIED VIOLATION** because `track_progress_rich` really is cross-cutting, and #3 a **JUSTIFIED VIOLATION** because `supported_VLM` really is a registry lookup. Those rulings are correct in isolation. But they are conditional on `vlmeval.utils` and `vlmeval.config` being thin and stable — and finding #1 says they aren't, because they participate in the cycle. The "justified" verdicts on #3 and #4 are only justified once #1 is resolved. Until then, every "cross-cutting" import is also a tightening of the knot.
+
+The cheapest single action that addresses this whole theme: create a `vlmeval/core/` package containing the genuinely dependency-free primitives (logging, file I/O, path utils, progress wrapper, the `supported_VLM` registry dict). The judge's recommendation on #1 estimates ~100 LOC for the initial extraction. Once `core/` exists and `smp` and `utils` both depend on it instead of on each other, the cycle edge `vlmeval.utils.matching_util → vlmeval.smp` disappears, and findings #3, #4, and #5 turn into one-line import rewrites rather than architectural questions.
+
+## The same anti-pattern in the sibling package
+
+Finding #2 (**STRUCTURAL DEBT**) is `omnilmm/train/train_utils.py` reaching up five layers to import `conversation` from the root `omnilmm/__init__.py`. The recommended fix — move `conversation.py` into `omnilmm/utils/conversation.py` and update the one import site — is ~40 LOC and mechanically identical to what #1 needs at scale: take a thing that lives at the top of the package because it was convenient, and put it at the bottom because it is foundational.
+
+The pattern across #1 and #2 is the research-codebase default: cross-cutting helpers accrete in `__init__.py` and adjacent flat modules because that is the path of least resistance during a paper push. The dissent on #1 names this directly — "research/eval toolkit where monolithic coupling is an accepted trade-off." That dissent has weight: if `vlmevalkit` is genuinely a vendored evaluation harness that is rarely modified, the ship cost of the current shape is paid only by people doing model integration. But finding #1's `blast_radius` of 1.0 and the 220 intra-SCC edges say that anyone touching anything in this package pays. With maintainability and velocity both weighted at 1.00, that is the cost the team is actually carrying.
+
+## What the structural signals are telling you about the cost
+
+Every finding here has `recency: 0.0`. Nothing is actively getting worse. This is accumulated debt, not a fire. That matters for sequencing: there is no incident vector forcing your hand, which means you can pick the highest-leverage refactor rather than the most urgent one. With scalability weighted at 1.00, the question to ask is not "what breaks tomorrow" but "what is capping our headroom for adding a new model family, a new dataset, or a new evaluator." The answer is the same in all four `vlmeval` findings: the lack of a stable base layer means every new addition either joins the SCC or routes around it with another upward import.
+
+## What to do, in order
+
+1. **Create `vlmeval/core/` and break the `smp ↔ utils` cycle.** Extract the dependency-free primitives — logging, file I/O, path utils, the `track_progress_rich` progress wrapper, and the `supported_VLM` registry dict — out of `vlmeval/smp/`, `vlmeval/utils/`, and `vlmeval/config.py` into a new `vlmeval/core/` package. Target ~100–150 LOC across one or two PRs. The defining test: `vlmeval/core/` must import nothing from elsewhere in `vlmeval`. Once this lands, the cycle edge `vlmeval.utils.matching_util → vlmeval.smp` is gone, the 68-module SCC breaks into much smaller components, and findings #3, #4, and #5 reduce to mechanical import rewrites (or, in #4's case, simply disappear because `track_progress_rich` now lives in `core/`). The next audit run will surface different top concerns — likely the remaining intra-`dataset/` coupling, which is currently masked by the larger cycle.
+
+2. **Sweep `vlmeval/inference_video.py` to import from `vlmeval/core/` only.** This is one PR, ~10 LOC of diff. It resolves #3, #4, and #5 in a single change and replaces the `from vlmeval.smp import *` wildcard in #5 with explicit named imports. After this, `inference_video.py` is a layer-5 module that only depends on layer-0 (`core/`) — the layering violation is gone, not annotated away.
+
+3. **Apply the same pattern to `omnilmm`.** Move `omnilmm/conversation.py` to `omnilmm/utils/conversation.py`, update the import in `omnilmm/train/train_utils.py:16`, and remove or re-export from `omnilmm/__init__.py`. ~40 LOC, one PR. This closes #2 directly and establishes the convention for the sibling package.
+
+4. **Audit the remaining 220 intra-SCC edges in `vlmeval/dataset/` and `vlmeval/api/base.py`.** This is the multi-week tail of #1's recommendation. With `core/` in place and `inference_video.py` clean, the remaining work is shaping `dataset → api → core` into a one-way flow. Do not start this until steps 1–3 are merged; the right boundaries will be much more obvious once the cycle is broken.
+
+Step 1 is the decision. Steps 2–4 are the consequences.

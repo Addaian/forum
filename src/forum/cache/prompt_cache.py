@@ -52,7 +52,12 @@ PRICES: dict[str, dict[str, float]] = {
 
 @dataclass
 class CallRecord:
-    """One round-trip's worth of token / cost / latency telemetry."""
+    """One round-trip's worth of token / cost / latency telemetry.
+
+    `cell_id` and `dp_id` are stamped from forum.events.CELL_CTX when the
+    cache wrapper sends the request; they enable per-cell aggregates and
+    "cells 2..N hit cache at X%" reporting.
+    """
     model: str
     input_tokens: int
     cache_creation_input_tokens: int
@@ -60,6 +65,8 @@ class CallRecord:
     output_tokens: int
     latency_s: float
     cost_usd: float
+    cell_id: int | None = None
+    dp_id: str | None = None
 
 
 def _compute_cost(model: str, ct: int, cw: int, cr: int, out: int) -> float:
@@ -71,6 +78,20 @@ def _compute_cost(model: str, ct: int, cw: int, cr: int, out: int) -> float:
         (ct * p["input"] / 1_000_000)
         + (cw * p["cache_write"] / 1_000_000)
         + (cr * p["cache_read"] / 1_000_000)
+        + (out * p["output"] / 1_000_000)
+    )
+
+
+def _no_cache_cost(model: str, ct: int, cw: int, cr: int, out: int) -> float:
+    """What this call would have cost without prompt caching: every input
+    token (uncached + would-have-been-cached) bills at the full input rate.
+    Used for the counterfactual savings number — see CacheMetrics.summary().
+    """
+    p = PRICES.get(model)
+    if p is None:
+        return 0.0
+    return (
+        ((ct + cw + cr) * p["input"] / 1_000_000)
         + (out * p["output"] / 1_000_000)
     )
 
@@ -94,13 +115,26 @@ class CacheMetrics:
                 "calls": 0, "total_tokens": 0, "cache_read_tokens": 0,
                 "cache_creation_tokens": 0, "input_tokens": 0,
                 "output_tokens": 0, "cache_read_ratio": 0.0,
-                "total_cost_usd": 0.0, "avg_latency_s": 0.0, "by_model": {},
+                "total_cost_usd": 0.0, "no_cache_cost_usd": 0.0,
+                "savings_usd": 0.0, "savings_multiplier": 1.0,
+                "avg_latency_s": 0.0, "by_model": {},
             }
         ct = sum(c.input_tokens for c in self.calls)
         cw = sum(c.cache_creation_input_tokens for c in self.calls)
         cr = sum(c.cache_read_input_tokens for c in self.calls)
         out = sum(c.output_tokens for c in self.calls)
         cost = sum(c.cost_usd for c in self.calls)
+        # Counterfactual: every cached token (read + creation) bills at full
+        # input rate. Subtract actual cost to get savings.
+        nocache_cost = sum(
+            _no_cache_cost(
+                c.model, c.input_tokens, c.cache_creation_input_tokens,
+                c.cache_read_input_tokens, c.output_tokens,
+            )
+            for c in self.calls
+        )
+        savings = nocache_cost - cost
+        savings_x = (nocache_cost / cost) if cost > 0 else 1.0
         lat = sum(c.latency_s for c in self.calls) / len(self.calls)
         total_in = ct + cr  # tokens the model actually processed on the input side
         ratio = (cr / total_in) if total_in else 0.0
@@ -116,9 +150,39 @@ class CacheMetrics:
             "output_tokens": out,
             "cache_read_ratio": round(ratio, 4),
             "total_cost_usd": round(cost, 5),
+            "no_cache_cost_usd": round(nocache_cost, 5),
+            "savings_usd": round(savings, 5),
+            "savings_multiplier": round(savings_x, 2),
             "avg_latency_s": round(lat, 3),
             "by_model": by_model,
         }
+
+    def per_cell(self) -> dict[int, dict[str, Any]]:
+        """Aggregate by cell_id. Returns {cell_id: {calls, cache_read,
+        cache_creation, cache_read_ratio, cost_usd}}. Calls with no stamped
+        cell_id (e.g., judge, report) are skipped.
+        """
+        out: dict[int, dict[str, Any]] = {}
+        for c in self.calls:
+            if c.cell_id is None:
+                continue
+            slot = out.setdefault(c.cell_id, {
+                "calls": 0, "cache_read": 0, "cache_creation": 0,
+                "uncached_input": 0, "output": 0, "cost_usd": 0.0,
+            })
+            slot["calls"] += 1
+            slot["cache_read"] += c.cache_read_input_tokens
+            slot["cache_creation"] += c.cache_creation_input_tokens
+            slot["uncached_input"] += c.input_tokens
+            slot["output"] += c.output_tokens
+            slot["cost_usd"] += c.cost_usd
+        for slot in out.values():
+            total_in = slot["uncached_input"] + slot["cache_read"]
+            slot["cache_read_ratio"] = round(
+                (slot["cache_read"] / total_in) if total_in else 0.0, 4,
+            )
+            slot["cost_usd"] = round(slot["cost_usd"], 5)
+        return out
 
 
 class PromptCache:
@@ -350,6 +414,9 @@ class PromptCache:
         cw_t = getattr(u, "cache_creation_input_tokens", 0) or 0
         cr_t = getattr(u, "cache_read_input_tokens", 0) or 0
         out_t = getattr(u, "output_tokens", 0) or 0
+        # Stamp cell context from the task-local ContextVar so per-cell
+        # aggregation (CacheMetrics.per_cell) can group calls correctly.
+        ctx = fevents.CELL_CTX.get() or {}
         record = CallRecord(
             model=kwargs["model"],
             input_tokens=in_t,
@@ -358,6 +425,8 @@ class PromptCache:
             output_tokens=out_t,
             latency_s=dt,
             cost_usd=_compute_cost(kwargs["model"], in_t, cw_t, cr_t, out_t),
+            cell_id=ctx.get("cell_id"),
+            dp_id=ctx.get("dp_id"),
         )
         self.metrics.record(record)
         return msg

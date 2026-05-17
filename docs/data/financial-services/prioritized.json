@@ -1,0 +1,57 @@
+{
+  "values": {
+    "flexibility": 1.0,
+    "maintainability": 1.0,
+    "scalability": 1.0,
+    "velocity": 1.0,
+    "simplicity": 1.0,
+    "correctness": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "e85d76f350",
+      "principle": "P5",
+      "subject": "Unreachable import 'Optional' in repo.plugins.agent-plugins.model-builder.skills.dcf-model.scripts.validate_dcf",
+      "structural_score": 0.48,
+      "value_affinity_score": 0.3667,
+      "composite_score": 0.568,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "8e3b83b77f",
+      "principle": "P5",
+      "subject": "Unreachable import 'Optional' in repo.plugins.agent-plugins.pitch-agent.skills.dcf-model.scripts.validate_dcf",
+      "structural_score": 0.48,
+      "value_affinity_score": 0.3667,
+      "composite_score": 0.568,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "8d483523d9",
+      "principle": "P5",
+      "subject": "Unreachable import 'Optional' in repo.plugins.agent-plugins.pitch-agent.skills.ib-check-deck.scripts.extract_numbers",
+      "structural_score": 0.48,
+      "value_affinity_score": 0.3667,
+      "composite_score": 0.568,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "03ecd64549",
+      "principle": "P5",
+      "subject": "Unreachable import 'Optional' in repo.plugins.vertical-plugins.financial-analysis.skills.dcf-model.scripts.validate_dcf",
+      "structural_score": 0.48,
+      "value_affinity_score": 0.3667,
+      "composite_score": 0.568,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "f89fdb3ae0",
+      "principle": "P5",
+      "subject": "Unreachable import 'Optional' in repo.plugins.vertical-plugins.financial-analysis.skills.ib-check-deck.scripts.extract_numbers",
+      "structural_score": 0.48,
+      "value_affinity_score": 0.3667,
+      "composite_score": 0.568,
+      "rank": 5
+    }
+  ]
+}

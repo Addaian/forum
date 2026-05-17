@@ -55,13 +55,20 @@ def parse_svg(svg: str) -> dict:
         nodes.append({"id": name, "label": label, "pkg": pkg, "x": x, "y": -y})
 
     edges: list[dict] = []
+    seen_edges: set[tuple[str, str]] = set()
     for m in EDGE_RE.finditer(svg):
         title = unescape(m.group(1)).strip()
         if "->" not in title:
             continue
         src, dst = (s.strip() for s in title.split("->", 1))
-        if src in seen and dst in seen:
-            edges.append({"source": src, "target": dst})
+        if src not in seen or dst not in seen:
+            continue
+        # Dedup edges so Cytoscape doesn't choke on duplicate `src->dst` ids.
+        key = (src, dst)
+        if key in seen_edges:
+            continue
+        seen_edges.add(key)
+        edges.append({"source": src, "target": dst})
 
     return {"nodes": nodes, "edges": edges}
 

@@ -1,0 +1,10 @@
+{
+  "actual_cost_usd": 0.7867,
+  "no_cache_cost_usd": 1.4491,
+  "savings_usd": 0.6624,
+  "savings_multiplier": 1.84,
+  "cache_read_ratio": 0.8126,
+  "cell_backend": "anthropic",
+  "tribunals": 5,
+  "audit_duration_s": 266.9
+}

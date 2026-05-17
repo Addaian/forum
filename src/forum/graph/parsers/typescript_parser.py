@@ -71,7 +71,10 @@ def parse_ts_file(path: Path, rel_path: str, source: str,
         language=language, content_hash=file_hash,
     ))
 
-    module_qualname = Path(rel_path).with_suffix("").as_posix().replace("/", ".")
+    module_parts = list(Path(rel_path.replace("\\", "/")).with_suffix("").parts)
+    while module_parts and module_parts[0] in ("src", "lib"):
+        module_parts = module_parts[1:]
+    module_qualname = ".".join(module_parts)
 
     # Extract imports
     for m in RE_IMPORT_FROM.finditer(source):
@@ -142,6 +145,8 @@ def parse_ts_file(path: Path, rel_path: str, source: str,
         ))
 
     # Extract classes
+    _METHOD_SKIP = {"if", "for", "while", "switch", "return", "catch",
+                    "constructor", "function", "class"}
     for m in RE_EXPORT_CLASS.finditer(source):
         name = m.group(1)
         base = m.group(2)
@@ -167,6 +172,31 @@ def parse_ts_file(path: Path, rel_path: str, source: str,
                 source_id=node_id, target_id="", target_name=base,
                 kind=EdgeKind.INHERITS, file=rel_path,
                 site=Span(line_num, line_num, 0, 0),
+            ))
+
+        # Extract methods inside the class body so they get nodes + call edges.
+        class_body = "\n".join(lines[line_num - 1:end_line])
+        for mm in RE_METHOD.finditer(class_body):
+            mname = mm.group(1)
+            if mname in _METHOD_SKIP:
+                continue
+            mparams = [p.strip().split(":")[0].strip()
+                       for p in mm.group(2).split(",") if p.strip()]
+            method_line = class_body[:mm.start()].count("\n") + line_num
+            method_qualname = f"{qualname}.{mname}"
+            method_id = f"{rel_path}::{method_qualname}"
+            method_end = _find_block_end(lines, method_line - 1)
+            fg.nodes.append(Node(
+                id=method_id, name=mname, qualname=method_qualname,
+                kind=NodeKind.METHOD, file=rel_path,
+                span=Span(method_line, method_end, 0, 0),
+                language=language, parent_id=node_id,
+                params=mparams,
+                is_exported=False,
+            ))
+            fg.edges.append(Edge(
+                source_id=node_id, target_id=method_id, target_name=mname,
+                kind=EdgeKind.CONTAINS, file=rel_path,
             ))
 
     # Extract interfaces

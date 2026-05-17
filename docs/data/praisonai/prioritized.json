@@ -1,0 +1,57 @@
+{
+  "values": {
+    "scalability": 1.0,
+    "maintainability": 1.0,
+    "simplicity": 1.0,
+    "flexibility": 1.0,
+    "velocity": 1.0,
+    "correctness": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "0e4ffadfb7",
+      "principle": "P1",
+      "subject": "Dependency cycle across 58 modules: praisonai \u2192 __main__ \u2192 cli \u2192 app\u2026",
+      "structural_score": 0.7,
+      "value_affinity_score": 0.3333,
+      "composite_score": 0.8167,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "ce169b1443",
+      "principle": "P1",
+      "subject": "Dependency cycle across 39 modules: praisonaiagents \u2192 agent \u2192 agent \u2192 chat_mixin\u2026",
+      "structural_score": 0.7,
+      "value_affinity_score": 0.3333,
+      "composite_score": 0.8167,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "f86502ba65",
+      "principle": "P6",
+      "subject": "Layering violation: praisonai.cli.features.ollama (layer 10) imports praisonai (layer 0)",
+      "structural_score": 0.64,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.7627,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "28d6db490b",
+      "principle": "P6",
+      "subject": "Layering violation: praisonai.cli.features.profiling (layer 10) imports praisonai (layer 0)",
+      "structural_score": 0.64,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.7627,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "e37bc7975b",
+      "principle": "P6",
+      "subject": "Layering violation: praisonai.cli.commands.app (layer 10) imports praisonai (layer 0)",
+      "structural_score": 0.64,
+      "value_affinity_score": 0.3833,
+      "composite_score": 0.7627,
+      "rank": 5
+    }
+  ]
+}

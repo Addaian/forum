@@ -31,21 +31,6 @@
   background: #5f5e5f;
 }
 
-/* Terminal cursor blink */
-.terminal-cursor::after {
-  content: "_";
-  animation: blink 1s step-end infinite;
-}
-@keyframes blink {
-  from,
-  to {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
 /* ----- Verdict color tokens (Tailwind doesn't ship these) ----- */
 .verdict-HEALTHY {
   color: #4ade80;
@@ -89,25 +74,6 @@
 }
 .verdict-bg-CONTESTED {
   background-color: rgba(103, 232, 249, 0.1);
-}
-
-.verdict-stripe-HEALTHY {
-  background-color: #4ade80;
-}
-.verdict-stripe-JUSTIFIED-VIOLATION {
-  background-color: #facc15;
-}
-.verdict-stripe-STRUCTURAL-DEBT {
-  background-color: #fb923c;
-}
-.verdict-stripe-CRITICAL {
-  background-color: #ef4444;
-}
-.verdict-stripe-DRIFTED {
-  background-color: #c084fc;
-}
-.verdict-stripe-CONTESTED {
-  background-color: #67e8f9;
 }
 
 /* ----- View switch helper ----- */
@@ -286,23 +252,49 @@
   vertical-align: 1px;
 }
 
-/* ----- 3D graph container ----- */
+/* Scanability helpers: enhanceBriefingHTML wraps these in the prose so
+   key spans pop without forcing the user to read every word. */
+.markdown-body .brief-path {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85em;
+  color: #5dd6ff;
+  background: rgba(93, 214, 255, 0.08);
+  padding: 0 4px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.markdown-body .brief-ref {
+  color: #facc15;
+  font-weight: 700;
+}
+.markdown-body .brief-metric {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85em;
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.08);
+  padding: 0 4px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.markdown-body .brief-num {
+  color: #fb923c;
+  font-weight: 600;
+}
+
+/* Lead paragraph: the first <p> sits as a visual TL;DR. Slightly larger,
+   bordered on the left, so the eye lands on it before the wall of text. */
+.markdown-body > p.brief-lead {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #e5e2e1;
+  border-left: 3px solid #c8c6c7;
+  padding: 4px 0 4px 14px;
+  margin: 12px 0 20px;
+}
+
+/* ----- Dependency graph container (Cytoscape mounts here) ----- */
 #ev-graph-wrap {
   position: absolute;
   inset: 0;
   top: 49px; /* below the header bar */
-}
-#ev-graph-wrap canvas {
-  display: block;
-}
-#ev-graph-wrap > div {
-  width: 100% !important;
-  height: 100% !important;
-}
-#ev-graph-wrap .scene-tooltip {
-  font-family: "JetBrains Mono", monospace !important;
-  background: #201f1f !important;
-  border: 1px solid #46464a !important;
-  padding: 4px 8px !important;
-  border-radius: 2px !important;
 }

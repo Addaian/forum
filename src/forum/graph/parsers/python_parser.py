@@ -31,10 +31,14 @@ def parse_python_file(path: Path, rel_path: str, source: str) -> FileGraph:
         language=Language.PYTHON, content_hash=file_hash,
     ))
 
-    # Determine module qualname from path
-    module_parts = Path(rel_path).with_suffix("").parts
-    if module_parts[-1] == "__init__":
+    # Determine module qualname from path. Use POSIX parts so Windows
+    # backslashes don't sneak into qualnames, and strip common source-root
+    # prefixes (src/, lib/, python/) that aren't part of the import path.
+    module_parts = list(Path(rel_path.replace("\\", "/")).with_suffix("").parts)
+    if module_parts and module_parts[-1] == "__init__":
         module_parts = module_parts[:-1]
+    while module_parts and module_parts[0] in ("src", "lib", "python"):
+        module_parts = module_parts[1:]
     module_qualname = ".".join(module_parts)
 
     # Walk the AST
@@ -51,7 +55,8 @@ def _extract_module(tree: ast.Module, fg: FileGraph, rel_path: str,
     for node in ast.iter_child_nodes(tree):
         if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
             _extract_function(node, fg, rel_path, file_node_id,
-                              module_qualname, source, lines)
+                              module_qualname, source, lines,
+                              parent_kind=NodeKind.FILE)
         elif isinstance(node, ast.ClassDef):
             _extract_class(node, fg, rel_path, file_node_id,
                            module_qualname, source, lines)
@@ -64,7 +69,8 @@ def _extract_module(tree: ast.Module, fg: FileGraph, rel_path: str,
 def _extract_function(node: ast.FunctionDef | ast.AsyncFunctionDef,
                       fg: FileGraph, rel_path: str, parent_id: str,
                       parent_qualname: str, source: str,
-                      lines: list[str]) -> None:
+                      lines: list[str],
+                      parent_kind: NodeKind = NodeKind.FILE) -> None:
     """Extract a function/method definition."""
     qualname = f"{parent_qualname}.{node.name}"
     node_id = f"{rel_path}::{qualname}"
@@ -73,9 +79,9 @@ def _extract_function(node: ast.FunctionDef | ast.AsyncFunctionDef,
     # Determine if exported (no leading underscore, or has __all__)
     is_exported = not node.name.startswith("_")
 
-    # Get parameters
+    # Get parameters, in source order: positional-only, then args, then kwonly.
     params = []
-    for arg in node.args.args + node.args.posonlyargs + node.args.kwonlyargs:
+    for arg in node.args.posonlyargs + node.args.args + node.args.kwonlyargs:
         params.append(arg.arg)
     if node.args.vararg:
         params.append(f"*{node.args.vararg.arg}")
@@ -90,9 +96,9 @@ def _extract_function(node: ast.FunctionDef | ast.AsyncFunctionDef,
     # Cyclomatic complexity
     complexity = _compute_complexity(node)
 
-    # Determine kind based on parent
-    parent_node = fg.nodes[-1] if fg.nodes else None
-    kind = NodeKind.METHOD if (parent_node and parent_node.kind == NodeKind.CLASS) else NodeKind.FUNCTION
+    # Use the caller-supplied parent kind so methods aren't misclassified as
+    # functions when fg.nodes[-1] happens to be a sibling method.
+    kind = NodeKind.METHOD if parent_kind == NodeKind.CLASS else NodeKind.FUNCTION
 
     # Content hash of just this function
     func_lines = lines[node.lineno - 1:end_line]
@@ -169,7 +175,8 @@ def _extract_class(node: ast.ClassDef, fg: FileGraph, rel_path: str,
     for child in ast.iter_child_nodes(node):
         if isinstance(child, ast.FunctionDef | ast.AsyncFunctionDef):
             _extract_function(child, fg, rel_path, node_id,
-                              qualname, source, lines)
+                              qualname, source, lines,
+                              parent_kind=NodeKind.CLASS)
         elif isinstance(child, ast.ClassDef):
             _extract_class(child, fg, rel_path, node_id,
                            qualname, source, lines)
@@ -187,10 +194,12 @@ def _extract_import(node: ast.Import | ast.ImportFrom, fg: FileGraph,
                 site=Span(node.lineno, node.lineno, node.col_offset, 0),
             ))
     elif isinstance(node, ast.ImportFrom):
-        # Resolve relative imports
+        # Resolve relative imports. `level=1` means "same package", so we
+        # strip `level` components off the module's qualname (the module's
+        # own filename, then one parent per extra dot).
         if node.level > 0:
-            parts = module_qualname.split(".")
-            base = parts[:max(0, len(parts) - (node.level - 1))]
+            parts = module_qualname.split(".") if module_qualname else []
+            base = parts[:max(0, len(parts) - node.level)]
             if node.module:
                 base.extend(node.module.split("."))
             target = ".".join(base)

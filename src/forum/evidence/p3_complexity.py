@@ -24,7 +24,9 @@ def check(index: RepoIndex, language: Language | None = None) -> list[DecisionPo
     else:
         findings = _findings_radon(index)
 
-    findings.sort(reverse=True)
+    # Explicit key so ties break deterministically across runs/platforms
+    # and we never compare Path objects in mixed-type tuples.
+    findings.sort(key=lambda t: (-t[0], str(t[1]), str(t[2]), str(t[3]), t[4]))
     decisions: list[DecisionPoint] = []
     for cc, qn, fname, path, lineno, end in findings[:MAX_DECISIONS]:
         decisions.append(DecisionPoint(

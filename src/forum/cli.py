@@ -38,7 +38,7 @@ def _commit_sha(repo_path: Path) -> str:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=repo_path, text=True,
         ).strip()
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return "unknown"
 
 
@@ -112,6 +112,9 @@ def audit(repo: Path | None, values_path: Path | None,
         sys.exit(2)
 
     log = logging.getLogger("forum")
+
+    import time as _time
+    audit_t0 = _time.perf_counter()
 
     repo = repo.resolve()
     sha = _commit_sha(repo)
@@ -203,7 +206,19 @@ def audit(repo: Path | None, values_path: Path | None,
         else:
             cell_pc = PromptCache(model=HAIKU)
             console.print(f"[magenta]Cells →[/] Anthropic ({HAIKU})")
-        judge_pc = PromptCache()  # Sonnet judge, separate metrics
+        # Judge runs on Sonnet. Anthropic Tier-1 caps Sonnet at 30K input
+        # tokens/min and each judge call sends ~5-10K input tokens (cells
+        # transcripts + evidence). Throttle hard so a 19-tribunal fanout
+        # doesn't 429 mid-flight: 1 in-flight call, 15s spacing → ~4 calls/min,
+        # comfortably under the cap.
+        # Judge runs on Sonnet. Anthropic Tier-1 caps Sonnet at 30K input
+        # tokens/min and each judge call sends ~5-10K input tokens. The
+        # 2-concurrent × 8s spacing gives us ~15 calls/min in the best case
+        # (~75-150K TPM) which would actually exceed the cap on long-cell
+        # cases, but the actual call latency (~3-5s) means in-flight count
+        # stays at 1-2 most of the time. Throughput vs safety tradeoff
+        # tuned to ~3 min for 19-finding judge stage instead of 5 min.
+        judge_pc = PromptCache(max_concurrent=2, min_interval_s=8.0)
 
         # Build a one-paragraph codebase narrative for the cached system prefix.
         pkgs = sorted({d.locations[0].module.split(".")[0]
@@ -240,18 +255,70 @@ def audit(repo: Path | None, values_path: Path | None,
         # one giant batch at the end.
         from . import events as fevents
 
+        # Fast-track threshold: if Layer 1 says the finding is unambiguous
+        # in either direction, skip the 10-cell debate and let the judge
+        # call directly from the evidence. We use only the 3 features that
+        # actually measure severity (blast_radius, principle_severity,
+        # pattern_violation); `recency` and `advocate_absence` are
+        # context/history signals that often pin near 0 and would otherwise
+        # drag every average below the threshold. Empirically ~50% of
+        # findings on real-world audits fall into one of these tails.
+        SKIP_CELLS_HIGH = 0.85
+        SKIP_CELLS_LOW = 0.15
+
+        def _structural_score(dp) -> float:
+            feats = dp.measured_impact or {}
+            keys = ("blast_radius", "principle_severity", "pattern_violation")
+            vals = [feats.get(k, 0) or 0 for k in keys]
+            return sum(vals) / len(vals) if vals else 0.5
+
+        from .types import TribunalResult
+
         async def _one_tribunal(i: int, dp) -> dict:
-            console.print(f"[blue]Tribunal {i + 1}/{len(top_dps)} ▸ started[/]: "
-                          f"{dp.id} ({dp.principle}) — {dp.subject[:80]}")
-            fevents.emit("tribunal_start", trib_idx=i, dp_id=dp.id,
-                         subject=dp.subject, principle=dp.principle)
-            tribunal = await run_tribunal_speculative(
-                decision_point=dp, num_cells=15,
-                codebase_summary=codebase_summary, git_summary=git_summary,
-                pc=cell_pc,
+            structural = _structural_score(dp)
+            skip_cells = (
+                structural >= SKIP_CELLS_HIGH or structural <= SKIP_CELLS_LOW
             )
+            console.print(
+                f"[blue]Tribunal {i + 1}/{len(top_dps)} ▸ started[/]: "
+                f"{dp.id} ({dp.principle}) — {dp.subject[:80]}"
+                + (f" [yellow](fast-tracked · structural={structural:.2f})[/]"
+                   if skip_cells else "")
+            )
+            fevents.emit("tribunal_start", trib_idx=i, dp_id=dp.id,
+                         subject=dp.subject, principle=dp.principle,
+                         skip_cells=skip_cells)
+
+            if skip_cells:
+                # No panel — synthesize an empty TribunalResult and let the
+                # judge work from Layer 1 evidence alone.
+                tribunal = TribunalResult(
+                    decision_point_id=dp.id,
+                    cells=[],
+                    aggregate_vote={
+                        "winner": "n/a",
+                        "cells_run": 0,
+                        "cells_cancelled": 0,
+                        "cells_failed": 0,
+                        "panel_skipped": True,
+                        "skip_reason": f"structural={structural:.2f}",
+                    },
+                    judge={},
+                )
+            else:
+                # 10 cells per finding (was 15) covers the top 10 of 15 pair
+                # combinations — the highest-tension matchups (Simp×Ship
+                # through Scaler×Simp). Speculative stopping may exit
+                # even earlier when ≥6 cells agree with avg conf ≥0.7.
+                tribunal = await run_tribunal_speculative(
+                    decision_point=dp, num_cells=10,
+                    codebase_summary=codebase_summary, git_summary=git_summary,
+                    pc=cell_pc,
+                )
+
             judge_out = await run_judge(
                 decision_point=dp, cells=tribunal.cells, pc=judge_pc,
+                panel_skipped=skip_cells,
             )
             console.print(
                 f"  [blue]◂ {i + 1}[/] {tribunal.aggregate_vote['cells_run']}/10 cells · "
@@ -275,12 +342,16 @@ def audit(repo: Path | None, values_path: Path | None,
                          override=bool(judge_out.get("override")))
             return tr
 
-        async def _layer2() -> None:
-            await asyncio.gather(*[
+        async def _layer2() -> list:
+            return await asyncio.gather(*[
                 _one_tribunal(i, dp) for i, dp in enumerate(top_dps)
-            ])
+            ], return_exceptions=True)
 
-        asyncio.run(_layer2())
+        results = asyncio.run(_layer2())
+        # Surface any tribunal failures without losing the rest of the run.
+        failed = [(i, r) for i, r in enumerate(results) if isinstance(r, BaseException)]
+        for i, exc in failed:
+            console.print(f"[red]Tribunal {i + 1} failed:[/] {exc!r}")
 
         # Final canonical write (in case the concurrent partial-flushes left
         # a slot-ordering quirk; this is a no-op if all slots filled cleanly).
@@ -291,6 +362,11 @@ def audit(repo: Path | None, values_path: Path | None,
         cell_s = cell_pc.metrics.summary()
         judge_s = judge_pc.metrics.summary()
         total_cost = cell_s["total_cost_usd"] + judge_s["total_cost_usd"]
+        total_nocache = (
+            cell_s.get("no_cache_cost_usd", cell_s["total_cost_usd"])
+            + judge_s.get("no_cache_cost_usd", judge_s["total_cost_usd"])
+        )
+        savings_x = (total_nocache / total_cost) if total_cost > 0 else 1.0
         console.print(
             f"[green]Layer 2[/]: {len(verdicts)} tribunals · "
             f"cells({cell_pc.backend_name})="
@@ -299,6 +375,60 @@ def audit(repo: Path | None, values_path: Path | None,
             f"judge(anthropic)=${judge_s['total_cost_usd']:.3f} · "
             f"total ${total_cost:.3f}"
         )
+
+        # --- Cache savings story ---
+        # Print the counterfactual cost (what we'd have paid without prompt
+        # caching) and the per-cell hit-rate breakdown. Cell 0 always misses
+        # — it writes the cache. Cells 1..N read it. The gap shows the
+        # cache delivering value, in real numbers.
+        console.print(
+            f"[bold cyan]Cache savings[/]: actual ${total_cost:.3f} · "
+            f"without cache ${total_nocache:.3f} · "
+            f"[bold]{savings_x:.1f}× reduction[/] "
+            f"(saved ${total_nocache - total_cost:.3f})"
+        )
+
+        # Persist a metrics sidecar the UI can read for the sidebar
+        # hero number. Keep the schema small and stable — it's the only
+        # surface the frontend consumes.
+        (audit_dir / "metrics.json").write_text(
+            json.dumps({
+                "actual_cost_usd": round(total_cost, 4),
+                "no_cache_cost_usd": round(total_nocache, 4),
+                "savings_usd": round(total_nocache - total_cost, 4),
+                "savings_multiplier": round(savings_x, 2),
+                "cache_read_ratio": cell_s.get("cache_read_ratio", 0),
+                "cell_backend": cell_pc.backend_name,
+                "tribunals": len(verdicts),
+            }, indent=2),
+            encoding="utf-8",
+        )
+
+        per_cell = cell_pc.metrics.per_cell()
+        if per_cell:
+            # Show first few cells so the cold-cache → warm-cache curve is
+            # legible without flooding the terminal.
+            ids = sorted(per_cell.keys())[:6]
+            console.print("[cyan]Per-cell cache hit rate (cells 0–{}):[/]".format(ids[-1]))
+            for cid in ids:
+                s = per_cell[cid]
+                console.print(
+                    f"  cell {cid:>2}: {s['cache_read_ratio']:>5.1%} hit · "
+                    f"read={s['cache_read']:>5}t  "
+                    f"created={s['cache_creation']:>5}t  "
+                    f"uncached={s['uncached_input']:>4}t  "
+                    f"${s['cost_usd']:.4f}"
+                )
+            # Aggregate over cells ≥ 1 (the cold cell 0 is the only writer).
+            warm_ids = [i for i in per_cell if i >= 1]
+            if warm_ids:
+                cr_warm = sum(per_cell[i]["cache_read"] for i in warm_ids)
+                un_warm = sum(per_cell[i]["uncached_input"] for i in warm_ids)
+                ratio_warm = cr_warm / (cr_warm + un_warm) if (cr_warm + un_warm) else 0
+                console.print(
+                    f"[cyan]Warm-cache cells (≥1):[/] "
+                    f"{ratio_warm:.1%} hit rate across {len(warm_ids)} cells"
+                )
 
     # --- Layer 3: Opus report writer ---
     if not skip_report:
@@ -317,7 +447,7 @@ def audit(repo: Path | None, values_path: Path | None,
                 f"--skip-report."
             )
             sys.exit(2)
-        verdicts_data = json.loads(verdicts_path.read_text())
+        verdicts_data = json.loads(verdicts_path.read_text(encoding="utf-8"))
 
         report_pc = PromptCache(model=OPUS)
         with phase(console, "Layer 3: Opus is writing the briefing"):
@@ -332,6 +462,17 @@ def audit(repo: Path | None, values_path: Path | None,
         report_path = audit_dir / "report.md"
         report_path.write_text(artifact.markdown, encoding="utf-8")
 
+        # Update metrics.json with the total wall-clock now that the full
+        # pipeline has finished. The earlier write (after Layer 2) didn't
+        # include Layer 3 latency. The UI shows this in the Briefing header.
+        metrics_path = audit_dir / "metrics.json"
+        try:
+            existing = json.loads(metrics_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            existing = {}
+        existing["audit_duration_s"] = round(_time.perf_counter() - audit_t0, 1)
+        metrics_path.write_text(json.dumps(existing, indent=2), encoding="utf-8")
+
         console.rule("[bold]Report[/]")
         console.print(f"[green]Layer 3[/]: [cyan]{report_path}[/]")
         console.print(f"  headline: {artifact.headline}")
@@ -339,6 +480,8 @@ def audit(repo: Path | None, values_path: Path | None,
                       f"(target 1500–2000)")
         console.print(f"  cost: ${artifact.stats['cost_usd']:.4f}  "
                       f"latency: {artifact.stats['latency_s']:.1f}s")
+        console.print(f"[bold cyan]Total audit wall-clock:[/] "
+                      f"{existing['audit_duration_s']:.1f}s")
 
         render_report(console, artifact.markdown)
 
@@ -367,10 +510,10 @@ def _replay_audit(audit_dir: Path) -> None:
             console.print(f"[red]Replay cache missing artifact:[/] {p}")
             sys.exit(2)
 
-    bundle = EvidenceBundle.model_validate_json(evidence_path.read_text())
-    prio = json.loads(prio_path.read_text())
-    verdicts = json.loads(verdicts_path.read_text())
-    report_md = report_path.read_text()
+    bundle = EvidenceBundle.model_validate_json(evidence_path.read_text(encoding="utf-8"))
+    prio = json.loads(prio_path.read_text(encoding="utf-8"))
+    verdicts = json.loads(verdicts_path.read_text(encoding="utf-8"))
+    report_md = report_path.read_text(encoding="utf-8")
 
     repo_name = Path(bundle.repo).name
     console.rule(f"[bold]forum audit[/] {repo_name} @ {bundle.commit_sha[:8]} "
@@ -468,7 +611,9 @@ def whatif(audit_dir: Path, values_path: Path | None,
     # default, surprising the user.
     prio_path = audit_dir / "prioritized.json"
     if prio_path.exists():
-        baseline = json.loads(prio_path.read_text()).get("values") or {}
+        baseline = json.loads(prio_path.read_text(encoding="utf-8")).get("values")
+        if not baseline:
+            baseline = {v: 1.0 for v in VALID_VALUES}
     else:
         baseline = {v: 1.0 for v in VALID_VALUES}
     new_weights = dict(baseline)

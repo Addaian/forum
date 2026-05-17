@@ -1,7 +1,15 @@
 """Cross-file edge resolution: link unresolved target_names to actual node IDs."""
 from __future__ import annotations
 
-from .models import EdgeKind, KnowledgeGraph, NodeKind
+from .models import EdgeKind, KnowledgeGraph, Language, NodeKind
+
+# File extensions to try when guessing a file-level node id from a dotted name.
+_LANG_EXTENSIONS: dict[Language, tuple[str, ...]] = {
+    Language.PYTHON: (".py",),
+    Language.JAVASCRIPT: (".js", ".jsx"),
+    Language.TYPESCRIPT: (".ts", ".tsx"),
+    Language.C: (".c", ".h"),
+}
 
 
 def resolve_edges(graph: KnowledgeGraph) -> int:
@@ -32,6 +40,10 @@ def resolve_edges(graph: KnowledgeGraph) -> int:
 
         if resolved_id:
             edge.target_id = resolved_id
+            # Use add_edge bookkeeping consistently — but we already pushed
+            # this edge into _outgoing at add_edge time, so only update the
+            # incoming index here. (We can't call add_edge again without
+            # duplicating into graph.edges / _outgoing.)
             graph._incoming[resolved_id].append(edge)
             resolved_count += 1
 
@@ -48,17 +60,22 @@ def _resolve_target(target: str, edge, graph: KnowledgeGraph,
         return qualname_index[target]
 
     # 2. Try as a file-level reference (for imports)
-    # e.g., "forum.graph.models" → look for the file node
-    file_path_guess = target.replace(".", "/") + ".py"
-    file_node_id = f"{file_path_guess}::<file>"
-    if file_node_id in graph.nodes:
-        return file_node_id
-
-    # Also try as package __init__
-    init_path_guess = target.replace(".", "/") + "/__init__.py"
-    init_node_id = f"{init_path_guess}::<file>"
-    if init_node_id in graph.nodes:
-        return init_node_id
+    # e.g., "forum.graph.models" → look for the file node. Dispatch the
+    # extension by the source-file's language so JS imports don't accidentally
+    # match a same-named Python module.
+    src_node = graph.nodes.get(f"{edge.file}::<file>")
+    src_lang = src_node.language if src_node else None
+    extensions = _LANG_EXTENSIONS.get(src_lang, (".py", ".js", ".jsx", ".ts", ".tsx", ".c", ".h"))
+    base = target.replace(".", "/")
+    for ext in extensions:
+        candidate = f"{base}{ext}::<file>"
+        if candidate in graph.nodes:
+            return candidate
+        # Also try as package __init__ / index file.
+        init_name = "__init__" if ext == ".py" else "index"
+        init_candidate = f"{base}/{init_name}{ext}::<file>"
+        if init_candidate in graph.nodes:
+            return init_candidate
 
     # 3. For calls like "self.method_name" or "obj.method", try just the last part
     if "." in target:

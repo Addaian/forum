@@ -20,8 +20,6 @@ const VALUES = [
   "simplicity",
   "flexibility",
 ];
-const SALIENCE_BUMP = 1.1;
-const INFINITY_SENTINEL = 999;
 const STRUCTURAL_FEATURES = [
   "blast_radius",
   "recency",
@@ -88,6 +86,38 @@ const AFFINITIES = {
     simplicity: 0.4,
     flexibility: 0.4,
   },
+  // P8 (stable abstractions): mis-placement on the I/A plane hurts
+  // flexibility and maintainability most; concrete-stable code is hard to
+  // extend, abstract-unstable code is design overhead.
+  P8: {
+    scalability: 0.3,
+    maintainability: 0.7,
+    velocity: -0.3,
+    correctness: 0.2,
+    simplicity: 0.4,
+    flexibility: 0.9,
+  },
+  // P9 (god class/function): pure size/complexity concern. Hits
+  // maintainability and simplicity hard, correctness via inability to
+  // exhaustively reason about the unit.
+  P9: {
+    scalability: 0.3,
+    maintainability: 0.9,
+    velocity: 0.2,
+    correctness: 0.7,
+    simplicity: 0.9,
+    flexibility: 0.4,
+  },
+  // P10 (duplication): two sites drift silently. Maintainability + velocity
+  // (every fix has to be applied twice); correctness suffers when one drifts.
+  P10: {
+    scalability: 0.2,
+    maintainability: 0.8,
+    velocity: 0.6,
+    correctness: 0.5,
+    simplicity: 0.7,
+    flexibility: 0.3,
+  },
 };
 
 // Plain-English subtitles for each verdict label. Used wherever a verdict
@@ -112,15 +142,21 @@ const PRINCIPLE_LABELS = {
   P5: "Code nothing calls",
   P6: "Helper imports orchestrator",
   P7: "Things that change together",
+  P8: "Mis-placed abstraction",
+  P9: "God class / god function",
+  P10: "Copy-pasted code",
 };
 const PRINCIPLE_SUBTITLES = {
-  P1: "Two modules importing each other (directly or via a chain). Hard to ship one without the other.",
-  P2: "A stable module (lots depend on it) depending on an unstable one. Inherits volatility.",
-  P3: "Cyclomatic complexity above 15 — too many branches to reason about confidently.",
-  P4: "Methods in one class barely share state — sign the class is two classes glued together.",
-  P5: "Functions/symbols no execution path reaches. Dead code that lies about the system surface.",
-  P6: "A module deep in the package imports back up to the entry point — direction violation.",
-  P7: "Files in different packages keep changing together — boundary is mis-cut.",
+  P1: "Modules import each other in a cycle. Can't ship one without the other.",
+  P2: "Stable module depends on an unstable one. Inherits volatility.",
+  P3: "Cyclomatic complexity above 15. Too many branches to reason about.",
+  P4: "Class methods barely share state. Probably two classes glued together.",
+  P5: "Dead code — nothing reaches it.",
+  P6: "Deep module imports back to the entry point. Layering violation.",
+  P7: "Files in different packages change together. Boundary mis-cut.",
+  P8: "Stable concrete code (no seams to extend) or abstract code nothing uses.",
+  P9: "One class/function exceeds multiple size thresholds at once.",
+  P10: "A 30+ line block appears in more than one file. Drifts silently.",
 };
 
 const PRESETS = {
@@ -288,7 +324,6 @@ async function init() {
   renderAuditSwitcher();
   wireNav();
   wireButtons();
-  wireClock();
   wireSettingsModal();
   await detectLiveMode();
   wireAuditModal();
@@ -304,7 +339,24 @@ async function init() {
     ? fromHash
     : "evidence";
 
-  await loadAudit(state.manifest.default);
+  // Empty manifest → show the landing page instead of trying to load a
+  // (non-existent) default audit. Otherwise load and render normally.
+  if (!state.manifest.audits || state.manifest.audits.length === 0) {
+    showLanding();
+  } else {
+    await loadAudit(state.manifest.default || state.manifest.audits[0].slug);
+  }
+}
+
+// Switch the main area to the landing view, hide the pipeline + tools
+// navigation since there's nothing to navigate to, and disable the
+// nav-item highlight that switchView would otherwise apply.
+function showLanding() {
+  document.querySelectorAll("section.view").forEach((s) => {
+    s.classList.toggle("hidden", s.dataset.view !== "landing");
+  });
+  document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+  state.activeView = "landing";
 }
 
 async function fetchOptional(url, asText = false) {
@@ -320,7 +372,13 @@ async function fetchOptional(url, asText = false) {
 async function loadAudit(slug) {
   const entry = state.manifest.audits.find((a) => a.slug === slug);
   if (!entry) return;
+  // Capture the slug we were asked for so a rapid sequence of pill clicks
+  // doesn't have a stale fetch overwrite the freshly-selected audit's data.
+  const requestedSlug = slug;
   state.activeSlug = slug;
+  // Reset cross-audit UI state so the next render doesn't show "moved
+  // up by N" arrows based on the previous audit's rankings.
+  lastRanking = null;
   markAuditActive(slug);
 
   const base = `data/${slug}`;
@@ -332,6 +390,9 @@ async function loadAudit(slug) {
       fetchOptional(`${base}/report.md`, true),
       fetchOptional(`${base}/graph.json`),
     ]);
+  // If the user switched audits while these were in flight, drop this
+  // response — the newer call owns state now.
+  if (state.activeSlug !== requestedSlug) return;
   if (!evidence || !prioritized) {
     alert(`Audit "${slug}" is missing data files. Check docs/data/${slug}/.`);
     return;
@@ -368,7 +429,6 @@ async function loadAudit(slug) {
   safe("prioritization", () => renderPrioritization());
   safe("jury", () => renderJury());
   safe("briefing", () => renderBriefing());
-  safe("footerStatus", () => renderFooterStatus(entry));
   switchView(state.activeView);
 }
 
@@ -377,35 +437,11 @@ async function loadAudit(slug) {
 // =====================================================================
 
 function renderTopBar(entry) {
-  const commit =
-    entry.commit || (state.evidence.commit_sha || "").slice(0, 8) || "no-git";
-  document.getElementById("topbar-commit").textContent = "commit " + commit;
-  document.getElementById("topbar-branch").textContent =
-    "branch " + (state.evidence.git_summary?.branch || "main");
-  document.getElementById("topbar-backend").textContent = backendBlurb();
-  document.getElementById("topbar-cost").textContent = costBlurb();
-
   // CLI command on Evidence view
   const langFlag =
     entry.language === "auto" ? "" : ` --language ${entry.language}`;
   document.getElementById("cli-display").value =
     `forum audit ${entry.source || "<repo>"}${langFlag} --top-n ${state.verdicts.length || 5} --cell-backend wafer`;
-}
-
-function backendBlurb() {
-  // We don't carry per-audit backend metadata yet — infer from cell count
-  // (Wafer = 10/10 typical; Anthropic-throttled = 6/10).
-  if (!state.verdicts.length) return "no jury";
-  const cells = state.verdicts[0].cells || [];
-  return cells.length === 10 ? "wafer · qwen3.5" : "anthropic · haiku 4.5";
-}
-
-function costBlurb() {
-  // Estimate from typical per-tribunal cost; refine if verdicts carry a stats key later.
-  const n = state.verdicts.length;
-  if (n === 0) return "$0.00";
-  // ~$0.32 per Wafer tribunal + $0.30 Opus, approx
-  return `$${(0.32 * n + 0.3).toFixed(2)}`;
 }
 
 function renderAuditSwitcher() {
@@ -415,15 +451,21 @@ function renderAuditSwitcher() {
     const btn = document.createElement("div");
     btn.className = "audit-pill group";
     btn.dataset.slug = entry.slug;
+    // Whitelist the language class so a crafted manifest can't break out of
+    // the class attribute; render the language text itself escaped.
+    const langClass = /^[a-z0-9_-]{1,32}$/i.test(String(entry.language || ""))
+      ? `lang-${entry.language}`
+      : "";
     btn.innerHTML = `
       <span class="flex-1 min-w-0 truncate">${escapeHtml(entry.label)}</span>
-      <span class="lang lang-${entry.language}">${entry.language}</span>
+      <span class="lang ${langClass}">${escapeHtml(entry.language)}</span>
       <button class="audit-pill-delete opacity-0 group-hover:opacity-100 hover:text-error transition-opacity"
               title="Delete this audit"
               data-slug="${escapeHtml(entry.slug)}">
         <span class="material-symbols-outlined text-[14px] align-middle">close</span>
       </button>`;
-    btn.title = `${entry.source} @ ${entry.commit}\n\n${entry.note}`;
+    // .title is set via property (text-only), so no escaping needed here.
+    btn.title = `${entry.source ?? ""} @ ${entry.commit ?? ""}\n\n${entry.note ?? ""}`;
     btn.addEventListener("click", (e) => {
       // Don't switch audits when the ✕ inside the pill was clicked.
       if (e.target.closest(".audit-pill-delete")) return;
@@ -482,8 +524,10 @@ async function deleteAudit(entry) {
     if (fallback) {
       await loadAudit(fallback);
     } else {
-      document.body.innerHTML = `<div style="padding:40px;color:#919094;font-family:sans-serif;text-align:center">
-        <h2>No audits left.</h2><p>Run a new audit via the CLI or the live backend.</p></div>`;
+      // Nothing left to display — fall back to the marketing landing page
+      // with the "+ NEW AUDIT" CTA front and center.
+      state.activeSlug = null;
+      showLanding();
     }
   }
 }
@@ -492,30 +536,6 @@ function markAuditActive(slug) {
   document
     .querySelectorAll(".audit-pill")
     .forEach((b) => b.classList.toggle("active", b.dataset.slug === slug));
-}
-
-function renderFooterStatus(entry) {
-  // Footer was removed; null-guard so we don't blow up if the element ever
-  // returns. Layer-status summary now derivable from view headers instead.
-  const el = document.getElementById("footer-layers");
-  if (!el) return;
-  const numDps = state.evidence.decision_points.length;
-  const numTrib = state.verdicts.length;
-  const reportWords = state.reportMd
-    ? state.reportMd.trim().split(/\s+/).length
-    : 0;
-  document.getElementById("footer-layers").textContent =
-    `${numDps} findings · top ${state.prioritized.items.length} ranked · ${numTrib} debate${numTrib === 1 ? "" : "s"} · ${reportWords.toLocaleString()}-word report`;
-}
-
-function wireClock() {
-  const el = document.getElementById("footer-clock");
-  if (!el) return;
-  const tick = () => {
-    el.textContent = new Date().toISOString().slice(11, 19) + " UTC";
-  };
-  tick();
-  setInterval(tick, 1000);
 }
 
 function wireNav() {
@@ -555,35 +575,52 @@ function switchView(view) {
 }
 
 function wireButtons() {
-  // Top-bar WHAT-IF → jump to Prioritization
-  document
-    .getElementById("btn-whatif")
-    ?.addEventListener("click", () => switchView("prioritization"));
-  // Top-bar RE-RUN → open New-Audit modal pre-filled with active audit's URL
+  // Sidebar RE-RUN → arm-then-fire (two-click confirmation). First click
+  // shows "CONFIRM?" in red for 4s; second click within the window
+  // overwrites the current audit's slug with a fresh run on the same repo.
   document
     .getElementById("btn-rerun")
-    ?.addEventListener("click", openRerunModal);
-  // Top-bar download icon → download report.md
+    ?.addEventListener("click", handleRerunClick);
+  // Landing CTA → trigger the same modal as the sidebar's "+ NEW AUDIT".
   document
-    .getElementById("btn-download")
-    ?.addEventListener("click", downloadReport);
-  // Sidebar EXPORT REPORT
+    .getElementById("btn-landing-new-audit")
+    ?.addEventListener("click", () => {
+      const sidebarBtn = document.getElementById("btn-new-audit");
+      if (sidebarBtn && !sidebarBtn.classList.contains("hidden")) {
+        sidebarBtn.click();
+      } else {
+        alert(
+          "New audits require the live backend. Configure it via the " +
+          "Live backend dialog in the sidebar, or run `uvicorn server:app` locally."
+        );
+      }
+    });
+  // Clicking outside the button disarms it (keeps the UI honest if the
+  // user moves on without confirming).
+  document.addEventListener("click", (e) => {
+    const btn = document.getElementById("btn-rerun");
+    if (!btn || btn.dataset.armed !== "yes") return;
+    if (e.target !== btn && !btn.contains(e.target)) disarmRerunButton(btn);
+  });
+  // Sidebar EXPORT REPORT → downloads report.md
   document
     .getElementById("btn-export")
     ?.addEventListener("click", downloadReport);
-  // Footer DOWNLOAD_BUNDLE — footer was removed; null-guard so wireButtons
-  // doesn't throw and kill the rest of init() (including wireAuditModal).
-  document
-    .getElementById("btn-bundle")
-    ?.addEventListener("click", downloadBundle);
   // Jury jump-to-action
   document
     .getElementById("btn-scroll-action")
     ?.addEventListener("click", () => {
       switchView("briefing");
+      // Briefing now ends with a "What to do, in order" section (per the new
+      // strategic-synthesis prompt). Find the matching H2 and scroll to it;
+      // fall back to the top of the briefing body if not present.
       setTimeout(() => {
-        const el = document.querySelector("#brief-verbatims");
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        const headings = document.querySelectorAll("#brief-markdown h2");
+        const actionHeading = [...headings].find((h) =>
+          /what to do|action plan|sequenced/i.test(h.textContent),
+        );
+        const target = actionHeading || document.querySelector("#brief-markdown");
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 80);
     });
   // Reset sliders to baseline
@@ -644,10 +681,30 @@ function wireButtons() {
   });
 }
 
-function openRerunModal() {
-  // Opens the existing New-Audit modal pre-filled with the active audit's
-  // repo URL and a fresh slug suggestion. User picks language, hits submit,
-  // and the existing modal flow takes over (SSE stream, live updates, etc.).
+// Two-click arm/fire pattern on RE-RUN:
+//   Click 1 → button transforms into "CONFIRM?" for 4 seconds
+//   Click 2 within the window → fires the re-run on the active audit
+//   Outside the window or click elsewhere → reverts silently
+// The actual re-run overwrites the same slug, reusing the audit-modal's
+// existing form-submit flow (POST + SSE stream + live progress UI).
+let rerunArmedTimer = null;
+const RERUN_ARM_MS = 4000;
+
+function disarmRerunButton(btn) {
+  if (!btn) return;
+  if (rerunArmedTimer) {
+    clearTimeout(rerunArmedTimer);
+    rerunArmedTimer = null;
+  }
+  btn.dataset.armed = "";
+  btn.textContent = "RE-RUN";
+  btn.style.background = "";
+  btn.style.color = "";
+}
+
+function handleRerunClick() {
+  const btn = document.getElementById("btn-rerun");
+  if (!btn) return;
   if (!state.liveMode) {
     alert(
       "Re-run requires the live backend. Static demo mode is read-only — " +
@@ -655,6 +712,22 @@ function openRerunModal() {
     );
     return;
   }
+  if (btn.dataset.armed === "yes") {
+    // Second click within the window → fire.
+    disarmRerunButton(btn);
+    fireCurrentAuditRerun();
+    return;
+  }
+  // First click → arm. The button visually transforms so the user knows
+  // the next click commits.
+  btn.dataset.armed = "yes";
+  btn.textContent = "CONFIRM?";
+  btn.style.background = "#ef4444";
+  btn.style.color = "#0a0a0b";
+  rerunArmedTimer = setTimeout(() => disarmRerunButton(btn), RERUN_ARM_MS);
+}
+
+function fireCurrentAuditRerun() {
   const entry = state.manifest.audits.find(a => a.slug === state.activeSlug);
   if (!entry) {
     alert("No active audit to re-run. Pick one from the sidebar first.");
@@ -665,30 +738,29 @@ function openRerunModal() {
   if (repoUrl && !/^https?:\/\//.test(repoUrl) && !/^git@/.test(repoUrl)) {
     repoUrl = "https://" + repoUrl.replace(/^\/+/, "");
   }
-  // Suggest a fresh slug so the POST doesn't 409 on the existing dir. The
-  // server will accept this hint or derive its own.
-  const stamp = new Date().toISOString().slice(5, 10).replace("-", "");  // MMDD
-  const slugSuggestion = `${entry.slug}-${stamp}`;
-
   const modal = document.getElementById("audit-modal");
   const form  = document.getElementById("audit-form");
   if (!modal || !form) {
-    alert("New-Audit modal isn't on the page — can't open it.");
+    alert("New-Audit modal isn't on the page — can't re-run.");
     return;
   }
-  // Set field values + open modal (re-uses the audit-modal's own wired handler).
-  const repoInput = form.elements.repo_url;
-  const slugInput = form.elements.slug;
-  const langInput = form.elements.language;
-  if (repoInput) repoInput.value = repoUrl;
-  if (slugInput) slugInput.value = slugSuggestion;
-  if (langInput && entry.language && entry.language !== "auto") {
-    langInput.value = entry.language;
+  // Pre-fill the form with the active audit's params using the SAME slug
+  // (server overwrites in place). The audit-modal's submit handler does
+  // the actual POST + SSE wiring; we just open the modal so the user
+  // can watch progress.
+  if (form.elements.repo_url) form.elements.repo_url.value = repoUrl;
+  if (form.elements.slug)     form.elements.slug.value     = entry.slug;
+  if (form.elements.language && entry.language && entry.language !== "auto") {
+    form.elements.language.value = entry.language;
   }
-  // Just toggle the modal visible. The audit-modal's open-button handler
-  // would normally call reset(); for a re-run we want the user's pre-filled
-  // values to stick, so we skip reset and just unhide.
+  // Signal the submit handler that this is an explicit re-run, so it
+  // passes overwrite:true and the server wipes the existing slug dir
+  // instead of 409-ing on the collision.
+  form.dataset.rerun = "yes";
   modal.classList.remove("hidden");
+  // Submit the form via the native API so its existing event listener fires.
+  if (typeof form.requestSubmit === "function") form.requestSubmit();
+  else form.dispatchEvent(new Event("submit", { cancelable: true }));
 }
 
 
@@ -699,25 +771,6 @@ function downloadReport() {
   }
   const blob = new Blob([state.reportMd], { type: "text/markdown" });
   triggerDownload(blob, `${state.activeSlug}-report.md`);
-}
-
-async function downloadBundle() {
-  if (!window.JSZip) {
-    alert("JSZip didn't load.");
-    return;
-  }
-  const zip = new JSZip();
-  if (state.evidence)
-    zip.file("evidence.json", JSON.stringify(state.evidence, null, 2));
-  if (state.prioritized)
-    zip.file("prioritized.json", JSON.stringify(state.prioritized, null, 2));
-  if (state.verdicts)
-    zip.file("verdicts.json", JSON.stringify(state.verdicts, null, 2));
-  if (state.reportMd) zip.file("report.md", state.reportMd);
-  if (state.graphJson)
-    zip.file("graph.json", JSON.stringify(state.graphJson, null, 2));
-  const blob = await zip.generateAsync({ type: "blob" });
-  triggerDownload(blob, `${state.activeSlug}-bundle.zip`);
 }
 
 function triggerDownload(blob, filename) {
@@ -908,14 +961,19 @@ function renderDependencyGraph() {
     fanIn.set(e.target, (fanIn.get(e.target) || 0) + 1);
   const maxFanIn = Math.max(1, ...fanIn.values());
 
-  // Identify modules with errors (decision points from evidence).
+  // Identify modules with errors (decision points from evidence). Match on
+  // whole tokens, not substrings — a finding on `foo.bar` was previously
+  // also flagging `bar`, `foo`, and any module sharing those name fragments.
   const errorModules = new Set();
   if (state.evidence?.decision_points) {
     for (const dp of state.evidence.decision_points) {
       if (dp.subject) errorModules.add(dp.subject);
       if (dp.evidence?.module) errorModules.add(dp.evidence.module);
-      for (const n of data.nodes) {
-        if (dp.subject && dp.subject.includes(n.id)) errorModules.add(n.id);
+      if (dp.subject) {
+        const tokens = new Set(dp.subject.split(/[\s.,;:()\[\]{}"'`]+/));
+        for (const n of data.nodes) {
+          if (tokens.has(n.id)) errorModules.add(n.id);
+        }
       }
     }
   }
@@ -1089,6 +1147,60 @@ function renderDependencyGraph() {
 
   state.cyGraph = cy;
 
+  // ---- Legend ----
+  // Floating panel bottom-left explaining what each color and node-shape means.
+  // Without this users have to guess what the colors mean (e.g., why is most
+  // of shadowbroker yellow? — because `services` happens to land in the 2nd
+  // palette slot, not because anything is wrong with services).
+  const oldLegend = container.querySelector(".graph-legend");
+  if (oldLegend) oldLegend.remove();
+  const legend = document.createElement("div");
+  legend.className = "graph-legend";
+  legend.style.cssText = `
+    position: absolute; left: 12px; bottom: 12px; z-index: 5;
+    background: rgba(20, 19, 19, 0.92); border: 1px solid #46464a;
+    padding: 8px 10px; min-width: 140px; max-width: 240px;
+    font-family: "JetBrains Mono", monospace; font-size: 10px;
+    color: #c7c6ca; line-height: 1.4;
+    backdrop-filter: blur(4px);
+  `;
+  const counts = new Map();
+  for (const n of data.nodes) counts.set(n.pkg, (counts.get(n.pkg) || 0) + 1);
+  const pkgRows = pkgOrder
+    .map((pkg) => {
+      const c = colorFor(pkg);
+      // Package names come from the indexed source — escape so arbitrary
+      // module identifiers can't inject HTML/script into the legend.
+      return (
+        `<div style="display:flex;align-items:center;gap:6px;margin:2px 0">` +
+        `<span style="width:10px;height:10px;background:${c};display:inline-block;border:1px solid ${c}"></span>` +
+        `<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(pkg || "?")}</span>` +
+        `<span style="opacity:0.6">${escapeHtml(String(counts.get(pkg) ?? ""))}</span>` +
+        `</div>`
+      );
+    })
+    .join("");
+  const errorRow = errorModules.size
+    ? `<div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding-top:4px;border-top:1px solid #46464a">
+         <span style="width:10px;height:10px;background:#ef4444;display:inline-block;border:1px solid #ef4444"></span>
+         <span style="flex:1">has finding</span>
+         <span style="opacity:0.6">${errorModules.size}</span>
+       </div>`
+    : "";
+  legend.innerHTML = `
+    <div style="font-weight:700;letter-spacing:0.08em;text-transform:uppercase;font-size:9px;color:#919094;margin-bottom:6px">
+      LEGEND · COLOR = PACKAGE
+    </div>
+    ${pkgRows}
+    ${errorRow}
+    <div style="margin-top:6px;padding-top:4px;border-top:1px solid #46464a;font-size:9px;color:#919094;line-height:1.3">
+      <div>□ rounded box = package dir</div>
+      <div>○ circle = module file</div>
+      <div>size ∝ fan-in (importers)</div>
+    </div>
+  `;
+  container.appendChild(legend);
+
   // Wire close button for findings panel.
   const closeBtn = document.getElementById("node-findings-close");
   if (closeBtn)
@@ -1197,10 +1309,9 @@ function renderPrioritization() {
   renderPresets();
   renderSliders();
   renderRanking();
+  // Plain-English placeholders in the header explainer.
   const topN = state.prioritized.items.length;
   const totalFindings = state.evidence?.decision_points?.length ?? topN;
-  document.getElementById("prio-stat-dps").textContent = topN;
-  // Plain-English placeholders in the header explainer.
   const elN    = document.getElementById("prio-explain-n");
   const elTopN = document.getElementById("prio-explain-topn");
   if (elN)    elN.textContent    = `${totalFindings}`;
@@ -1283,6 +1394,19 @@ function updateSliderLabel(name) {
 
 let lastRanking = null;
 
+// Severity buckets for the per-card pill. `structural` is the average of 5
+// normalized impact features in [0,1]; thresholds split into three readable
+// tiers. Colors match the site's existing red/orange/grey accents.
+const SEVERITY_BUCKETS = [
+  { min: 0.66, label: "HIGH", color: "#ef4444" },
+  { min: 0.33, label: "MED",  color: "#fb923c" },
+  { min: 0.0,  label: "LOW",  color: "#919094" },
+];
+function severityFor(structural) {
+  return SEVERITY_BUCKETS.find((b) => structural >= b.min) ||
+    SEVERITY_BUCKETS[SEVERITY_BUCKETS.length - 1];
+}
+
 function renderRanking() {
   const root = document.getElementById("prio-ranking");
   // Re-score only the originally-prioritized set; live composite under current weights.
@@ -1298,54 +1422,69 @@ function renderRanking() {
   scored.sort((a, b) => b.composite - a.composite);
 
   root.innerHTML = "";
-  let nShifted = 0;
   scored.forEach((row, idx) => {
     const oldRank = lastRanking ? lastRanking.indexOf(row.dp.id) : idx;
     const delta = lastRanking ? oldRank - idx : 0;
-    if (delta !== 0) nShifted += 1;
     const principleName =
       PRINCIPLE_LABELS[row.dp.principle] || row.dp.principle;
-    const deltaTag =
+    const sev = severityFor(row.structural);
+
+    // Delta indicator: icon + count when rank shifted, em-dash placeholder
+    // otherwise (keeps the right column width stable across rows).
+    const deltaMarkup =
       delta > 0
-        ? `<span class="text-[#4ade80] text-[10px] ml-2" title="Moved up ${delta} place${delta === 1 ? "" : "s"}">↑${delta}</span>`
+        ? `<span class="flex items-center gap-0.5 text-[#4ade80]"
+                  title="Moved up ${delta} place${delta === 1 ? "" : "s"}">
+             <span class="material-symbols-outlined" style="font-size:16px">arrow_upward</span>
+             <span class="font-code-md">${delta}</span>
+           </span>`
         : delta < 0
-          ? `<span class="text-[#fb923c] text-[10px] ml-2" title="Moved down ${Math.abs(delta)} place${Math.abs(delta) === 1 ? "" : "s"}">↓${Math.abs(delta)}</span>`
-          : "";
+          ? `<span class="flex items-center gap-0.5 text-[#fb923c]"
+                    title="Moved down ${Math.abs(delta)} place${Math.abs(delta) === 1 ? "" : "s"}">
+               <span class="material-symbols-outlined" style="font-size:16px">arrow_downward</span>
+               <span class="font-code-md">${Math.abs(delta)}</span>
+             </span>`
+          : `<span class="font-code-md text-on-surface-variant opacity-40">—</span>`;
+
     const div = document.createElement("div");
     div.className =
-      "bg-surface-container border border-outline-variant p-4 transition-all" +
+      "bg-surface-container border border-outline-variant p-4 " +
+      "flex items-center justify-between gap-4 " +
+      "relative overflow-hidden hover:border-primary/40 transition-colors" +
       (delta !== 0 ? " ring-1 ring-primary/30" : "");
     div.innerHTML = `
-      <div class="flex items-start justify-between gap-4 mb-3">
-        <div class="flex items-baseline gap-3">
-          <span class="font-code-md text-primary font-bold">#${idx + 1}</span>
-          <div>
-            <div class="font-body-md text-on-surface">${escapeHtml(row.dp.subject)}</div>
-            <div class="font-code-sm text-on-surface-variant text-[11px] mt-1">
-              <span title="${escapeHtml(PRINCIPLE_SUBTITLES[row.dp.principle] || "")}">${escapeHtml(principleName)} (${row.dp.principle})</span>
-            </div>
+      <div class="absolute top-0 left-0 w-1 h-full" style="background:${sev.color}"></div>
+      <div class="flex items-start gap-4 min-w-0 flex-1">
+        <span class="font-code-md text-primary font-bold pt-0.5 shrink-0">#${idx + 1}</span>
+        <div class="min-w-0 flex-1">
+          <div class="font-body-md text-on-surface leading-tight">${escapeHtml(row.dp.subject)}</div>
+          <div class="font-code-sm text-on-surface-variant text-[11px] mt-1 opacity-70"
+               title="${escapeHtml(PRINCIPLE_SUBTITLES[row.dp.principle] || "")}">
+            ${escapeHtml(principleName)} (${row.dp.principle})
           </div>
         </div>
-        <div class="text-right">
-          <div class="font-code-md text-primary font-bold" title="Composite score = structural × (1 + 0.5 × value-affinity)">${row.composite.toFixed(3)}${deltaTag}</div>
-          <div class="font-code-sm text-on-surface-variant text-[10px]" title="Raw severity from the static checks">raw severity ${row.structural.toFixed(3)}</div>
-          <div class="font-code-sm text-on-surface-variant text-[10px]" title="How much your priorities care about this kind of issue (-1 to +1)">priority match ${row.value_affinity >= 0 ? "+" : ""}${row.value_affinity.toFixed(3)}</div>
-        </div>
       </div>
-      <div class="flex gap-1 h-1" title="Visual width = composite score">
-        <div class="bg-primary" style="flex:${row.composite}"></div>
-        <div class="bg-surface-container-highest" style="flex:${Math.max(0, 1.5 - row.composite)}"></div>
+      <div class="flex items-center gap-6 pl-6 border-l border-outline-variant/30 shrink-0">
+        <div class="flex flex-col items-end"
+             title="Composite score = structural × (1 + 0.5 × value-affinity)">
+          <span class="font-code-md text-primary font-bold">${row.composite.toFixed(2)}</span>
+          <span class="font-label-caps text-[9px] text-on-surface-variant opacity-60">COMPOSITE</span>
+        </div>
+        <span class="font-label-caps text-[10px] tracking-widest px-2 py-1 border"
+              style="color:${sev.color};border-color:${sev.color};background:${sev.color}1A"
+              title="Static-analysis severity: ${row.structural.toFixed(2)} (0–1)">
+          ${sev.label}
+        </span>
+        <div class="w-10 flex justify-end">${deltaMarkup}</div>
       </div>`;
     root.appendChild(div);
   });
   lastRanking = scored.map((s) => s.dp.id);
-  document.getElementById("prio-stat-shift").textContent = nShifted;
 }
 
 function refreshAfterSlider() {
   renderRanking();
   renderJuryAggregates(); // re-projected verdict line per tribunal updates too
-  renderBriefingSummary(); // verdict-distribution card might shift
 }
 
 // =====================================================================
@@ -1353,11 +1492,10 @@ function refreshAfterSlider() {
 // =====================================================================
 
 function renderJury() {
+  renderJuryDebaters();
   const root = document.getElementById("jury-cells");
-  const judgeRoot = document.getElementById("jury-judges");
   if (!state.verdicts.length) {
     root.innerHTML = `<div class="text-center text-on-surface-variant p-12">No Layer-2 verdicts on disk for this audit.</div>`;
-    judgeRoot.innerHTML = "";
     document.getElementById("jury-stat-tribunals").textContent = "0";
     document.getElementById("jury-stat-cells").textContent = "0";
     document.getElementById("jury-stat-overrides").textContent = "0";
@@ -1365,7 +1503,6 @@ function renderJury() {
   }
 
   root.innerHTML = "";
-  judgeRoot.innerHTML = "";
   let totalCells = 0,
     overrides = 0;
 
@@ -1394,10 +1531,23 @@ function renderJury() {
     const v = String(judge.verdict || "—").toUpperCase();
     const vKey = v.replace(/ /g, "-");
 
+    // Verdict color drives the left-edge stripe and the FINDING-N chip,
+    // so the severity is the first thing the eye picks up.
+    const VERDICT_COLOR = {
+      CRITICAL:               "#ef4444",
+      "STRUCTURAL DEBT":      "#fb923c",
+      "JUSTIFIED VIOLATION":  "#facc15",
+      DRIFTED:                "#c084fc",
+      CONTESTED:              "#67e8f9",
+      HEALTHY:                "#4ade80",
+    };
+    const vColor = VERDICT_COLOR[v] || "#919094";
+
     // ---- Compact summary card ----
     const section = document.createElement("div");
     section.className =
-      "mb-4 mt-6 first:mt-0 bg-surface-container border border-outline-variant";
+      "mb-4 mt-6 first:mt-0 bg-surface-container border border-outline-variant " +
+      "relative overflow-hidden";
 
     // Vote dots: one dot per cell, colored by position
     const dots = cells
@@ -1418,25 +1568,49 @@ function renderJury() {
     const bestDis = disCells[0];
 
     section.innerHTML = `
-      <div class="p-4">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <span class="font-label-caps text-label-caps text-primary">FINDING ${tribIdx + 1}</span>
-            <span class="text-[11px] text-on-surface-variant opacity-70 ml-2">${escapeHtml(principleName)} (${dp?.principle ?? "?"})</span>
-          </div>
-          <span class="font-code-sm font-bold verdict-${vKey} verdict-bg-${vKey} px-2 py-0.5">${escapeHtml(v)}</span>
-        </div>
-        <div class="font-body-lg text-on-surface leading-tight mb-3">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
+      <!-- Verdict-colored stripe on the left edge -->
+      <div class="absolute top-0 left-0 w-1 h-full" style="background:${vColor}"></div>
 
-        <!-- Vote split strip -->
+      <!-- Prominent header band: big FINDING-N chip + verdict pill -->
+      <div class="flex items-center justify-between gap-4 px-5 pt-4 pb-3 border-b border-outline-variant/40">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="font-label-caps text-[13px] tracking-widest px-2.5 py-1 border-2 shrink-0"
+                style="color:${vColor};border-color:${vColor};background:${vColor}1A">
+            FINDING ${tribIdx + 1}
+          </span>
+          <span class="font-code-sm text-[11px] text-on-surface-variant opacity-70 truncate"
+                title="${escapeHtml(PRINCIPLE_SUBTITLES[dp?.principle] || "")}">
+            ${escapeHtml(principleName)} (${dp?.principle ?? "?"})
+          </span>
+        </div>
+        <span class="font-code-md font-bold verdict-${vKey} verdict-bg-${vKey} px-3 py-1 border shrink-0">${escapeHtml(v)}</span>
+      </div>
+
+      <div class="px-5 py-4">
+        <!-- Subject as the headline of the card -->
+        <div class="font-headline-sm text-headline-sm text-on-surface leading-tight mb-4">
+          ${escapeHtml(dp?.subject || trib.decision_point_id)}
+        </div>
+
+        ${
+          judge.panel_skipped || cells.length === 0
+            ? `<!-- Fast-tracked: panel skipped because Layer 1 was extreme -->
+        <div class="flex items-center gap-2 mb-3">
+          <span class="material-symbols-outlined text-[14px] text-primary">bolt</span>
+          <span class="font-label-caps text-[10px] text-primary tracking-widest">FAST-TRACKED</span>
+          <span class="text-[11px] text-on-surface-variant opacity-70">no panel needed — Layer 1 evidence was clear-cut</span>
+          ${judge.override ? '<span class="text-[10px] text-yellow-400 font-bold ml-2">· JUDGE OVERRODE</span>' : ""}
+        </div>`
+            : `<!-- Vote split strip -->
         <div class="flex items-center gap-3 mb-3">
           <div class="flex gap-1">${dots}</div>
           <span class="text-[11px]"><span style="color:${majorityColor}" class="font-bold">${majority === "debt" ? nDebt : nJust} ${majorityLabel}</span> <span class="text-on-surface-variant opacity-60">·</span> <span style="color:${dissentColor}">${majority === "debt" ? nJust : nDebt} dissent</span></span>
           <span class="text-[10px] text-on-surface-variant opacity-60">· avg ${avgConf}% confident</span>
           ${judge.override ? '<span class="text-[10px] text-yellow-400 font-bold">· JUDGE OVERRODE</span>' : ""}
-        </div>
+        </div>`
+        }
 
-        <!-- Best arguments from each side -->
+        <!-- Best arguments from each side (only when there are cells) -->
         ${
           bestMaj
             ? `<div class="text-[12px] text-on-surface leading-relaxed mb-2">
@@ -1470,8 +1644,6 @@ function renderJury() {
     aggLine.dataset.aggregateFor = trib.decision_point_id;
     section.appendChild(aggLine);
 
-    // ---- Judge card in right panel ----
-    judgeRoot.appendChild(renderJudgeCard(trib, tribIdx, dp));
   });
 
   document.getElementById("jury-stat-tribunals").textContent =
@@ -1500,52 +1672,96 @@ const PERSONA_INFO = {
   adapter: { name: "Flexibility", value: "flexibility", color: "#facc15" },
 };
 
-function personaPill(personaId) {
-  const info = PERSONA_INFO[personaId] || {
-    name: personaId,
-    value: "?",
-    color: "#919094",
-  };
-  // Name is the value (e.g., "Velocity"); a colored dot reinforces it.
-  return `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 border rounded-sm"
-                style="color:${info.color};border-color:${info.color};background:${info.color}14;"
-                title="${escapeHtml(info.name)} — only cares about ${escapeHtml(info.value)}, indifferent to the other 5 values.">
-            <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:${info.color}"></span>
-            <span class="font-code-sm text-[11px] font-bold">${escapeHtml(info.name)}</span>
-          </span>`;
-}
+// Per-persona hover blurbs for the AI Jury header avatars. Kept in sync
+// with personas.yaml on the backend — each persona cares about exactly one
+// value and is indifferent to the other five.
+const JURY_DEBATERS = [
+  { id: "simplifier", code: "Si", name: "Simplicity", color: "#a78bfa",
+    blurb: "Cares about less indirection and fewer abstractions. " +
+           "Dead code, one-implementation wrappers, and unused config knobs " +
+           "anger them. Indifferent to shipping speed or flexibility." },
+  { id: "shipper", code: "Ve", name: "Velocity", color: "#fb923c",
+    blurb: "Cares about PR cycle time and how fast a contributor can land " +
+           "a change. Refactors with high cost and unclear payoff anger them. " +
+           "Indifferent to long-term maintainability." },
+  { id: "maintainer", code: "Ma", name: "Maintainability", color: "#5dd6ff",
+    blurb: "Cares about ramp cost for the next contributor and the blast " +
+           "radius of any single change. Cleverness that requires tribal " +
+           "knowledge angers them. Indifferent to raw shipping speed." },
+  { id: "verifier", code: "Co", name: "Correctness", color: "#4ade80",
+    blurb: "Cares about exhaustive coverage and defensive validation at " +
+           "boundaries. Cyclomatic complexity in boundary code angers them. " +
+           "Indifferent to whether the code is the simplest possible." },
+  { id: "scaler", code: "Sc", name: "Scalability", color: "#f472b6",
+    blurb: "Cares about surviving 10× growth in load, team, and surface " +
+           "area. Coupling that prevents independent deployment angers them. " +
+           "Indifferent to minimalism or short-term shipping cost." },
+  { id: "adapter", code: "Fl", name: "Flexibility", color: "#facc15",
+    blurb: "Cares about modules that can be lifted out cleanly when " +
+           "requirements change. High efferent coupling and stable-on-" +
+           "unstable dependencies anger them. Indifferent to raw simplicity." },
+];
 
+function renderJuryDebaters() {
+  const root = document.getElementById("jury-debaters");
+  if (!root) return;
+  // Fixed-width grid → constant column width regardless of label length,
+  // and constant inter-column gap. All 6 personas are statically lit here;
+  // the dynamic "highlight the 2 currently debating" behavior happens in
+  // the live audit modal's renderPersonasRow, where it tracks cell_start.
+  root.innerHTML = "";
+  root.className = "mt-5 grid grid-cols-6 gap-3 max-w-2xl";
+  const n = JURY_DEBATERS.length;
+  for (let i = 0; i < n; i++) {
+    const d = JURY_DEBATERS[i];
+    // Anchor the popover so it stays inside the section's overflow-hidden
+    // bounds: first cell → anchor left (extends right), last cell → anchor
+    // right (extends left), middle cells → centered.
+    const anchor =
+      i === 0 ? "left-0" :
+      i === n - 1 ? "right-0" :
+      "left-1/2 -translate-x-1/2";
+    const cell = document.createElement("div");
+    cell.className =
+      "group relative flex flex-col items-center gap-1.5 cursor-help";
+    cell.innerHTML = `
+      <div class="flex items-center justify-center
+                  font-code-md font-bold text-[13px] border-2 transition-transform
+                  group-hover:scale-110"
+           style="width:44px;height:44px;border-radius:9999px;
+                  background:${d.color};border-color:${d.color};
+                  color:#0a0a0b;box-shadow:0 0 10px ${d.color}55">
+        ${d.code}
+      </div>
+      <div class="font-label-caps text-[9px] tracking-wider text-center leading-tight"
+           style="color:${d.color}">
+        ${d.name}
+      </div>
 
-function renderJudgeCard(trib, tribIdx, dp) {
-  const judge = trib.judge || {};
-  const v = String(judge.verdict || "—").toUpperCase();
-  const vKey = v.replace(/ /g, "-");
-  const verdictExplainer = VERDICT_PLAIN[v] || "";
-
-  const card = document.createElement("div");
-  card.className = `bg-surface-container-low border border-outline-variant p-4`;
-  card.innerHTML = `
-    <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
-      <span class="font-label-caps text-[10px] text-on-tertiary-container">FINDING ${tribIdx + 1}${judge.override ? " · JUDGE OVERRODE THE PAIRS" : ""}</span>
-      <span class="font-code-sm font-bold verdict-${vKey} verdict-bg-${vKey} px-2 py-0.5"
-            title="${escapeHtml(verdictExplainer)}">${escapeHtml(v)}</span>
-    </div>
-    <div class="font-code-sm text-on-surface-variant text-[10px] mb-3 truncate" title="${escapeHtml(dp?.subject || "")}">${escapeHtml(dp?.subject || trib.decision_point_id)}</div>
-    ${verdictExplainer ? `<div class="text-[11px] text-on-surface-variant opacity-70 mb-3 leading-snug">${escapeHtml(verdictExplainer)}</div>` : ""}
-    <div class="font-body-md text-on-surface leading-relaxed text-[13px]">
-      <div class="font-label-caps text-[9px] text-on-tertiary-container mb-1">REASONING</div>
-      <div class="whitespace-pre-line">${escapeHtml(judge.reasoning || "(no reasoning)")}</div>
-    </div>
-    ${
-      judge.dissent_summary
-        ? `
-      <div class="mt-3 pt-3 border-t border-outline-variant/30">
-        <div class="font-label-caps text-[9px] text-on-tertiary-container mb-1">STRONGEST DISSENT (the losing side's best point)</div>
-        <div class="font-code-sm text-on-surface-variant text-[11px] italic whitespace-pre-line">${escapeHtml(judge.dissent_summary)}</div>
-      </div>`
-        : ""
-    }`;
-  return card;
+      <!-- Hover popover. left-/right- anchor adapts to position so the
+           leftmost and rightmost cards don't get clipped by section overflow. -->
+      <div class="absolute top-full mt-2 ${anchor} w-64 z-30
+                  bg-surface-container-high border border-outline-variant
+                  p-3 shadow-2xl
+                  opacity-0 group-hover:opacity-100
+                  pointer-events-none transition-opacity duration-150">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex items-center justify-center
+                      font-code-md font-bold text-[10px]"
+               style="width:24px;height:24px;border-radius:9999px;
+                      background:${d.color};color:#0a0a0b">${d.code}</div>
+          <div class="font-label-caps text-[10px] tracking-widest"
+               style="color:${d.color}">
+            ${d.name.toUpperCase()}
+          </div>
+        </div>
+        <div class="text-[11px] text-on-surface-variant leading-snug">
+          ${d.blurb}
+        </div>
+      </div>
+    `;
+    root.appendChild(cell);
+  }
 }
 
 function renderJuryAggregates() {
@@ -1593,162 +1809,151 @@ function renderJuryAggregates() {
 // =====================================================================
 
 function renderBriefing() {
-  // Tone switcher
-  const toneRoot = document.getElementById("brief-tones");
-  toneRoot.innerHTML = "";
-  for (const [key, p] of Object.entries(PRESETS)) {
-    const b = document.createElement("button");
-    b.className = "tone-btn" + (key === state.activePreset ? " active" : "");
-    b.dataset.preset = key;
-    b.textContent = p.label;
-    b.addEventListener("click", () => applyPreset(key));
-    toneRoot.appendChild(b);
-  }
-
-  renderBriefingSummary();
   renderBriefingBody();
-  renderBriefingVerbatims();
 
   const stamp = new Date().toISOString().replace("T", " ").slice(0, 19);
   document.getElementById("brief-report-id").textContent =
-    `REPORT_ID: ${state.activeSlug.toUpperCase()}-${state.evidence.commit_sha?.slice(0, 6) || "—"}`;
+    `REPORT_ID: ${(state.activeSlug || "").toUpperCase()}-${state.evidence.commit_sha?.slice(0, 6) || "—"}`;
   document.getElementById("brief-words").textContent =
     `${state.reportMd ? state.reportMd.trim().split(/\s+/).length : 0} WORDS`;
   document.getElementById("brief-stamp").textContent = stamp;
+  // Total audit wall-clock from metrics.json (written by cli.py once the
+  // full pipeline finishes). Format as "Nm SSs" or "SSs" if <1 min.
+  const durEl = document.getElementById("brief-duration");
+  if (durEl) {
+    const dur = state.metrics?.audit_duration_s;
+    if (typeof dur === "number" && dur > 0) {
+      const m = Math.floor(dur / 60);
+      const s = Math.round(dur % 60);
+      durEl.textContent = `RAN IN ${m > 0 ? `${m}m ${String(s).padStart(2, "0")}s` : `${s}s`}`;
+    } else {
+      durEl.textContent = "";
+    }
+  }
   document.getElementById("brief-watermark-stamp").textContent =
     `GEN_STAMP: ${stamp}`;
   document.getElementById("brief-watermark-sig").textContent =
     `SIGNATURE: ${(state.evidence.commit_sha || "00000000").slice(0, 8)}…`;
 }
 
-function renderBriefingSummary() {
-  // Counts of verdicts in current cache (rule: verdict text never changes
-  // with sliders; only the re-projected aggregate winner can hypothetically
-  // shift — counts here always reflect the literal judge output).
-  const verdictCounts = {};
-  for (const t of state.verdicts) {
-    const v = t.judge?.verdict || "—";
-    verdictCounts[v] = (verdictCounts[v] || 0) + 1;
-  }
-  const critical = verdictCounts["CRITICAL"] || 0;
-  const debt = verdictCounts["STRUCTURAL DEBT"] || 0;
-  const just = verdictCounts["JUSTIFIED VIOLATION"] || 0;
+// Lightweight DOM-level enhancer: walks every paragraph in the rendered
+// briefing and wraps a few scanability signals — file paths with line
+// ranges, finding/cell references, metric assertions, and standalone
+// numbers — so the eye lands on the load-bearing parts of each
+// paragraph without reading every word.
+//
+// We operate on actual TEXT NODES so we never touch text inside <code>,
+// <a>, or <strong> children. That avoids accidentally re-tagging spans
+// the markdown renderer already styled.
+function enhanceBriefingHTML(root) {
+  const PATTERNS = [
+    // Path with optional line ref: fastapi/_compat/__init__.py:1-40
+    {
+      re: /\b([\w-]+(?:\/[\w.-]+)+\.(?:py|c|h|hpp|cpp|js|ts|tsx|jsx|go|rs|json|yaml|md))(?::(\d+(?:-\d+)?))?\b/g,
+      wrap: (m, path, lines) =>
+        `<span class="brief-path">${path}${lines ? `:${lines}` : ""}</span>`,
+    },
+    // Finding / cell references — "Finding #3", "#3", "cell 7"
+    {
+      re: /\b(Findings?\s+#?\d+|#\d+|cells?\s+\d+)\b/g,
+      wrap: (m) => `<span class="brief-ref">${m}</span>`,
+    },
+    // Metric assertion — "blast_radius=1.0", "LCOM > 0.7", "CC > 15"
+    {
+      re: /\b([a-z][a-z_]{2,})\s*([=≥≤<>])\s*([\d.]+)\b/g,
+      wrap: (m, k, op, v) =>
+        `<span class="brief-metric">${k}${op}${v}</span>`,
+    },
+    // Plain hyphenated counts like "18-module", "50-LOC", "2-turn"
+    {
+      re: /\b(\d+(?:[.,]\d+)?)-([a-z]+)\b/g,
+      wrap: (m, num, word) =>
+        `<span class="brief-num">${num}-${word}</span>`,
+    },
+  ];
 
-  // Confidence avg (mean of all cell confidences across all tribunals)
-  let confSum = 0,
-    confN = 0;
-  for (const t of state.verdicts) {
-    for (const c of t.cells || []) {
-      confSum += c.confidence || 0;
-      confN += 1;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      // Skip text inside elements where re-styling would corrupt formatting
+      // or duplicate styling (code blocks, links, existing chips).
+      const skip = new Set([
+        "CODE", "PRE", "A", "STRONG", "SPAN",
+      ]);
+      for (let p = node.parentElement; p; p = p.parentElement) {
+        if (skip.has(p.tagName)) return NodeFilter.FILTER_REJECT;
+      }
+      return node.nodeValue.trim().length
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_REJECT;
+    },
+  });
+  const targets = [];
+  while (walker.nextNode()) targets.push(walker.currentNode);
+
+  for (const node of targets) {
+    let html = node.nodeValue
+      // Escape HTML entities first since we're emitting raw HTML strings.
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    for (const { re, wrap } of PATTERNS) {
+      html = html.replace(re, wrap);
+    }
+    if (html !== node.nodeValue) {
+      const span = document.createElement("span");
+      span.innerHTML = html;
+      node.parentNode.replaceChild(span, node);
     }
   }
-  const meanConf = confN ? confSum / confN : 0;
 
-  document.getElementById("brief-summary").innerHTML = `
-    <div class="bg-surface-container border border-outline-variant p-6" style="border-top:2px solid #ef4444"
-         title="Verdicts marked CRITICAL by the judge — actively causing or about to cause production impact.">
-      <div class="flex items-center justify-between mb-2">
-        <span class="font-label-caps text-label-caps text-[#ef4444]">CRITICAL</span>
-        <span class="material-symbols-outlined text-[#ef4444]">dangerous</span>
-      </div>
-      <div class="text-4xl font-headline-lg text-on-surface">${String(critical).padStart(2, "0")}</div>
-      <p class="text-[11px] text-on-surface-variant opacity-70 mt-2 leading-snug">
-        Urgent — refactor right away
-      </p>
-      <div class="mt-3 h-1 bg-surface-container-highest">
-        <div class="h-full bg-[#ef4444]" style="width:${Math.min(100, critical * 50)}%"></div>
-      </div>
-    </div>
-    <div class="bg-surface-container border border-outline-variant p-6" style="border-top:2px solid #fb923c"
-         title="Verdicts marked STRUCTURAL DEBT — real cost, refactor warranted but not urgent.">
-      <div class="flex items-center justify-between mb-2">
-        <span class="font-label-caps text-label-caps text-[#fb923c]">STRUCTURAL DEBT</span>
-        <span class="material-symbols-outlined text-[#fb923c]">warning</span>
-      </div>
-      <div class="text-4xl font-headline-lg text-on-surface">${String(debt).padStart(2, "0")}</div>
-      <p class="text-[11px] text-on-surface-variant opacity-70 mt-2 leading-snug">
-        Real debt — refactor on the roadmap
-      </p>
-      <div class="mt-3 h-1 bg-surface-container-highest">
-        <div class="h-full bg-[#fb923c]" style="width:${Math.min(100, debt * 25)}%"></div>
-      </div>
-      ${just ? `<p class="text-[10px] text-on-surface-variant mt-2 opacity-70">+${just} JUSTIFIED VIOLATION (judge says leave it alone)</p>` : ""}
-    </div>
-    <div class="bg-surface-container border border-outline-variant p-6" style="border-top:2px solid #c8c6c7"
-         title="Average confidence across all ${confN} cell votes. High = the panel was decisive.">
-      <div class="flex items-center justify-between mb-2">
-        <span class="font-label-caps text-label-caps text-primary">PANEL CONFIDENCE</span>
-        <span class="material-symbols-outlined text-primary">bolt</span>
-      </div>
-      <div class="text-4xl font-headline-lg text-on-surface">${(meanConf * 100).toFixed(0)}%</div>
-      <p class="text-[11px] text-on-surface-variant opacity-70 mt-2 leading-snug">
-        Average over ${confN} cell votes across ${state.verdicts.length} finding${state.verdicts.length === 1 ? "" : "s"}
-      </p>
-      <div class="mt-3 h-1 bg-surface-container-highest">
-        <div class="h-full bg-primary" style="width:${meanConf * 100}%"></div>
-      </div>
-    </div>`;
+  // Mark the very first paragraph as the "lead" so CSS can give it
+  // typographic prominence — this is the "if you only read one paragraph"
+  // line that the new Opus prompt is told to write.
+  const firstP = root.querySelector(":scope > p");
+  if (firstP) firstP.classList.add("brief-lead");
 }
 
 function renderBriefingBody() {
   if (!window.marked) return;
   marked.setOptions({ breaks: false, gfm: true });
-  let html = marked.parse(state.reportMd || "_(no Layer-3 briefing on disk)_");
-  // Wrap literal verdict labels in colored chips.
+  // Strip the values-tone framing the Opus report writer appends to the H1
+  // title ("— A Velocity and Simplicity Briefing", "— A Correctness
+  // Briefing", etc.). These were generated when the UI exposed a tone
+  // selector; that selector is gone, so the title shouldn't claim a tone.
+  let md = (state.reportMd || "_(no Layer-3 briefing on disk)_");
+  md = md.replace(
+    /^(#\s+.+?)\s*[—–-]\s*A\s+[A-Z][A-Za-z]+(?:\s+and\s+[A-Z][A-Za-z]+)?\s+Briefing\s*$/m,
+    "$1",
+  );
+  let html = marked.parse(md);
+  // Wrap literal verdict labels in colored chips. The verdict label is
+  // a captured regex group restricted to /[A-Z][A-Z ]+[A-Z]/, so no
+  // injection surface here.
   html = html.replace(
     /<strong>\s*Verdict:\s*([A-Z][A-Z ]+[A-Z])\s*<\/strong>/g,
     (_, v) => {
       const plain = VERDICT_PLAIN[v] || "";
-      return `<span class="verdict-tag verdict-${v.replace(/ /g, "-")} verdict-bg-${v.replace(/ /g, "-")}" title="${plain.replace(/"/g, "&quot;")}">${v}</span>`;
+      const cls = v.replace(/ /g, "-");
+      return `<span class="verdict-tag verdict-${cls} verdict-bg-${cls}" title="${escapeHtml(plain)}">${escapeHtml(v)}</span>`;
     },
   );
-  document.getElementById("brief-markdown").innerHTML = html;
-}
-
-function renderBriefingVerbatims() {
-  const root = document.getElementById("brief-verbatims");
-  if (!state.verdicts.length) {
-    root.innerHTML = "";
-    return;
+  // Sanitize before injecting: report.md is LLM-generated and could
+  // theoretically contain raw <script> or <img onerror>. Prefer DOMPurify
+  // if it's loaded; otherwise fall back to a conservative tag stripper.
+  if (window.DOMPurify) {
+    html = window.DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+  } else {
+    // Last-resort: strip <script>/<iframe>/<object>/<embed> and inline
+    // event handlers. Not as thorough as DOMPurify but blocks the obvious.
+    html = html
+      .replace(/<\/?(script|iframe|object|embed|link|meta)\b[^>]*>/gi, "")
+      .replace(/\son\w+\s*=\s*"[^"]*"/gi, "")
+      .replace(/\son\w+\s*=\s*'[^']*'/gi, "")
+      .replace(/\son\w+\s*=\s*[^\s>]+/gi, "");
   }
-  root.innerHTML = `
-    <h3 class="font-headline-sm text-headline-sm text-primary uppercase tracking-widest flex items-center gap-2 mt-4">
-      <span class="w-4 h-[2px] bg-primary"></span> What the judge actually recommended
-    </h3>
-    <p class="text-[12px] text-on-surface-variant opacity-70 mt-1 mb-4 leading-snug">
-      The judge model wrote one specific next step per finding — quoted exactly as it appeared.
-    </p>`;
-  state.verdicts.forEach((trib, idx) => {
-    const judge = trib.judge || {};
-    const v = String(judge.verdict || "—").toUpperCase();
-    const vKey = v.replace(/ /g, "-");
-    const dp = state.dpById[trib.decision_point_id];
-    const block = document.createElement("div");
-    block.className = "bg-surface-container-low p-6 my-4";
-    block.style.borderLeft = "4px solid";
-    block.style.borderLeftColor =
-      {
-        HEALTHY: "#4ade80",
-        "JUSTIFIED VIOLATION": "#facc15",
-        "STRUCTURAL DEBT": "#fb923c",
-        CRITICAL: "#ef4444",
-        DRIFTED: "#c084fc",
-        CONTESTED: "#67e8f9",
-      }[v] || "#c8c6c7";
-    const plain = VERDICT_PLAIN[v] || "";
-    block.innerHTML = `
-      <div class="flex items-center gap-2 mb-2 flex-wrap">
-        <span class="font-label-caps text-label-caps verdict-bg-${vKey} verdict-${vKey} px-2 py-1"
-              title="${escapeHtml(plain)}">${escapeHtml(v)}</span>
-        ${judge.override ? `<span class="font-label-caps text-[10px] text-yellow-400 bg-yellow-900/20 px-2 py-1" title="Judge overrode the panel majority on this finding.">OVERRIDE</span>` : ""}
-        <span class="text-on-surface-variant font-code-sm">DP ${idx + 1}/${state.verdicts.length} · ${escapeHtml(trib.decision_point_id)}</span>
-      </div>
-      ${plain ? `<div class="text-[11px] text-on-surface-variant opacity-70 mb-3 leading-snug">${escapeHtml(plain)}</div>` : ""}
-      <div class="font-code-sm text-on-surface-variant text-[11px] mb-3">${escapeHtml(dp?.subject || "(no subject)")}</div>
-      <blockquote class="m-0 border-none p-0 text-on-surface italic font-code-md leading-relaxed whitespace-pre-line">${escapeHtml(judge.recommended_action || "(no recommended action)")}</blockquote>`;
-    root.appendChild(block);
-  });
+  const root = document.getElementById("brief-markdown");
+  root.innerHTML = html;
+  enhanceBriefingHTML(root);
 }
 
 // =====================================================================
@@ -1829,10 +2034,19 @@ async function detectLiveMode() {
     if (rerun) {
       rerun.disabled = false;
       rerun.classList.remove("opacity-50", "cursor-not-allowed");
-      rerun.title = "Re-run an audit on the active repo (opens the New Audit modal pre-filled).";
+      rerun.title =
+        "Re-run the active audit (click twice to confirm — overwrites the same slug).";
     }
+    // Landing CTA hint switches from "configure backend" to "submit any repo".
+    const hint = document.getElementById("btn-landing-new-audit-hint");
+    if (hint) hint.textContent = "Submit any public git repo.";
   } catch {
-    /* unreachable backend — leave button hidden */
+    // No backend reachable. Tell landing visitors how to enable live mode.
+    const hint = document.getElementById("btn-landing-new-audit-hint");
+    if (hint) {
+      hint.innerHTML =
+        'Static demo mode — <span class="text-primary">configure a live backend</span> to submit audits.';
+    }
   }
 }
 
@@ -1943,7 +2157,6 @@ function wireAuditModal() {
   const liveText = document.getElementById("audit-live-text");
   const liveSpeaker = document.getElementById("audit-live-speaker");
   const liveTurnLabel = document.getElementById("audit-live-turn-label");
-  const liveCellTag = document.getElementById("audit-live-cell-tag");
   const liveDp = document.getElementById("audit-live-dp");
   const liveSidePill = document.getElementById("audit-live-side-pill");
   const cellsStrip = document.getElementById("audit-cells-strip");
@@ -1953,8 +2166,34 @@ function wireAuditModal() {
   const tribunalsCount = document.getElementById("audit-tribunals-count");
   const statusDot = document.getElementById("audit-status-dot");
   const statusLabel = document.getElementById("audit-status-label");
-  const activeMeta = document.getElementById("audit-active-meta");
+  const elapsedEl = document.getElementById("audit-elapsed");
   if (!openBtn || !modal) return;
+
+  // Elapsed-time ticker. setInterval ID lives here so reset()/done can clear it.
+  let elapsedTimer = null;
+  let elapsedStart = 0;
+  const fmtElapsed = (s) => {
+    const m = Math.floor(s / 60);
+    const r = Math.floor(s % 60);
+    return m > 0 ? `${m}m ${String(r).padStart(2, "0")}s` : `${r}s`;
+  };
+  const startElapsed = () => {
+    if (elapsedTimer) clearInterval(elapsedTimer);
+    elapsedStart = performance.now();
+    if (elapsedEl) elapsedEl.textContent = "0s";
+    elapsedTimer = setInterval(() => {
+      if (!elapsedEl) return;
+      const secs = (performance.now() - elapsedStart) / 1000;
+      elapsedEl.textContent = fmtElapsed(secs);
+    }, 1000);
+  };
+  const stopElapsed = () => {
+    if (elapsedTimer) clearInterval(elapsedTimer);
+    elapsedTimer = null;
+    if (!elapsedEl || !elapsedStart) return;
+    const finalSecs = (performance.now() - elapsedStart) / 1000;
+    elapsedEl.textContent = `total ${fmtElapsed(finalSecs)}`;
+  };
 
   // Per-audit live state — reset on each open.
   //   tribunals: dpId → { subject, principle, status, cellsVoted, cellsFailed }
@@ -1979,14 +2218,14 @@ function wireAuditModal() {
     liveText.textContent = "";
     liveSpeaker.textContent = "—";
     liveTurnLabel.textContent = "OPEN";
-    liveCellTag.textContent = "—";
     liveDp.textContent = "";
     cellsStrip.innerHTML = "";
+    if (elapsedEl) elapsedEl.textContent = "";
+    if (elapsedTimer) { clearInterval(elapsedTimer); elapsedTimer = null; }
     if (personasRow) personasRow.innerHTML = "";
     if (tribunalsList) tribunalsList.innerHTML = "";
     if (tribunalsWrap) tribunalsWrap.classList.add("hidden");
     if (tribunalsCount) tribunalsCount.textContent = "";
-    activeMeta.textContent = "";
     statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
     statusLabel.textContent = "RUNNING";
     live.activeDp = null;
@@ -2070,7 +2309,7 @@ function wireAuditModal() {
         chip.type = "button";
         chip.className = [
           "flex items-center gap-2 px-2 py-1 border font-code-sm text-[10px]",
-          "transition-colors",
+          "max-w-[200px] min-w-0 transition-colors",
           isFocus
             ? "bg-primary/20 border-primary text-on-surface"
             : "bg-surface-container border-outline-variant text-on-surface-variant hover:bg-surface-container-high",
@@ -2085,6 +2324,7 @@ function wireAuditModal() {
         );
         dot.style.background = dotColor;
         const label = document.createElement("span");
+        label.className = "truncate min-w-0 flex-1";
         label.textContent =
           `${t.principle || "?"} · ${(t.subject || t.dpId).slice(0, 28)}`;
         const prog = document.createElement("span");
@@ -2135,8 +2375,14 @@ function wireAuditModal() {
 
       const circle = document.createElement("div");
       circle.className =
-        "w-9 h-9 rounded-full flex items-center justify-center " +
+        "flex items-center justify-center " +
         "font-code-sm text-[11px] font-bold border-2 transition-all";
+      // Inline border-radius because the site's Tailwind config aliases
+      // `rounded-full` to 12px (not 50%) — using a literal pixel value
+      // keeps these as actual circles.
+      circle.style.width = "36px";
+      circle.style.height = "36px";
+      circle.style.borderRadius = "9999px";
       if (isActive) {
         circle.style.background = info.color;
         circle.style.borderColor = info.color;
@@ -2272,8 +2518,6 @@ function wireAuditModal() {
         live.activeDp = dpId;
         live.activeCell = { red: cell.red, blue: cell.blue };
         liveDp.textContent = `${cell.principle || ""} · ${dpId}`;
-        liveCellTag.textContent = `cell ${cellId} · ${cell.red} vs ${cell.blue}`;
-        activeMeta.textContent = `${cell.principle || ""} · cell ${cellId}/15`;
         ensureLivePanel();
         bumpTribunal(dpId, "cellsTotal");
         renderPersonasRow();
@@ -2300,6 +2544,16 @@ function wireAuditModal() {
             ? "#ef4444"
             : "#4ade80";
         liveSidePill.style.borderColor = liveSidePill.style.color;
+        // Re-anchor the personas row to whichever cell is producing the
+        // tokens we're showing right now. Without this, the row sticks on
+        // whichever cell most recently fired cell_start — which, with cells
+        // running concurrently, is rarely the cell whose text is in front
+        // of the user. cell.red/cell.blue come from the per-cell context
+        // the backend stamps on every emitted event.
+        if (cell.red && cell.blue) {
+          live.activeCell = { red: cell.red, blue: cell.blue };
+          renderPersonasRow();
+        }
         break;
 
       case "token":
@@ -2336,10 +2590,15 @@ function wireAuditModal() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
+    const isRerun = form.dataset.rerun === "yes";
+    // Clear the marker immediately so any subsequent manual submit defaults
+    // back to "new audit, don't overwrite".
+    form.dataset.rerun = "";
     const body = {
       repo_url: fd.get("repo_url"),
       slug: fd.get("slug")?.trim() || undefined,
       language: fd.get("language") || "auto",
+      overwrite: isRerun,
     };
 
     let res;
@@ -2385,6 +2644,7 @@ function wireAuditModal() {
 
     form.classList.add("hidden");
     logWrap.classList.remove("hidden");
+    startElapsed();
 
     const sse = apiEventSource(`/api/audits/${job_id}/stream`);
     sse.addEventListener("log", (e) => {
@@ -2401,6 +2661,7 @@ function wireAuditModal() {
     sse.addEventListener("done", async (e) => {
       const info = JSON.parse(e.data);
       sse.close();
+      stopElapsed();
       const ok = info.status === "completed";
       statusDot.className = `w-2 h-2 rounded-full ${ok ? "bg-emerald-500" : "bg-red-500"}`;
       statusLabel.textContent = ok
@@ -2409,6 +2670,11 @@ function wireAuditModal() {
       // Clear the running-slug so subsequent clicks of "New Audit" open a
       // fresh form instead of landing back on this finished run's progress.
       currentRunningSlug = null;
+      // Clear the active-cell highlight so the personas row stops glowing
+      // on the last-fired cell's pair (which would otherwise leave Si+Co
+      // — cell 14 — perpetually lit after every audit).
+      live.activeCell = { red: null, blue: null };
+      renderPersonasRow();
       if (ok) {
         const mres = await fetch("data/manifest.json", { cache: "no-store" });
         state.manifest = await mres.json();
@@ -2420,9 +2686,12 @@ function wireAuditModal() {
     sse.onerror = () => {
       statusDot.className = "w-2 h-2 rounded-full bg-red-500";
       statusLabel.textContent = "DISCONNECTED";
+      stopElapsed();
       // Treat a dropped SSE the same as a finished run — let the user
       // start a fresh audit instead of trapping them in the dead modal.
       currentRunningSlug = null;
+      live.activeCell = { red: null, blue: null };
+      renderPersonasRow();
     };
   });
 }

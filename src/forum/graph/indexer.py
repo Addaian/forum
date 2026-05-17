@@ -13,6 +13,11 @@ from .resolver import resolve_edges
 
 log = logging.getLogger("forum.graph")
 
+# Bump when parser output schema or extraction logic changes so stale caches
+# from a prior version are silently invalidated rather than returning wrong
+# graphs.
+CACHE_VERSION = 2
+
 
 def index_repo(repo_root: Path, cache_path: Path | None = None,
                max_workers: int | None = None) -> KnowledgeGraph:
@@ -34,15 +39,21 @@ def index_repo(repo_root: Path, cache_path: Path | None = None,
     files_to_parse: set[str]
 
     if cache_path and cache_path.exists():
-        graph, old_tree = _load_cache(cache_path)
-        added, modified, removed = old_tree.diff(current_tree)
-        files_to_parse = added | modified
+        loaded = _load_cache(cache_path)
+        if loaded is None:
+            log.info("Cache version mismatch — rebuilding from scratch.")
+            graph = KnowledgeGraph()
+            files_to_parse = set(current_tree.file_hashes.keys())
+        else:
+            graph, old_tree = loaded
+            added, modified, removed = old_tree.diff(current_tree)
+            files_to_parse = added | modified
 
-        # Remove stale files from graph
-        for f in removed:
-            graph.remove_file(f)
-        log.info("Incremental: +%d added, ~%d modified, -%d removed",
-                 len(added), len(modified), len(removed))
+            # Remove stale files from graph
+            for f in removed:
+                graph.remove_file(f)
+            log.info("Incremental: +%d added, ~%d modified, -%d removed",
+                     len(added), len(modified), len(removed))
     else:
         graph = KnowledgeGraph()
         files_to_parse = set(current_tree.file_hashes.keys())
@@ -110,8 +121,8 @@ def _parse_single_file(repo_root: Path, rel_path: str) -> FileGraph:
     language = EXTENSION_MAP.get(ext, Language.UNKNOWN)
 
     try:
-        source = abs_path.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError) as e:
+        source = abs_path.read_text(encoding="utf-8", errors="replace")
+    except OSError as e:
         return FileGraph(path=rel_path, language=language,
                          content_hash="", errors=[str(e)])
 
@@ -129,10 +140,15 @@ def _parse_single_file(repo_root: Path, rel_path: str) -> FileGraph:
         return parse_generic_file(abs_path, rel_path, source, language)
 
 
-def _load_cache(cache_path: Path) -> tuple[KnowledgeGraph, MerkleTree]:
-    """Load cached graph and Merkle tree."""
+def _load_cache(cache_path: Path) -> tuple[KnowledgeGraph, MerkleTree] | None:
+    """Load cached graph and Merkle tree, or None if the cache is stale."""
     import json
-    data = json.loads(cache_path.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(cache_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+    if data.get("cache_version") != CACHE_VERSION:
+        return None
     graph = KnowledgeGraph.from_dict(data["graph"])
     tree = MerkleTree(
         file_hashes=data.get("file_hashes", {}),
@@ -147,6 +163,7 @@ def _save_cache(cache_path: Path, graph: KnowledgeGraph, tree: MerkleTree) -> No
     import json
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     data = {
+        "cache_version": CACHE_VERSION,
         "graph": graph.to_dict(),
         "file_hashes": tree.file_hashes,
         "dir_hashes": tree.dir_hashes,

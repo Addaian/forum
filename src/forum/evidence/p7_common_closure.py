@@ -1,12 +1,16 @@
-"""P7 — Common Closure. Flag cross-package co-changes (≥5 in last 12 months).
+"""P7 — Common Closure. Flag cross-package co-changes (≥5 in last 6 months).
 
 Files that change together belong together (Martin's CCP). When edits in
 package A repeatedly co-occur with edits in package B in the same commit,
 the package boundary may be misaligned with the actual reason-to-change.
 
-Implementation: walk commits in the last 365 days; for each commit, collect
+Implementation: walk commits in the last 180 days; for each commit, collect
 the set of top-level packages it touched; for every pair of distinct
 packages, increment a co-change counter. Pairs ≥ 5 surface as decisions.
+
+Was 365 days, dropped to 180 to halve the git-history walk time. Most
+real co-change patterns repeat within a quarter; a year-wide window
+mostly inflates the count without changing which pairs surface.
 """
 from __future__ import annotations
 
@@ -20,7 +24,7 @@ from .languages import Language
 from .utils import RepoIndex, rel_path, stable_id
 
 CO_CHANGE_THRESHOLD = 5
-DAYS = 365
+DAYS = 180
 MAX_DECISIONS = 5
 
 
@@ -81,8 +85,19 @@ def check(index: RepoIndex, language: Language | None = None) -> list[DecisionPo
         b_pkg = next((p for p in index.packages if p.name == b), None)
         if a_pkg is None or b_pkg is None:
             continue
-        a_init = a_pkg.root / "__init__.py"
-        b_init = b_pkg.root / "__init__.py"
+        # Prefer the package's __init__.py if it actually exists (Python),
+        # otherwise point at any real file in the package — C packages don't
+        # have __init__.py, and PEP-420 namespace packages don't either.
+        def _pkg_anchor(pkg) -> Path:
+            init = pkg.root / "__init__.py"
+            if init.exists():
+                return init
+            for cand in sorted(pkg.root.rglob("*")):
+                if cand.is_file():
+                    return cand
+            return pkg.root
+        a_init = _pkg_anchor(a_pkg)
+        b_init = _pkg_anchor(b_pkg)
         decisions.append(DecisionPoint(
             id=stable_id("P7", a, b),
             principle="P7",

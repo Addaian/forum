@@ -65,8 +65,10 @@ def build_merkle_tree(repo_root: Path, ignore_patterns: set[str] | None = None) 
             if d not in SKIP_DIRS and not d.startswith(".") and d not in ignore
         ]
 
-        rel_dir = os.path.relpath(dirpath, repo_root)
-        child_hashes: list[str] = []
+        # Normalize separators so downstream code (which assumes POSIX) and
+        # cache keys stay stable across OSes.
+        rel_dir = Path(os.path.relpath(dirpath, repo_root)).as_posix()
+        child_entries: list[str] = []
 
         for fname in sorted(filenames):
             ext = os.path.splitext(fname)[1].lower()
@@ -74,19 +76,22 @@ def build_merkle_tree(repo_root: Path, ignore_patterns: set[str] | None = None) 
                 continue
 
             fpath = Path(dirpath) / fname
-            rel_path = os.path.relpath(fpath, repo_root)
+            rel_path = Path(os.path.relpath(fpath, repo_root)).as_posix()
 
             fhash = hash_file(fpath)
             if fhash:
                 tree.file_hashes[rel_path] = fhash
-                child_hashes.append(fhash)
+                # Include the path in the per-file contribution so a pure
+                # rename (same content, different name) changes the hash.
+                child_entries.append(f"{rel_path}:{fhash}")
 
-        if child_hashes:
-            dir_hash = hashlib.sha256("".join(child_hashes).encode()).hexdigest()[:16]
+        if child_entries:
+            dir_hash = hashlib.sha256("\n".join(child_entries).encode()).hexdigest()[:16]
             tree.dir_hashes[rel_dir] = dir_hash
 
-    # Root hash = hash of all file hashes sorted
-    all_hashes = sorted(tree.file_hashes.values())
-    tree.root_hash = hashlib.sha256("".join(all_hashes).encode()).hexdigest()[:16]
+    # Root hash = hash of every (path, hash) pair in sorted path order, so
+    # renames flip the root even when content is unchanged.
+    sorted_entries = sorted(f"{p}:{h}" for p, h in tree.file_hashes.items())
+    tree.root_hash = hashlib.sha256("\n".join(sorted_entries).encode()).hexdigest()[:16]
 
     return tree

@@ -1,0 +1,2461 @@
+{
+  "repo": "/private/var/folders/zd/s7jl32v96ys2vvr589y26gqr0000gn/T/forum-praisonai-ahvnosha/repo",
+  "commit_sha": "92644518c068182a27e6cd4975920ae5119f276e",
+  "decision_points": [
+    {
+      "id": "0e4ffadfb7",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/__init__.py",
+          "line_start": 1,
+          "line_end": 191,
+          "module": "praisonai"
+        },
+        {
+          "file": "src/praisonai/praisonai/__main__.py",
+          "line_start": 1,
+          "line_end": 190,
+          "module": "praisonai.__main__"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/__init__.py",
+          "line_start": 1,
+          "line_end": 28,
+          "module": "praisonai.cli"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/app.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.app"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/branding.py",
+          "line_start": 1,
+          "line_end": 94,
+          "module": "praisonai.cli.branding"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/__init__.py",
+          "line_start": 1,
+          "line_end": 107,
+          "module": "praisonai.cli.commands"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/agents.py",
+          "line_start": 1,
+          "line_end": 80,
+          "module": "praisonai.cli.commands.agents"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/call.py",
+          "line_start": 1,
+          "line_end": 45,
+          "module": "praisonai.cli.commands.call"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/chat.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.chat"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/code.py",
+          "line_start": 1,
+          "line_end": 156,
+          "module": "praisonai.cli.commands.code"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/commit.py",
+          "line_start": 1,
+          "line_end": 47,
+          "module": "praisonai.cli.commands.commit"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/context.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.context"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/deploy.py",
+          "line_start": 1,
+          "line_end": 109,
+          "module": "praisonai.cli.commands.deploy"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/docs.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.docs"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/doctor.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.doctor"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/endpoints.py",
+          "line_start": 1,
+          "line_end": 51,
+          "module": "praisonai.cli.commands.endpoints"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/environment.py",
+          "line_start": 1,
+          "line_end": 179,
+          "module": "praisonai.cli.commands.environment"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/eval.py",
+          "line_start": 1,
+          "line_end": 131,
+          "module": "praisonai.cli.commands.eval"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/github.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.github"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/hooks.py",
+          "line_start": 1,
+          "line_end": 74,
+          "module": "praisonai.cli.commands.hooks"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/langextract.py",
+          "line_start": 1,
+          "line_end": 120,
+          "module": "praisonai.cli.commands.langextract"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/managed.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.managed"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/memory.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.memory"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/package.py",
+          "line_start": 1,
+          "line_end": 76,
+          "module": "praisonai.cli.commands.package"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/recipe.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.recipe"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/registry.py",
+          "line_start": 1,
+          "line_end": 59,
+          "module": "praisonai.cli.commands.registry"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/research.py",
+          "line_start": 1,
+          "line_end": 49,
+          "module": "praisonai.cli.commands.research"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/rules.py",
+          "line_start": 1,
+          "line_end": 71,
+          "module": "praisonai.cli.commands.rules"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/run.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.run"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/schedule.py",
+          "line_start": 1,
+          "line_end": 195,
+          "module": "praisonai.cli.commands.schedule"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/serve.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.serve"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/skills.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.skills"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/templates.py",
+          "line_start": 1,
+          "line_end": 54,
+          "module": "praisonai.cli.commands.templates"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/todo.py",
+          "line_start": 1,
+          "line_end": 74,
+          "module": "praisonai.cli.commands.todo"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/train.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.commands.train"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/commands/workflow.py",
+          "line_start": 1,
+          "line_end": 97,
+          "module": "praisonai.cli.commands.workflow"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/agent_scheduler.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.agent_scheduler"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/doctor/__init__.py",
+          "line_start": 1,
+          "line_end": 63,
+          "module": "praisonai.cli.features.doctor"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/doctor/checks/__init__.py",
+          "line_start": 1,
+          "line_end": 25,
+          "module": "praisonai.cli.features.doctor.checks"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/doctor/checks/performance_checks.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.doctor.checks.performance_checks"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/doctor/checks/serve_checks.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.doctor.checks.serve_checks"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/doctor/handler.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.doctor.handler"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/recipe.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.recipe"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/recipe_optimizer.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.recipe_optimizer"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/serve.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.serve"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/interactive/async_tui.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.interactive.async_tui"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/main.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.main"
+        },
+        {
+          "file": "src/praisonai/praisonai/mcp_server/cli.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.mcp_server.cli"
+        },
+        {
+          "file": "src/praisonai/praisonai/mcp_server/recipe_adapter.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.mcp_server.recipe_adapter"
+        },
+        {
+          "file": "src/praisonai/praisonai/mcp_server/recipe_cli.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.mcp_server.recipe_cli"
+        },
+        {
+          "file": "src/praisonai/praisonai/recipe/__init__.py",
+          "line_start": 1,
+          "line_end": 134,
+          "module": "praisonai.recipe"
+        },
+        {
+          "file": "src/praisonai/praisonai/recipe/bridge.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.recipe.bridge"
+        },
+        {
+          "file": "src/praisonai/praisonai/recipe/core.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.recipe.core"
+        },
+        {
+          "file": "src/praisonai/praisonai/recipe/operations.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.recipe.operations"
+        },
+        {
+          "file": "src/praisonai/praisonai/recipe/security.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.recipe.security"
+        },
+        {
+          "file": "src/praisonai/praisonai/recipe/serve.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.recipe.serve"
+        },
+        {
+          "file": "src/praisonai/praisonai/scheduler/__init__.py",
+          "line_start": 1,
+          "line_end": 50,
+          "module": "praisonai.scheduler"
+        },
+        {
+          "file": "src/praisonai/praisonai/scheduler/agent_scheduler.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.scheduler.agent_scheduler"
+        }
+      ],
+      "subject": "Dependency cycle across 58 modules: praisonai \u2192 __main__ \u2192 cli \u2192 app\u2026",
+      "evidence": {
+        "scc_members": [
+          "praisonai",
+          "praisonai.__main__",
+          "praisonai.cli",
+          "praisonai.cli.app",
+          "praisonai.cli.branding",
+          "praisonai.cli.commands",
+          "praisonai.cli.commands.agents",
+          "praisonai.cli.commands.call",
+          "praisonai.cli.commands.chat",
+          "praisonai.cli.commands.code",
+          "praisonai.cli.commands.commit",
+          "praisonai.cli.commands.context",
+          "praisonai.cli.commands.deploy",
+          "praisonai.cli.commands.docs",
+          "praisonai.cli.commands.doctor",
+          "praisonai.cli.commands.endpoints",
+          "praisonai.cli.commands.environment",
+          "praisonai.cli.commands.eval",
+          "praisonai.cli.commands.github",
+          "praisonai.cli.commands.hooks",
+          "praisonai.cli.commands.langextract",
+          "praisonai.cli.commands.managed",
+          "praisonai.cli.commands.memory",
+          "praisonai.cli.commands.package",
+          "praisonai.cli.commands.recipe",
+          "praisonai.cli.commands.registry",
+          "praisonai.cli.commands.research",
+          "praisonai.cli.commands.rules",
+          "praisonai.cli.commands.run",
+          "praisonai.cli.commands.schedule",
+          "praisonai.cli.commands.serve",
+          "praisonai.cli.commands.skills",
+          "praisonai.cli.commands.templates",
+          "praisonai.cli.commands.todo",
+          "praisonai.cli.commands.train",
+          "praisonai.cli.commands.workflow",
+          "praisonai.cli.features.agent_scheduler",
+          "praisonai.cli.features.doctor",
+          "praisonai.cli.features.doctor.checks",
+          "praisonai.cli.features.doctor.checks.performance_checks",
+          "praisonai.cli.features.doctor.checks.serve_checks",
+          "praisonai.cli.features.doctor.handler",
+          "praisonai.cli.features.recipe",
+          "praisonai.cli.features.recipe_optimizer",
+          "praisonai.cli.features.serve",
+          "praisonai.cli.interactive.async_tui",
+          "praisonai.cli.main",
+          "praisonai.mcp_server.cli",
+          "praisonai.mcp_server.recipe_adapter",
+          "praisonai.mcp_server.recipe_cli",
+          "praisonai.recipe",
+          "praisonai.recipe.bridge",
+          "praisonai.recipe.core",
+          "praisonai.recipe.operations",
+          "praisonai.recipe.security",
+          "praisonai.recipe.serve",
+          "praisonai.scheduler",
+          "praisonai.scheduler.agent_scheduler"
+        ],
+        "scc_size": 58,
+        "cycle_edges": [
+          [
+            "praisonai.recipe.core",
+            "praisonai"
+          ],
+          [
+            "praisonai",
+            "praisonai.recipe.core"
+          ]
+        ],
+        "total_internal_edges_within_scc": 128
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai\nimport threading\n\n# Version is lightweight, import directly\nfrom .version import __version__\n\n# Define __all__ for lazy loading\n__all__ = [\n    'PraisonAI',\n    '__version__',\n    'Deploy',\n    'DeployConfig',\n    'DeployType',\n    'CloudProvider',\n    'AgentOS',  # Production deployment platform (v0.14.16+)\n    'AgentApp',  # Silent alias for AgentOS (backward compat)\n    'Agent',  # Wrapper Agent with CLI backend string resolution\n    'recipe',\n    'embed',\n    'embedding',\n    'DB',  # Short alias for PraisonAIDB \u2014 recommended for simplicity",
+        "# praisonai.__main__\n# __main__.py\n\"\"\"\nPraisonAI CLI \u2014 Unified Entry Point.\n\nSingle entry point for all CLI invocations.\nRoutes to Typer-based commands for known subcommands,\nfalls back to legacy argparse for direct prompts and YAML files.\n\nDesign:\n  - Typer-first: all registered commands auto-discovered via Click\n  - Legacy fallback: prompts, .yaml paths, and deprecated --flags\n  - No manual command lists needed \u2014 adding a Typer command Just Works\n\"\"\"\n\nimport sys\nimport threading\n\n\n# ---------------------------------------------------------------------------\n# Internal helpers",
+        "# praisonai.cli\n\"\"\"\nPraisonAI CLI Package\n\nThis package provides the command-line interface for PraisonAI.\n\nStructure:\n- ../.__main__.py: Unified CLI entry point (Typer-first, legacy fallback)\n- app.py: Typer app with all command registrations\n- main.py: Legacy argparse PraisonAI class (used for prompts/YAML)\n- commands/: Individual Typer command modules\n- features/: Feature handlers for CLI flags and commands\n\"\"\"\n\n__all__ = [\"PraisonAI\"]\n\n\ndef __getattr__(name):\n    \"\"\"Lazy load PraisonAI to avoid slow imports.\"\"\"\n    if name == \"PraisonAI\":\n        from .main import PraisonAI",
+        "# praisonai.cli.app\n\"\"\"\nPraisonAI CLI Typer Application.\n\nMain Typer app that registers all command groups and handles global options.\n\"\"\"\n\nfrom enum import Enum\nfrom typing import Optional\n\nimport typer\n\nfrom .output.console import OutputController, OutputMode, set_output_controller\nfrom .state.identifiers import create_context\n\n\ndef _setup_langfuse_observability(*, verbose: bool = False) -> None:\n    \"\"\"Set up Langfuse observability by wiring TraceSink to action emitter.\"\"\"\n    try:\n        from praisonai.observability.langfuse import LangfuseSink\n        from praisonaiagents.trace.protocol import TraceEmitter, set_default_emitter",
+        "# praisonai.cli.branding\n\"\"\"\nPraisonAI Branding - Single Source of Truth.\n\nThis module provides unified branding assets (logo, version, product name)\nfor all interactive UIs. All frontends should import from here.\n\nUsage:\n    from praisonai.cli.branding import get_logo, get_version, PRODUCT_NAME\n\"\"\"\n\n# Product name\nPRODUCT_NAME = \"Praison AI\"\n\n# ASCII Art Logos - responsive to terminal width\nLOGO_LARGE = r\"\"\"\n \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2557   \u2588\u2588\u2557     \u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557\n \u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2551    \u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2551\n \u2588\u2588\u2588\u2588\u2588\u2588\u2554\u255d\u2588\u2588\u2588\u2588\u2588\u2588\u2554\u255d\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2554\u2588\u2588\u2557 \u2588\u2588\u2551    \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551\u2588\u2588\u2551\n \u2588\u2588\u2554\u2550\u2550\u2550\u255d \u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2557\u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2551\u2588\u2588\u2551\u255a\u2550\u2550\u2550\u2550\u2588\u2588\u2551\u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2551\u255a\u2588\u2588\u2557\u2588\u2588\u2551    \u2588\u2588\u2554\u2550\u2550\u2588\u2588\u2551\u2588\u2588\u2551\n \u2588\u2588\u2551     \u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2551\u255a\u2588\u2588\u2588\u2588\u2588\u2588\u2554\u255d\u2588\u2588\u2551 \u255a\u2588\u2588\u2588\u2588\u2551    \u2588\u2588\u2551  \u2588\u2588\u2551\u2588\u2588\u2551",
+        "# praisonai.cli.commands\n\"\"\"\nPraisonAI CLI Commands Module.\n\nThis module contains all Typer command groups and subcommands.\nEach file represents a command group (e.g., config, traces, session).\n\"\"\"\n\n# Lazy imports to avoid loading all commands at startup\n__all__ = [\n    'run_app',\n    'config_app',\n    'traces_app',\n    'env_app',\n    'session_app',\n    'schedule_app',\n    'serve_app',\n    'completion_app',\n    'version_app',\n    'debug_app',\n    'lsp_app',",
+        "# praisonai.cli.commands.agents\n\"\"\"\nAgents command group for PraisonAI CLI.\n\nProvides agent management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Agent management\")\n\n\n@app.command(\"list\")\ndef agents_list(\n    verbose: bool = typer.Option(False, \"--verbose\", \"-v\", help=\"Show detailed info\"),\n):\n    \"\"\"List available agents.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    \n    argv = ['agents', 'list']",
+        "# praisonai.cli.commands.call\n\"\"\"\nCall command group for PraisonAI CLI.\n\nProvides voice/call interaction commands.\n\"\"\"\n\nfrom typing import Optional\n\nimport typer\n\napp = typer.Typer(help=\"Voice/call interaction mode\")\n\n\n@app.callback(invoke_without_command=True)\ndef call_main(\n    ctx: typer.Context,\n    model: Optional[str] = typer.Option(None, \"--model\", \"-m\", help=\"LLM model to use\"),\n    verbose: bool = typer.Option(False, \"--verbose\", \"-v\", help=\"Verbose output\"),\n):\n    \"\"\"",
+        "# praisonai.cli.commands.chat\n\"\"\"\nChat command group for PraisonAI CLI.\n\nProvides terminal-native interactive chat mode.\nThis command NEVER opens a browser - it runs entirely in the terminal.\n\"\"\"\n\nfrom typing import List, Optional, Union\n\nimport typer\n\napp = typer.Typer(help=\"Terminal-native interactive chat mode\")\n\n\ndef _parse_memory_flag(memory: Optional[str], no_memory: bool) -> Union[bool, str, None]:\n    \"\"\"\n    Parse memory CLI flag to value for Agent.\n    \n    Precedence: --no-memory > --memory=value > --memory (flag) > None\n    ",
+        "# praisonai.cli.commands.code\n\"\"\"\nCode command group for PraisonAI CLI.\n\nProvides terminal-native code assistant mode.\nThis command NEVER opens a browser - it runs entirely in the terminal.\n\"\"\"\n\nfrom typing import List, Optional\n\nimport typer\n\napp = typer.Typer(help=\"Terminal-native code assistant mode\")\n\n\n@app.callback(invoke_without_command=True)\ndef code_main(\n    ctx: typer.Context,\n    prompt: Optional[str] = typer.Argument(None, help=\"Code task or question\"),\n    model: Optional[str] = typer.Option(None, \"--model\", \"-m\", help=\"LLM model to use\"),\n    verbose: bool = typer.Option(False, \"--verbose\", \"-v\", help=\"Verbose output\"),",
+        "# praisonai.cli.commands.commit\n\"\"\"\nCommit command group for PraisonAI CLI.\n\nProvides git commit commands with AI assistance.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"AI-assisted git commits\")\n\n\n@app.callback(invoke_without_command=True)\ndef commit_main(\n    ctx: typer.Context,\n    message: str = typer.Option(None, \"--message\", \"-m\", help=\"Commit message (auto-generated if not provided)\"),\n    all_files: bool = typer.Option(False, \"--all\", \"-a\", help=\"Stage all changes\"),\n    push: bool = typer.Option(False, \"--push\", \"-p\", help=\"Push after commit\"),\n):\n    \"\"\"\n    Create AI-assisted git commits.",
+        "# praisonai.cli.commands.context\n\"\"\"\nContext command group for PraisonAI CLI.\n\nProvides context management commands:\n- stats: Show context statistics\n- compact: Manually trigger context compaction\n- export: Export context to file\n- show: Show current context\n- clear: Clear current context\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Context management\")\n\n\n@app.command(\"show\")\ndef context_show(\n    verbose: bool = typer.Option(False, \"--verbose\", \"-v\", help=\"Verbose output\"),\n):",
+        "# praisonai.cli.commands.deploy\n\"\"\"\nDeploy command group for PraisonAI CLI.\n\nProvides deployment commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Deployment management\")\n\n\n@app.command(\"docker\")\ndef deploy_docker(\n    file: str = typer.Argument(\"agents.yaml\", help=\"Agent file to deploy\"),\n    tag: str = typer.Option(None, \"--tag\", \"-t\", help=\"Docker image tag\"),\n):\n    \"\"\"Deploy as Docker container.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    ",
+        "# praisonai.cli.commands.docs\n\"\"\"\nDocs command group for PraisonAI CLI.\n\nProvides documentation commands including code execution validation.\n\nUsage:\n    praisonai docs run                    # Run all Python blocks from docs\n    praisonai docs list                   # List discovered code blocks\n    praisonai docs run --dry-run          # Extract only, no execution\n    praisonai docs cli run-all            # Validate all CLI commands from docs\n\"\"\"\n\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import Optional, List\n\nimport typer\n\napp = typer.Typer(help=\"Documentation management and code validation\")\n",
+        "# praisonai.cli.commands.doctor\n\"\"\"\nDoctor command group for PraisonAI CLI.\n\nWraps existing doctor functionality from features/doctor/.\nProvides health checks and diagnostics.\n\"\"\"\n\nfrom typing import Optional\n\nimport typer\n\nfrom ..output.console import get_output_controller\n\napp = typer.Typer(help=\"Health checks and diagnostics\")\n\n\ndef _run_doctor(args: list) -> int:\n    \"\"\"Run doctor command with args.\"\"\"\n    try:\n        from ..features.doctor.handler import DoctorHandler",
+        "# praisonai.cli.commands.endpoints\n\"\"\"\nEndpoints command group for PraisonAI CLI.\n\nProvides API endpoint management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"API endpoint management\")\n\n\n@app.command(\"list\")\ndef endpoints_list():\n    \"\"\"List available endpoints.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    \n    argv = ['endpoints', 'list']\n    \n    original_argv = sys.argv",
+        "# praisonai.cli.commands.environment\n\"\"\"\nEnvironment command group for PraisonAI CLI.\n\nProvides environment management and diagnostics:\n- env view: Show environment variables\n- env check: Validate API keys\n- env doctor: Run diagnostics (alias for doctor command)\n\"\"\"\n\nimport os\nfrom typing import Optional\n\nimport typer\n\nfrom ..output.console import get_output_controller\n\napp = typer.Typer(help=\"Environment and diagnostics\")\n\n\n# Known API key patterns",
+        "# praisonai.cli.commands.eval\n\"\"\"\nEval command group for PraisonAI CLI.\n\nProvides evaluation commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Evaluation and testing\")\n\n\n@app.command(\"accuracy\")\ndef eval_accuracy(\n    agent: str = typer.Argument(..., help=\"Agent file or name\"),\n    input_text: str = typer.Option(..., \"--input\", \"-i\", help=\"Input text\"),\n    expected: str = typer.Option(..., \"--expected\", \"-e\", help=\"Expected output\"),\n    iterations: int = typer.Option(3, \"--iterations\", \"-n\", help=\"Number of iterations\"),\n):\n    \"\"\"Run accuracy evaluation.\"\"\"\n    from praisonai.cli.main import PraisonAI",
+        "# praisonai.cli.commands.github\nimport os\nimport re\nimport sys\nimport json\nimport time\nimport threading\nimport urllib.request\nimport urllib.error\nfrom typing import Optional, List, Dict, Any\n\nimport typer\nfrom rich import print\n\napp = typer.Typer(help=\"GitHub integration commands (triage, tracking).\")\n\n\n# ---------------------------------------------------------------------------\n# GitHub REST helper\n# ---------------------------------------------------------------------------\n",
+        "# praisonai.cli.commands.hooks\n\"\"\"\nHooks command group for PraisonAI CLI.\n\nProvides hook management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Hook management\")\n\n\n@app.command(\"list\")\ndef hooks_list():\n    \"\"\"List available hooks.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    \n    argv = ['hooks', 'list']\n    \n    original_argv = sys.argv",
+        "# praisonai.cli.commands.langextract\n\"\"\"\nPraisonAI Langextract Commands.\n\nCLI commands for rendering PraisonAI traces with langextract:\n- `praisonai langextract view` - render existing JSONL to HTML\n- `praisonai langextract render` - run workflow with langextract observability\n\"\"\"\n\nimport typer\nimport webbrowser\nfrom pathlib import Path\nfrom typing import Optional\n\napp = typer.Typer(name=\"langextract\", help=\"Render PraisonAI traces with langextract.\")\n\n\n@app.command(name=\"view\")\ndef view(\n    jsonl_path: Path = typer.Argument(..., help=\"Path to annotated-documents JSONL\"),\n    output_html: Path = typer.Option(\"trace.html\", \"--output\", \"-o\", help=\"Output HTML file path\"),",
+        "# praisonai.cli.commands.managed\n\"\"\"\nManaged Agents command group for PraisonAI CLI.\n\nProvides commands for Anthropic Managed Agents (cloud-hosted agent backend).\n\nSub-command groups:\n  praisonai managed \"prompt\"          \u2014 run a single prompt\n  praisonai managed multi             \u2014 interactive multi-turn chat\n  praisonai managed sessions ...      \u2014 list / get / resume sessions\n  praisonai managed agents ...        \u2014 list / get / update agents\n  praisonai managed envs ...          \u2014 list / get environments\n  praisonai managed ids ...           \u2014 save / restore / show ID snapshots\n\"\"\"\n\nimport json\nimport pathlib\nfrom typing import Optional\n\nimport typer\n",
+        "# praisonai.cli.commands.memory\n\"\"\"\nMemory command group for PraisonAI CLI.\n\nProvides memory management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Memory management\")\n\n\n@app.command(\"show\")\ndef memory_show(\n    user_id: str = typer.Option(None, \"--user-id\", help=\"User ID for memory isolation\"),\n    limit: int = typer.Option(10, \"--limit\", \"-l\", help=\"Number of memories to show\"),\n):\n    \"\"\"Show stored memories.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    ",
+        "# praisonai.cli.commands.package\n\"\"\"\nPackage command group for PraisonAI CLI.\n\nProvides package management commands (pip-like).\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Package management\")\n\n\n@app.command(\"install\")\ndef package_install(\n    package: str = typer.Argument(..., help=\"Package to install\"),\n    upgrade: bool = typer.Option(False, \"--upgrade\", \"-U\", help=\"Upgrade if already installed\"),\n):\n    \"\"\"Install a package.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    ",
+        "# praisonai.cli.commands.recipe\n\"\"\"\nRecipe command group for PraisonAI CLI.\n\nProvides recipe management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Recipe management\")\n\n\n@app.command(\"create\")\ndef recipe_create(\n    goal: str = typer.Argument(..., help=\"Natural language goal for the recipe\"),\n    output: str = typer.Option(\".\", \"--output\", \"-o\", help=\"Output directory\"),\n    no_optimize: bool = typer.Option(False, \"--no-optimize\", help=\"Skip optimization loop\"),\n    iterations: int = typer.Option(3, \"--iterations\", help=\"Max optimization iterations\"),\n    threshold: float = typer.Option(8.0, \"--threshold\", help=\"Score threshold to stop\"),\n    agents: str = typer.Option(None, \"--agents\", help=\"Custom agents (format: name:role=X,goal=Y;name2:...)\"),\n    tools: str = typer.Option(None, \"--tools\", help=\"Custom tools per agent (format: agent:tool1,tool2;...)\"),",
+        "# praisonai.cli.commands.registry\n\"\"\"\nRegistry command group for PraisonAI CLI.\n\nProvides registry management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Registry management\")\n\n\n@app.command(\"list\")\ndef registry_list():\n    \"\"\"List registry entries.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    \n    argv = ['registry', 'list']\n    \n    original_argv = sys.argv",
+        "# praisonai.cli.commands.research\n\"\"\"\nResearch command group for PraisonAI CLI.\n\nProvides research and analysis commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Research and analysis\")\n\n\n@app.callback(invoke_without_command=True)\ndef research_main(\n    ctx: typer.Context,\n    query: str = typer.Argument(None, help=\"Research query\"),\n    model: str = typer.Option(None, \"--model\", \"-m\", help=\"LLM model to use\"),\n    verbose: bool = typer.Option(False, \"--verbose\", \"-v\", help=\"Verbose output\"),\n    output: str = typer.Option(None, \"--output\", \"-o\", help=\"Output file path\"),\n):\n    \"\"\"",
+        "# praisonai.cli.commands.rules\n\"\"\"\nRules command group for PraisonAI CLI.\n\nProvides rules management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Rules management\")\n\n\n@app.command(\"list\")\ndef rules_list():\n    \"\"\"List active rules.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    \n    argv = ['rules', 'list']\n    \n    original_argv = sys.argv",
+        "# praisonai.cli.commands.run\n\"\"\"\nRun command group for PraisonAI CLI.\n\nProvides agent execution commands.\n\"\"\"\n\nfrom typing import Optional\n\nimport typer\n\nfrom ..output.console import get_output_controller\nfrom ..state.identifiers import get_current_context\n\napp = typer.Typer(help=\"Run agents\")\n\n\n@app.callback(invoke_without_command=True)\ndef run_main(\n    ctx: typer.Context,\n    target: Optional[str] = typer.Argument(None, help=\"Agent file or prompt\"),",
+        "# praisonai.cli.commands.schedule\n\"\"\"\nSchedule command group for PraisonAI CLI.\n\nProvides scheduler management.\n\"\"\"\n\nfrom typing import Optional\n\nimport typer\n\nfrom ..output.console import get_output_controller\n\napp = typer.Typer(help=\"Scheduler management\")\n\n\ndef _run_schedule(args: list) -> int:\n    \"\"\"Run schedule command with args.\"\"\"\n    try:\n        from ..features.agent_scheduler import AgentSchedulerHandler\n        ",
+        "# praisonai.cli.commands.serve\n\"\"\"\nServe command group for PraisonAI CLI.\n\nProvides unified server management for ALL PraisonAI server types.\nAll server commands are consolidated under `praisonai serve <type>`.\n\nServer Types:\n- agents: HTTP REST API for agents\n- gateway: WebSocket multi-agent coordination\n- mcp: MCP server (Model Context Protocol)\n- acp: ACP server (Agent Client Protocol for IDEs)\n- lsp: Language Server Protocol\n- ui: Web UI (aiui)\n- rag: RAG query server\n- registry: Package registry server\n- docs: Documentation preview server\n- scheduler: Background job scheduler\n- recipe: Recipe runner server\n- a2a: Agent-to-Agent protocol\n- a2u: Agent-to-User event stream",
+        "# praisonai.cli.commands.skills\n\"\"\"\nSkills command group for PraisonAI CLI.\n\nProvides skill management commands inspired by moltbot's skills CLI.\nSupports listing, checking eligibility, and managing skills.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Skill management and inspection\")\n\n\n@app.command(\"list\")\ndef skills_list(\n    verbose: bool = typer.Option(False, \"--verbose\", \"-v\", help=\"Show detailed info\"),\n):\n    \"\"\"List available skills.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    ",
+        "# praisonai.cli.commands.templates\n\"\"\"\nTemplates command group for PraisonAI CLI.\n\nProvides template management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Template management\")\n\n\n@app.command(\"list\")\ndef templates_list():\n    \"\"\"List available templates.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    \n    argv = ['templates', 'list']\n    \n    original_argv = sys.argv",
+        "# praisonai.cli.commands.todo\n\"\"\"\nTodo command group for PraisonAI CLI.\n\nProvides todo/task management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Todo/task management\")\n\n\n@app.command(\"list\")\ndef todo_list():\n    \"\"\"List todos.\"\"\"\n    from praisonai.cli.main import PraisonAI\n    import sys\n    \n    argv = ['todo', 'list']\n    \n    original_argv = sys.argv",
+        "# praisonai.cli.commands.train\n\"\"\"\nTrain command group for PraisonAI CLI.\n\nProvides two types of training:\n1. LLM Fine-tuning: praisonai train dataset.json\n2. Agent Training: praisonai train agents [OPTIONS]\n\"\"\"\n\nimport json\nfrom pathlib import Path\nfrom typing import Optional\n\nimport typer\n\napp = typer.Typer(help=\"Training commands for models and agents\")\n\n\n@app.callback()\ndef train_callback():\n    \"\"\"",
+        "# praisonai.cli.commands.workflow\n\"\"\"\nWorkflow command group for PraisonAI CLI.\n\nProvides workflow management commands.\n\"\"\"\n\nimport typer\n\napp = typer.Typer(help=\"Workflow management\")\n\n\n@app.command(\"run\", context_settings={\"allow_extra_args\": True, \"allow_interspersed_args\": True, \"ignore_unknown_options\": True})\ndef workflow_run(\n    ctx: typer.Context,\n    file: str = typer.Argument(..., help=\"Workflow file path\"),\n    model: str = typer.Option(None, \"--model\", \"-m\", help=\"LLM model to use\"),\n    verbose: bool = typer.Option(False, \"--verbose\", \"-v\", help=\"Verbose output\"),\n    dry_run: bool = typer.Option(False, \"--dry-run\", help=\"Preview steps without executing (job workflows only)\"),\n):\n    \"\"\"Run a workflow.",
+        "# praisonai.cli.features.agent_scheduler\n\"\"\"\nAgent Scheduler CLI Feature.\n\nProvides CLI commands for scheduling agents to run 24/7 at regular intervals.\n\"\"\"\n\nimport logging\n\nlogger = logging.getLogger(__name__)\n\n\nclass AgentSchedulerHandler:\n    \"\"\"Handler for agent scheduler CLI commands.\"\"\"\n    \n    @staticmethod\n    def handle_daemon_command(subcommand: str, args, unknown_args=None) -> int:\n        \"\"\"\n        Handle daemon management commands (start, list, stop, logs, restart).\n        \n        Args:",
+        "# praisonai.cli.features.doctor\n\"\"\"\nDoctor CLI module for PraisonAI.\n\nProvides comprehensive health checks, diagnostics, and validation for the PraisonAI ecosystem.\n\nCommands:\n    praisonai doctor              - Run fast default checks\n    praisonai doctor env          - Environment and API key validation\n    praisonai doctor config       - Configuration file validation\n    praisonai doctor tools        - Tool availability checks\n    praisonai doctor db           - Database connectivity checks\n    praisonai doctor mcp          - MCP server validation\n    praisonai doctor obs          - Observability provider checks\n    praisonai doctor skills       - Agent skills validation\n    praisonai doctor memory       - Memory/session storage checks\n    praisonai doctor permissions  - Filesystem permission checks\n    praisonai doctor network      - Network connectivity checks\n    praisonai doctor performance  - Import time analysis\n    praisonai doctor ci           - CI-optimized checks\n    praisonai doctor selftest     - Minimal agent dry-run",
+        "# praisonai.cli.features.doctor.checks\n\"\"\"\nDoctor checks package.\n\nContains all individual check implementations organized by category.\n\"\"\"\n\n# Import all check modules to register them\ndef register_all_checks():\n    \"\"\"Register all doctor checks.\"\"\"\n    from . import env_checks\n    from . import config_checks\n    from . import tools_checks\n    from . import db_checks\n    from . import mcp_checks\n    from . import obs_checks\n    from . import skills_checks\n    from . import memory_checks\n    from . import permissions_checks\n    from . import network_checks\n    from . import performance_checks",
+        "# praisonai.cli.features.doctor.checks.performance_checks\n\"\"\"\nPerformance checks for the Doctor CLI module.\n\nMeasures import times and identifies slow imports.\n\"\"\"\n\nimport sys\nimport time\n\nfrom ..models import (\n    CheckCategory,\n    CheckResult,\n    CheckStatus,\n    CheckSeverity,\n    DoctorConfig,\n)\nfrom ..registry import register_check\n\n\ndef _measure_import_time(module_name: str) -> tuple:",
+        "# praisonai.cli.features.doctor.checks.serve_checks\n\"\"\"\nDoctor checks for serve and endpoints functionality.\n\nChecks for:\n- Serve module availability\n- Endpoints module availability\n- Server connectivity\n- Discovery endpoint\n- Provider types\n\"\"\"\n\nimport os\n\nfrom ..models import CheckResult, CheckStatus, CheckCategory, CheckSeverity, DoctorConfig\nfrom ..registry import register_check\n\n\n@register_check(\n    id=\"serve_module\",\n    title=\"Serve Module\",",
+        "# praisonai.cli.features.doctor.handler\n\"\"\"\nDoctor CLI handler for PraisonAI.\n\nProvides the main DoctorHandler class that integrates with the CLI.\n\"\"\"\n\nimport argparse\nimport sys\nfrom typing import List, Optional\n\nfrom ..base import CommandHandler\nfrom .models import CheckCategory, DoctorConfig, DoctorReport\nfrom .engine import DoctorEngine\nfrom .registry import get_registry\nfrom .formatters import get_formatter\n\n\nclass DoctorHandler(CommandHandler):\n    \"\"\"\n    Handler for the 'praisonai doctor' command.",
+        "# praisonai.cli.features.recipe\n\"\"\"\nRecipe CLI Feature Handler\n\nProvides CLI commands for recipe management and execution:\n- list, search, info, validate, run\n- init, test, pack, unpack\n- export, replay\n- serve\n\nAll commands use the canonical `praisonai recipe` prefix.\n\"\"\"\n\nimport json\nimport sys\nimport os\nfrom pathlib import Path\nfrom typing import Any, Dict, List, Optional\n\n\nclass RecipeHandler:",
+        "# praisonai.cli.features.recipe_optimizer\n\"\"\"\nRecipe Optimizer for PraisonAI.\n\nIteratively optimizes recipes using LLM-as-judge feedback.\nRuns the recipe, judges the output, proposes improvements, and applies them.\n\nDRY: Reuses ContextEffectivenessJudge from replay module.\n     Reuses SDK knowledge and tool categories from recipe_creator.\n     Reuses image reading and URL crawling from judge module.\n\"\"\"\n\nimport os\nimport re\nimport logging\nimport base64\nfrom pathlib import Path\nfrom typing import Optional, List, Tuple, Any, Dict\n\n# DRY: Import SDK knowledge from shared modules\nfrom .sdk_knowledge import get_sdk_knowledge_prompt",
+        "# praisonai.cli.features.serve\n\"\"\"\nServe CLI Feature Handler\n\nProvides CLI commands for launching PraisonAI servers:\n- praisonai serve agents - Launch agents as HTTP API\n- praisonai serve recipe - Launch recipe runner\n- praisonai serve mcp - Launch MCP server\n- praisonai serve tools - Launch tools as MCP server\n- praisonai serve a2a - Launch A2A server\n- praisonai serve a2u - Launch A2U event stream server\n- praisonai serve unified - Launch unified server with all providers\n\nAll servers include the unified discovery endpoint at /__praisonai__/discovery.\n\"\"\"\n\nimport os\nimport sys\nimport logging\nfrom typing import Any, Dict, List, Optional\n",
+        "# praisonai.cli.interactive.async_tui\n\"\"\"\nPraisonAI Async TUI Application.\n\nFull-screen terminal UI with:\n- Non-blocking LLM execution (UI stays responsive)\n- Scrollable output area with keyboard navigation\n- Fixed bottom input pane (always visible)\n- Activity indicators during processing\n\nKey fixes:\n- Uses threading for LLM calls to prevent UI freeze\n- Uses Buffer + BufferControl for scrollable output\n- Proper app.invalidate() for UI refresh\n\"\"\"\n\nimport logging\nimport os\nimport shutil\nimport threading\nimport time",
+        "# praisonai.cli.main\n# praisonai/cli/main.py\n\nimport sys\nimport argparse\nimport warnings\nimport os\nimport json\n\n# Warning filter support - now opt-in only (no global mutation at import)\nimport atexit\n\n_SUPPRESSED_PATTERNS = (\n    \"Pydantic serializer warnings\",\n    \"PydanticSerializationUnexpectedValue\",\n    \"Expected \",  # Narrowed from just \"Expected\" to avoid false positives\n    \"StreamingChoices\",\n    \"serialized value may not be as expected\",\n    \"duckduckgo_search\",\n)\n",
+        "# praisonai.mcp_server.cli\n\"\"\"\nMCP Server CLI Integration\n\nProvides CLI commands for managing the MCP server:\n- praisonai mcp serve --transport stdio|http-stream\n- praisonai mcp list-tools\n- praisonai mcp config-generate\n\"\"\"\n\nimport argparse\nimport json\nimport logging\nimport sys\nfrom typing import List\n\nlogger = logging.getLogger(__name__)\n\n\nclass MCPServerCLI:\n    \"\"\"CLI handler for MCP server commands.\"\"\"",
+        "# praisonai.mcp_server.recipe_adapter\n\"\"\"\nRecipe MCP Adapter\n\nAdapts PraisonAI recipes to MCP server primitives (tools, resources, prompts).\nEnables any recipe to be served as an MCP server.\n\nMCP Protocol Version: 2025-11-25\n\"\"\"\n\nimport asyncio\nimport logging\nimport re\nfrom dataclasses import dataclass\nfrom pathlib import Path\nfrom typing import Any, Callable, Dict, List, Optional, Set, TYPE_CHECKING, Union\n\nif TYPE_CHECKING:\n    from .server import MCPServer\n\nfrom .registry import (",
+        "# praisonai.mcp_server.recipe_cli\n\"\"\"\nRecipe MCP Server CLI Commands\n\nCLI commands for serving recipes as MCP servers.\n\nCommands:\n- serve-recipe: Serve a recipe as MCP server\n- list-recipes: List available recipes for MCP serving\n- validate-recipe: Validate recipe MCP compatibility\n- inspect-recipe: Inspect recipe MCP schema\n- config-generate-recipe: Generate client config for recipe server\n\"\"\"\n\nimport argparse\nimport json\nimport logging\nimport sys\nfrom typing import List\n\nlogger = logging.getLogger(__name__)",
+        "# praisonai.recipe\n\"\"\"\nPraisonAI Recipe Module\n\nProvides a minimal, client-friendly API for running Agent Recipes.\nAll imports are lazy to ensure zero performance impact on Core SDK.\n\nUsage:\n    from praisonai import recipe\n    result = recipe.run(\"support-reply-drafter\", input={\"ticket\": \"T-123\"})\n    \n    # Or with streaming\n    for event in recipe.run_stream(\"transcript-generator\", input=\"audio.mp3\"):\n        print(event)\n\"\"\"\n\n__all__ = [\n    # Core API\n    \"run\",\n    \"run_stream\",\n    \"validate\",",
+        "# praisonai.recipe.bridge\n\"\"\"\nRecipe Runtime Bridge.\n\nProvides unified recipe resolution and execution for operational runtimes:\n- Background tasks\n- Async jobs\n- Scheduled execution\n\nThis module bridges the gap between recipes and operational features,\nkeeping all glue code in the wrapper (praisonai) without modifying core SDK.\n\"\"\"\n\nimport uuid\nimport logging\nfrom dataclasses import dataclass, field\nfrom pathlib import Path\nfrom typing import Any, Dict, Iterator, List, Optional\n\nlogger = logging.getLogger(__name__)\n",
+        "# praisonai.recipe.core\n\"\"\"\nRecipe Core API\n\nProvides the main recipe execution functions.\n\"\"\"\n\nimport os\nimport time\nimport uuid\nfrom datetime import datetime, timezone\nfrom pathlib import Path\nfrom typing import Any, Dict, Iterator, List, Optional, Union\n\nfrom .models import (\n    RecipeResult,\n    RecipeEvent,\n    RecipeConfig,\n    RecipeInfo,\n    RecipeStatus,\n    ValidationResult,",
+        "# praisonai.recipe.operations\n\"\"\"\nRecipe Operations Module.\n\nProvides high-level APIs for running recipes in different operational modes:\n- run_background(): Execute recipe as a background task\n- submit_job(): Submit recipe to async jobs server\n- schedule(): Create a scheduled recipe executor\n\nAll functions are lazy-loaded and have zero performance impact when not used.\n\"\"\"\n\nimport logging\nfrom dataclasses import dataclass, field\nfrom typing import Any, Dict, Optional\n\nlogger = logging.getLogger(__name__)\n\n\n# Safe defaults\nDEFAULT_TIMEOUT_SEC = 300",
+        "# praisonai.recipe.security\n\"\"\"\nRecipe Security Module\n\nProvides security features for recipes:\n- SBOM (Software Bill of Materials) generation\n- Bundle signing and verification\n- Dependency auditing\n- PII redaction\n- Lockfile validation\n\"\"\"\n\nimport hashlib\nimport json\nimport re\nimport subprocess\nimport sys\nimport uuid\nfrom datetime import datetime, timezone\nfrom pathlib import Path\nfrom typing import Any, Dict, List, Optional, Tuple, Union",
+        "# praisonai.recipe.serve\n\"\"\"\nRecipe HTTP Server\n\nProvides HTTP endpoints for recipe execution.\nOptional dependency - requires: pip install praisonai[serve]\n\nEndpoints:\n- GET  /health              - Health check\n- GET  /v1/recipes          - List recipes\n- GET  /v1/recipes/{name}   - Describe recipe\n- GET  /v1/recipes/{name}/schema - Get recipe schema\n- POST /v1/recipes/run      - Run recipe (sync)\n- POST /v1/recipes/stream   - Run recipe (SSE)\n- POST /v1/recipes/validate - Validate recipe\n- GET  /metrics             - Prometheus metrics (optional)\n- GET  /openapi.json        - OpenAPI specification\n- POST /admin/reload        - Hot reload registry (auth required)\n\nAuth modes:\n- none: No authentication (localhost only)",
+        "# praisonai.scheduler\n\"\"\"\nPraisonAI Scheduler Module\n\nThis module provides scheduling capabilities for running agents and deployments\nat regular intervals, enabling 24/7 autonomous operations.\n\nComponents:\n- ScheduleParser: Parse schedule expressions (hourly, daily, */30m, etc.)\n- ExecutorInterface: Abstract interface for executors\n- AgentScheduler: Schedule agent execution at regular intervals\n- DeploymentScheduler: Schedule deployment operations\n\"\"\"\n\nfrom .base import ScheduleParser, ExecutorInterface, PraisonAgentExecutor\n\n__all__ = [\n    'ScheduleParser',\n    'ExecutorInterface',\n    'PraisonAgentExecutor',\n    'ScheduledAgentExecutor',",
+        "# praisonai.scheduler.agent_scheduler\n\"\"\"\nAgent Scheduler for PraisonAI - Run agents periodically 24/7.\n\nThis module provides scheduling capabilities for running PraisonAI agents\nat regular intervals, enabling 24/7 autonomous agent operations.\n\"\"\"\n\nimport threading\nimport logging\nfrom datetime import datetime\nfrom typing import Optional, Dict, Any, Callable\n\nfrom .base import ScheduleParser, PraisonAgentExecutor\nfrom .shared import backoff_delay\n\nlogger = logging.getLogger(__name__)\n\n\nclass AgentScheduler:\n    \"\"\""
+      ]
+    },
+    {
+      "id": "ce169b1443",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/__init__.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/__init__.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/agent.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.agent"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/chat_mixin.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.chat_mixin"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/context_agent.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.context_agent"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/execution_mixin.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.execution_mixin"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/handoff.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.handoff"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/image_agent.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.image_agent"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/memory_mixin.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.memory_mixin"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/prompt_expander_agent.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.prompt_expander_agent"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/query_rewriter_agent.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.query_rewriter_agent"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/router_agent.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.router_agent"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/tool_execution.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agent.tool_execution"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agents/agents.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.agents.agents"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/eval/judge.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.eval.judge"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/eval/loop.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.eval.loop"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/llm/__init__.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.llm"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/llm/model_router.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.llm.model_router"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/mcp/mcp.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.mcp.mcp"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/memory/core.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.memory.core"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/memory/learn/__init__.py",
+          "line_start": 1,
+          "line_end": 91,
+          "module": "praisonai-agents.praisonaiagents.memory.learn"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/memory/learn/manager.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.memory.learn.manager"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/memory/memory.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.memory.memory"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/planning/__init__.py",
+          "line_start": 1,
+          "line_end": 141,
+          "module": "praisonai-agents.praisonaiagents.planning"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/planning/approval.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.planning.approval"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/planning/planner.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.planning.planner"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/process/process.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.process.process"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/session/__init__.py",
+          "line_start": 1,
+          "line_end": 153,
+          "module": "praisonai-agents.praisonaiagents.session"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/session/api.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.session.api"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/session/hierarchy.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.session.hierarchy"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/session/title.py",
+          "line_start": 1,
+          "line_end": 169,
+          "module": "praisonai-agents.praisonaiagents.session.title"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/task/__init__.py",
+          "line_start": 1,
+          "line_end": 13,
+          "module": "praisonai-agents.praisonaiagents.task"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/task/task.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.task.task"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/telemetry/__init__.py",
+          "line_start": 1,
+          "line_end": 197,
+          "module": "praisonai-agents.praisonaiagents.telemetry"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/telemetry/integration.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.telemetry.integration"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/telemetry/performance_cli.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.telemetry.performance_cli"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/telemetry/performance_monitor.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.telemetry.performance_monitor"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/telemetry/performance_utils.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.telemetry.performance_utils"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/telemetry/telemetry.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.telemetry.telemetry"
+        }
+      ],
+      "subject": "Dependency cycle across 39 modules: praisonaiagents \u2192 agent \u2192 agent \u2192 chat_mixin\u2026",
+      "evidence": {
+        "scc_members": [
+          "praisonai-agents.praisonaiagents",
+          "praisonai-agents.praisonaiagents.agent",
+          "praisonai-agents.praisonaiagents.agent.agent",
+          "praisonai-agents.praisonaiagents.agent.chat_mixin",
+          "praisonai-agents.praisonaiagents.agent.context_agent",
+          "praisonai-agents.praisonaiagents.agent.execution_mixin",
+          "praisonai-agents.praisonaiagents.agent.handoff",
+          "praisonai-agents.praisonaiagents.agent.image_agent",
+          "praisonai-agents.praisonaiagents.agent.memory_mixin",
+          "praisonai-agents.praisonaiagents.agent.prompt_expander_agent",
+          "praisonai-agents.praisonaiagents.agent.query_rewriter_agent",
+          "praisonai-agents.praisonaiagents.agent.router_agent",
+          "praisonai-agents.praisonaiagents.agent.tool_execution",
+          "praisonai-agents.praisonaiagents.agents.agents",
+          "praisonai-agents.praisonaiagents.eval.judge",
+          "praisonai-agents.praisonaiagents.eval.loop",
+          "praisonai-agents.praisonaiagents.llm",
+          "praisonai-agents.praisonaiagents.llm.model_router",
+          "praisonai-agents.praisonaiagents.mcp.mcp",
+          "praisonai-agents.praisonaiagents.memory.core",
+          "praisonai-agents.praisonaiagents.memory.learn",
+          "praisonai-agents.praisonaiagents.memory.learn.manager",
+          "praisonai-agents.praisonaiagents.memory.memory",
+          "praisonai-agents.praisonaiagents.planning",
+          "praisonai-agents.praisonaiagents.planning.approval",
+          "praisonai-agents.praisonaiagents.planning.planner",
+          "praisonai-agents.praisonaiagents.process.process",
+          "praisonai-agents.praisonaiagents.session",
+          "praisonai-agents.praisonaiagents.session.api",
+          "praisonai-agents.praisonaiagents.session.hierarchy",
+          "praisonai-agents.praisonaiagents.session.title",
+          "praisonai-agents.praisonaiagents.task",
+          "praisonai-agents.praisonaiagents.task.task",
+          "praisonai-agents.praisonaiagents.telemetry",
+          "praisonai-agents.praisonaiagents.telemetry.integration",
+          "praisonai-agents.praisonaiagents.telemetry.performance_cli",
+          "praisonai-agents.praisonaiagents.telemetry.performance_monitor",
+          "praisonai-agents.praisonaiagents.telemetry.performance_utils",
+          "praisonai-agents.praisonaiagents.telemetry.telemetry"
+        ],
+        "scc_size": 39,
+        "cycle_edges": [
+          [
+            "praisonai-agents.praisonaiagents.memory.learn",
+            "praisonai-agents.praisonaiagents.memory.learn.manager"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.memory.learn.manager",
+            "praisonai-agents.praisonaiagents.llm"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.llm",
+            "praisonai-agents.praisonaiagents.llm.model_router"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.llm.model_router",
+            "praisonai-agents.praisonaiagents.agent"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.agent",
+            "praisonai-agents.praisonaiagents.agent.context_agent"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.agent.context_agent",
+            "praisonai-agents.praisonaiagents.agent.agent"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.agent.agent",
+            "praisonai-agents.praisonaiagents"
+          ],
+          [
+            "praisonai-agents.praisonaiagents",
+            "praisonai-agents.praisonaiagents.telemetry.integration"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.telemetry.integration",
+            "praisonai-agents.praisonaiagents.task.task"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.task.task",
+            "praisonai-agents.praisonaiagents.memory.memory"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.memory.memory",
+            "praisonai-agents.praisonaiagents.memory.learn"
+          ]
+        ],
+        "total_internal_edges_within_scc": 94
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.praisonaiagents\n\"\"\"\nPraison AI Agents - A package for hierarchical AI agent task execution\n\nThis module uses lazy loading to minimize import time and memory usage.\nHeavy dependencies like litellm are only loaded when actually needed.\n\"\"\"\n\n# =============================================================================\n# NAMING CONVENTION GUIDE (Simplified patterns for consistency)\n# =============================================================================\n# | Pattern       | When to Use             | Examples                        |\n# |---------------|-------------------------|----------------------------------|\n# | add_X         | Register something      | add_hook, add_tool, add_profile |\n# | get_X         | Retrieve something      | get_tool, get_profile           |\n# | remove_X      | Unregister something    | remove_hook, remove_tool        |\n# | has_X         | Check existence         | has_hook, has_tool              |\n# | list_X        | List all items          | list_tools, list_profiles       |\n# | enable_X      | Turn on feature         | enable_telemetry                |\n# | disable_X     | Turn off feature        | disable_telemetry               |\n# | XConfig       | Configuration class     | MemoryConfig, HooksConfig       |",
+        "# praisonai-agents.praisonaiagents.agent\n\"\"\"Agent module for AI agents - uses lazy loading for performance\n\nThe Agent class has been decomposed into focused modules for better maintainability:\n- tool_execution: Tool calling and execution functionality  \n- chat_handler: Chat and conversation management\n- session_manager: Session persistence and state management\n\nBackward compatibility is maintained via mixins in the main Agent class.\n\"\"\"\n\n# Lazy loading cache\n_lazy_cache = {}\n\ndef __getattr__(name):\n    \"\"\"Lazy load agent classes to avoid importing rich at startup.\"\"\"\n    if name in _lazy_cache:\n        return _lazy_cache[name]\n    \n    # Core Agent - always needed\n    if name == 'Agent':",
+        "# praisonai-agents.praisonaiagents.agent.agent\nimport os\nimport time\nimport json\nimport logging\nfrom praisonaiagents._logging import get_logger\nimport asyncio\nimport contextlib\nimport threading\nimport concurrent.futures\nfrom typing import List, Optional, Any, Dict, Union, Literal, TYPE_CHECKING, Callable, Generator\nfrom collections import OrderedDict\nimport inspect\n\n# Decomposed agent functionality - real implementations in mixin files\nfrom .chat_mixin import ChatMixin\nfrom .execution_mixin import ExecutionMixin\nfrom .memory_mixin import MemoryMixin\nfrom .async_memory_mixin import AsyncMemoryMixin\nfrom .tool_execution import ToolExecutionMixin\nfrom .chat_handler import ChatHandlerMixin",
+        "# praisonai-agents.praisonaiagents.agent.chat_mixin\n\"\"\"\nChat and LLM interaction mixin for the Agent class.\n\nContains all methods for chat completion, streaming, message building,\nand response processing. Extracted from agent.py for maintainability.\n\"\"\"\n\nimport os\nimport re\nimport time\nimport json\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom ..errors import BudgetExceededError\n\n# Fallback helpers to avoid circular imports\ndef _get_console():\n    from rich.console import Console\n    return Console\n",
+        "# praisonai-agents.praisonaiagents.agent.context_agent\n\"\"\"\nContextAgent - Advanced Context Engineering for AI Coding Assistants\n\nThis class implements proper Context Engineering principles following the PRD template:\n- 10x better than prompt engineering\n- 100x better than vibe coding\n- Comprehensive context generation for first-try implementation success\n- Systematic codebase analysis with modern tools\n- PRP (Product Requirements Prompt) generation\n- Validation loops and quality gates\n- SAVES EVERY AGENT RESPONSE ALONG THE WAY for complete traceability\n\"\"\"\n\nimport os\nimport json\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import Optional, Any, Dict, Union, List, TYPE_CHECKING",
+        "# praisonai-agents.praisonaiagents.agent.execution_mixin\n\"\"\"\nExecution and orchestration mixin for the Agent class.\n\nContains all methods for run/start/launch lifecycle, planning,\nand server endpoints. Extracted from agent.py for maintainability.\n\"\"\"\n\nimport time\nimport json\nimport logging\nimport inspect\n\nimport asyncio\nimport threading\n\n\n# Fallback helpers to avoid circular imports\ndef _get_console():\n    from rich.console import Console\n    return Console",
+        "# praisonai-agents.praisonaiagents.agent.handoff\n\"\"\"\nHandoff functionality for agent-to-agent delegation.\n\nThis module provides handoff capabilities that allow agents to delegate tasks\nto other agents, similar to the OpenAI Agents SDK implementation.\n\nUnified Handoff System:\n- Handoff: LLM-driven (tool call) or programmatic agent-to-agent transfer\n- HandoffConfig: Configuration for context policy, timeouts, concurrency, safety\n- Replaces/absorbs Agent.delegate() and SubagentDelegator functionality\n\"\"\"\n\nfrom typing import Optional, Any, Callable, Dict, List, Union, TYPE_CHECKING\nfrom dataclasses import dataclass, field\nfrom enum import Enum\nimport inspect\nimport logging\nfrom praisonaiagents._logging import get_logger\nimport asyncio\nimport threading",
+        "# praisonai-agents.praisonaiagents.agent.image_agent\n\"\"\"\nImageAgent - A specialized agent class for generating images using AI models.\nThis class extends the base Agent class to provide specific functionality for image generation,\nincluding support for different image models, sizes, and quality settings.\n\"\"\"\nfrom typing import Optional, Any, Dict, Union, List\nfrom ..agent.agent import Agent\nfrom pydantic import BaseModel, Field\nimport logging\nfrom praisonaiagents._logging import get_logger\nimport warnings\n# Filter out Pydantic warning about fields\nwarnings.filterwarnings(\"ignore\", \"Valid config keys have changed in V2\", UserWarning)\nclass ImageGenerationConfig(BaseModel):\n    \"\"\"Configuration for image generation settings.\"\"\"\n    style: str = Field(default=\"natural\", description=\"Style of the generated image\")\n    response_format: str = Field(default=\"url\", description=\"Format of the response (url or b64_json)\")\n    timeout: int = Field(default=600, description=\"Timeout in seconds for the API call\")\n    api_base: Optional[str] = Field(default=None, description=\"Optional API base URL\")\n    api_key: Optional[str] = Field(default=None, description=\"Optional API key\")",
+        "# praisonai-agents.praisonaiagents.agent.memory_mixin\n\"\"\"\nMemory, caching, and session persistence mixin for the Agent class.\n\nContains all methods for chat history management, caching, session\npersistence, auto-memory, and auto-learning. Extracted from agent.py\nfor maintainability.\n\"\"\"\n\nimport os\nimport logging\nfrom typing import Optional\n\n# Fallback helpers to avoid circular imports\ndef _get_console():\n    from rich.console import Console\n    return Console\n\ndef _get_live():\n    from rich.live import Live\n    return Live",
+        "# praisonai-agents.praisonaiagents.agent.prompt_expander_agent\n\"\"\"\nPrompt Expander Agent Module\n\nThis module provides the PromptExpanderAgent class for expanding short prompts\ninto detailed, comprehensive prompts for better task execution.\n\nUnlike QueryRewriterAgent (which optimizes queries for search/retrieval),\nPromptExpanderAgent focuses on enriching prompts for task execution.\n\nSupported Expansion Strategies:\n- **BASIC**: Simple expansion with clarity improvements\n- **DETAILED**: Rich expansion with context, constraints, and examples\n- **STRUCTURED**: Expansion with clear structure (task, format, requirements)\n- **CREATIVE**: Expansion with creative flair and vivid language\n- **AUTO**: Automatically selects the best strategy based on prompt analysis\n\nExample:\n    from praisonaiagents import PromptExpanderAgent, ExpandStrategy\n    \n    agent = PromptExpanderAgent()",
+        "# praisonai-agents.praisonaiagents.agent.query_rewriter_agent\n\"\"\"\nQuery Rewriter Agent Module\n\nThis module provides the QueryRewriterAgent class for transforming user queries\nto improve retrieval quality in RAG applications.\n\nSupported Rewriting Strategies:\n- **BASIC**: Simple rephrasing for clarity and keyword optimization\n- **HYDE**: Hypothetical Document Embeddings - generates a hypothetical answer\n- **STEP_BACK**: Generates higher-level concept questions for complex queries\n- **SUB_QUERIES**: Decomposes multi-part questions into focused sub-queries\n- **MULTI_QUERY**: Generates multiple paraphrased versions for ensemble retrieval\n- **CONTEXTUAL**: Uses conversation history to resolve references and context\n\nExample:\n    from praisonaiagents import QueryRewriterAgent, RewriteStrategy\n    \n    agent = QueryRewriterAgent()\n    \n    # Basic rewriting",
+        "# praisonai-agents.praisonaiagents.agent.router_agent\n\"\"\"\nRouter Agent that can use different LLM models based on task requirements.\n\nThis module extends the base Agent class to support multiple models and intelligent\nmodel selection based on task characteristics.\n\"\"\"\n\nimport os\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom typing import Dict, List, Optional, Any, Union\nfrom .agent import Agent\nfrom ..llm.model_router import ModelRouter\nfrom ..llm import LLM, TokenUsage\nfrom ..trace.protocol import get_default_emitter\n\nlogger = get_logger(__name__)\n\nclass RouterAgent(Agent):\n    \"\"\"",
+        "# praisonai-agents.praisonaiagents.agent.tool_execution\n\"\"\"\nTool execution mixin for the Agent class.\n\nContains all methods for tool resolution, execution, approval,\ncost tracking, and hook integration. Extracted from agent.py\nfor maintainability.\n\"\"\"\n\nimport os\nimport time\nimport json\nimport logging\nimport asyncio\nimport inspect\nimport contextvars\nimport concurrent.futures\nfrom typing import List, Optional, Any, Dict, Union, TYPE_CHECKING\nfrom ..errors import ToolExecutionError\n\nlogger = logging.getLogger(__name__)",
+        "# praisonai-agents.praisonaiagents.agents.agents\nimport os\nimport time\nimport json\nimport logging\nimport threading\nfrom praisonaiagents._logging import get_logger\nfrom typing import Any, Dict, Optional, List, Tuple\nfrom ..main import display_error, TaskOutput\nfrom ..agent.agent import Agent\nfrom ..task.task import Task\nfrom ..process.process import Process\nimport asyncio\nimport uuid\nfrom enum import Enum\n\n# Import token tracking\ntry:\n    from ..telemetry.token_collector import _token_collector\nexcept ImportError:\n    _token_collector = None",
+        "# praisonai-agents.praisonaiagents.eval.judge\n\"\"\"\nUnified Judge class for LLM-as-judge evaluation.\n\nProvides a simple, unified API for evaluating agent outputs using LLM-as-judge.\nFollows PraisonAI naming conventions and engineering principles.\n\nDRY: Extends BaseLLMGrader to reuse prompt building and response parsing.\nProtocol-driven: Implements JudgeProtocol for extensibility.\nZero performance impact: Lazy imports for litellm.\n\nExample:\n    >>> from praisonaiagents.eval import Judge\n    >>> result = Judge().run(output=\"4\", expected=\"4\")\n    >>> print(f\"Score: {result.score}/10\")\n\"\"\"\n\nimport os\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom dataclasses import dataclass",
+        "# praisonai-agents.praisonaiagents.eval.loop\n\"\"\"\nEvaluationLoop - Iterative evaluation and improvement loop for agents.\n\nThis module provides the EvaluationLoop class which implements the \"Ralph Loop\"\npattern: run agent \u2192 judge output \u2192 improve \u2192 repeat until threshold met.\n\nExample:\n    from praisonaiagents import Agent\n    from praisonaiagents.eval import EvaluationLoop\n    \n    agent = Agent(name=\"analyzer\", instructions=\"Analyze systems\")\n    loop = EvaluationLoop(agent=agent, criteria=\"Analysis is thorough\")\n    result = loop.run(\"Analyze the auth flow\")\n    \n    print(result.final_score)  # 8.5\n    print(result.success)      # True\n\"\"\"\n\nimport time\nimport logging",
+        "# praisonai-agents.praisonaiagents.llm\n\"\"\"\nLLM Module for PraisonAI Agents.\n\nThis module provides language model integrations with lazy loading\nto minimize import time when LLM functionality is not immediately needed.\n\"\"\"\nimport os\n\n# Ensure litellm telemetry is disabled before any imports\nos.environ[\"LITELLM_TELEMETRY\"] = \"False\"\n\nimport threading\n\n# Module-level cache for lazy-loaded classes\n_lazy_cache = {}\n_cache_lock = threading.Lock()\n\n\ndef __getattr__(name):\n    \"\"\"Lazy load LLM classes to avoid importing litellm at module load time.\"\"\"",
+        "# praisonai-agents.praisonaiagents.llm.model_router\n\"\"\"\nModel Router for intelligent model selection based on task characteristics.\n\nThis module provides functionality to automatically select the most appropriate\nLLM model/provider based on task complexity, cost considerations, and model capabilities.\n\"\"\"\n\nimport os\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom typing import Dict, List, Optional, Tuple\nfrom dataclasses import dataclass\nfrom enum import IntEnum\n\nlogger = get_logger(__name__)\n\nclass TaskComplexity(IntEnum):\n    \"\"\"Enum for task complexity levels\"\"\"\n    SIMPLE = 1          # Basic queries, math, factual questions\n    MODERATE = 2        # Summarization, basic analysis",
+        "# praisonai-agents.praisonaiagents.mcp.mcp\nimport asyncio\nimport threading\nimport queue\nimport time\nimport inspect\nimport shlex\nimport logging\nfrom praisonaiagents._logging import get_logger\nimport os\nimport re\nimport platform\nfrom typing import Any, List, Optional, Callable, Iterable, Union\nfrom functools import wraps, partial\n\ntry:\n    from mcp import ClientSession, StdioServerParameters\n    from mcp.client.stdio import stdio_client\n    MCP_AVAILABLE = True\nexcept ImportError:\n    MCP_AVAILABLE = False",
+        "# praisonai-agents.praisonaiagents.memory.core\n\"\"\"\nCore memory functionality for Memory class.\n\nThis module contains the core Memory class definition, initialization,\nand quality scoring logic. Split from the main memory.py file for better maintainability.\n\"\"\"\n\nimport json\nimport logging\nimport threading\nimport asyncio\nfrom typing import Any, Dict, List, Optional\nfrom datetime import datetime\nfrom .results import MemoryResult, MemoryResultStatus, SearchResult\n\n\nclass MemoryCoreMixin:\n    \"\"\"Mixin class containing core memory functionality for the Memory class.\"\"\"\n    \n    def store_short_term(self, content: str, metadata: Optional[Dict] = None, quality_score: Optional[float] = None, ",
+        "# praisonai-agents.praisonaiagents.memory.learn\n\"\"\"\nLearn Module - Continuous Learning within Memory System.\n\nProvides learning capabilities for agents to capture patterns, preferences,\nand insights from interactions to improve future responses.\n\nUsage:\n    from praisonaiagents import Agent, LearnConfig\n    \n    # Simple enable (top-level param)\n    agent = Agent(learn=True)\n    \n    # With specific capabilities and auto-learning\n    agent = Agent(learn=LearnConfig(\n        persona=True,\n        insights=True,\n        patterns=True,\n        mode=\"agentic\",  # Auto-extract learnings\n    ))\n    ",
+        "# praisonai-agents.praisonaiagents.memory.learn.manager\n\"\"\"\nLearnManager - Central manager for continuous learning capabilities.\n\nCoordinates all learning stores and provides a unified interface for\ncapturing and retrieving learned information.\n\"\"\"\n\nfrom typing import Any, Dict, List, Optional\nimport logging\n\nfrom ...config.feature_configs import LearnConfig, LearnScope, LearnBackend\nfrom .stores import (\n    PersonaStore,\n    InsightStore,\n    ThreadStore,\n    PatternStore,\n    DecisionStore,\n    FeedbackStore,\n    ImprovementStore,\n    LearnEntry,",
+        "# praisonai-agents.praisonaiagents.memory.memory\nimport os\nimport sqlite3\nimport json\nimport time\nimport shutil\nimport threading\nfrom typing import Any, Dict, List, Optional, Union, Literal\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom datetime import datetime, timezone\n\n# Decomposed memory functionality - imported as mixins for backward compatibility\nfrom .storage import StorageMixin\nfrom .search import SearchMixin\nfrom .core import MemoryCoreMixin\n\n# Protocol-driven imports (AGENTS.md compliant)\nfrom .protocols import MemoryProtocol\nfrom .adapters import get_memory_adapter, get_first_available_memory_adapter\nfrom .adapters.sqlite_adapter import SqliteMemoryAdapter",
+        "# praisonai-agents.praisonaiagents.planning\n\"\"\"\nPlanning Module for PraisonAI Agents.\n\nProvides Planning Mode functionality similar to:\n- Cursor Plan Mode\n- Windsurf Planning Mode  \n- Claude Code Plan Mode\n- Gemini CLI Plan Mode\n- Codex CLI /plan command\n\nFeatures:\n- PlanningAgent for creating implementation plans\n- Plan and PlanStep dataclasses for plan structure\n- TodoList for tracking progress\n- PlanStorage for persistence\n- ApprovalCallback for plan approval flow\n- Read-only mode for safe research\n\nUsage:\n    from praisonaiagents import Agent, Task, AgentManager",
+        "# praisonai-agents.praisonaiagents.planning.approval\n\"\"\"\nApprovalCallback for plan approval flow.\n\nProvides approval functionality similar to:\n- Cursor Plan Mode approval\n- Claude Code plan approval\n- Codex CLI /approvals\n\nFeatures:\n- Auto-approve option\n- Custom approval functions\n- Async support\n- Plan modification during approval\n\"\"\"\n\nimport asyncio\nimport inspect\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom typing import Callable, Optional, Union, TYPE_CHECKING",
+        "# praisonai-agents.praisonaiagents.planning.planner\n\"\"\"\nPlanningAgent for creating implementation plans.\n\nProvides planning functionality similar to:\n- CrewAI AgentPlanner\n- Cursor Plan Mode\n- Claude Code Plan Mode\n\nFeatures:\n- Analyze requests and create detailed plans\n- Read-only mode for safe research\n- Plan refinement based on feedback\n- Context analysis\n\"\"\"\n\nimport json\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom typing import List, Optional, Dict, Any, TYPE_CHECKING\n",
+        "# praisonai-agents.praisonaiagents.process.process\nimport logging\nimport asyncio\nimport threading\nimport time\nimport json\nfrom typing import Dict, Optional, List, Any, AsyncGenerator\nfrom pydantic import BaseModel, ConfigDict\nfrom ..agent.agent import Agent\nfrom ..task.task import Task\nfrom ..main import display_error\nfrom ..llm import LLM\nimport csv\nimport os\n\nclass LoopItems(BaseModel):\n    model_config = ConfigDict(arbitrary_types_allowed=True)\n    items: List[Any]\n\nclass Process:\n    DEFAULT_RETRY_LIMIT = 3  # Predefined retry limit in a common place",
+        "# praisonai-agents.praisonaiagents.session\n\"\"\"\nSession persistence module for PraisonAI Agents.\n\nProvides automatic session persistence with zero configuration.\nWhen a session_id is provided to an Agent, conversation history\nis automatically persisted to disk and restored on subsequent runs.\n\nUsage:\n    from praisonaiagents import Agent\n    \n    # With session persistence (auto-enabled)\n    agent = Agent(\n        name=\"Assistant\",\n        session_id=\"my-session-123\"\n    )\n    agent.start(\"Hello\")\n    \n    # Later, new process - history is restored\n    agent = Agent(\n        name=\"Assistant\", ",
+        "# praisonai-agents.praisonaiagents.session.api\n\"\"\"\nSession Management for PraisonAI Agents\n\nA simple wrapper around existing stateful capabilities to provide a unified\nsession API for developers building stateful agent applications.\n\nThis module uses deferred imports to ensure `requests` is NOT loaded at import time.\n\"\"\"\nfrom __future__ import annotations\n\nimport os\nimport uuid\nimport json\nfrom typing import Any, Dict, List, Optional, TYPE_CHECKING\n\nif TYPE_CHECKING:\n    from ..memory.memory import Memory\n    from ..knowledge.knowledge import Knowledge\n    from ..agent import Agent\n",
+        "# praisonai-agents.praisonaiagents.session.hierarchy\n\"\"\"\nSession Hierarchy for PraisonAI Agents.\n\nExtends the session system with parent-child relationships,\nforking, and revert capabilities.\n\"\"\"\n\nimport copy\nimport json\nimport logging\nfrom praisonaiagents._logging import get_logger\nimport os\nimport threading\nimport time\nimport uuid\nfrom dataclasses import dataclass, field\nfrom datetime import datetime, timezone\nfrom typing import Any, Dict, List, Optional\n\nfrom .store import SessionData, SessionMessage, DefaultSessionStore, FileLock",
+        "# praisonai-agents.praisonaiagents.session.title\n\"\"\"\nSession Title Auto-Generation - Generate descriptive titles for chat sessions.\n\nAutomatically creates concise, meaningful titles based on the first user-assistant\nexchange in a conversation. Uses a lightweight model for fast generation.\n\"\"\"\n\nimport asyncio\nfrom typing import Optional\n\n__all__ = [\"generate_title\", \"generate_title_async\"]\n\n\ndef generate_title(\n    user_msg: str, \n    assistant_msg: str,\n    llm_model: str = \"gpt-4o-mini\",\n    timeout: float = 10.0,\n    max_length: int = 60\n) -> str:",
+        "# praisonai-agents.praisonaiagents.task\n\"\"\"Task module for AI agent tasks\"\"\"\nfrom .task import Task\nfrom .protocols import TaskStatus, TaskLifecycleManager, InvalidTransitionError, TaskLifecycleProtocol\nfrom .message_sink import (\n    TaskMessage, TaskMessageSinkProtocol, NoOpTaskMessageSink,\n    InMemoryTaskMessageSink, TaskMessageEmitter,\n)\n\n__all__ = [\n    'Task', 'TaskStatus', 'TaskLifecycleManager', 'InvalidTransitionError', 'TaskLifecycleProtocol',\n    'TaskMessage', 'TaskMessageSinkProtocol', 'NoOpTaskMessageSink',\n    'InMemoryTaskMessageSink', 'TaskMessageEmitter',\n] ",
+        "# praisonai-agents.praisonaiagents.task.task\nimport logging\nfrom praisonaiagents._logging import get_logger\nimport asyncio\nimport inspect\nfrom typing import List, Optional, Dict, Any, Type, Callable, Union, Coroutine, Literal, Tuple, get_args, get_origin\nfrom pydantic import BaseModel\nfrom ..output.models import TaskOutput\nfrom ..agent.agent import Agent\nimport uuid\nimport os\nimport time\n\nfrom .protocols import TaskStatus, TaskLifecycleManager\n\n# Set up logger\nlogger = get_logger(__name__)\n\n# Shared lifecycle manager (stateless, thread-safe)\n_lifecycle_manager = TaskLifecycleManager()\n",
+        "# praisonai-agents.praisonaiagents.telemetry\n\"\"\"\nPraisonAI Agents Telemetry & Performance Monitoring Module\n\nThis module provides:\n1. Anonymous usage tracking with privacy-first design  \n2. User-friendly performance monitoring and analysis tools\n\nTelemetry can be disabled via environment variables:\n- PRAISONAI_TELEMETRY_DISABLED=true\n- PRAISONAI_DISABLE_TELEMETRY=true  \n- DO_NOT_TRACK=true\n\nPerformance monitoring can be optimized via environment variables:\n- PRAISONAI_PERFORMANCE_DISABLED=true (disables performance monitoring overhead)\n- PRAISONAI_FLOW_ANALYSIS_ENABLED=true (enables expensive flow analysis - opt-in only)\n\nNo personal data, prompts, or responses are collected.\n\nPerformance Monitoring Features:\n- Function performance tracking with detailed statistics",
+        "# praisonai-agents.praisonaiagents.telemetry.integration\n\"\"\"\nPerformance-optimized integration module for adding telemetry to core PraisonAI components.\nUses thread pools and async patterns to minimize performance overhead.\n\"\"\"\n\nfrom typing import Any, Optional, TYPE_CHECKING\nfrom functools import wraps\nimport time\nimport threading\nimport concurrent.futures\nimport queue\nimport asyncio\nfrom contextlib import contextmanager\n\nif TYPE_CHECKING:\n    from .telemetry import MinimalTelemetry\n    from ..agent.agent import Agent\n    from ..task.task import Task\n    from ..agents.agents import AgentManager\n",
+        "# praisonai-agents.praisonaiagents.telemetry.performance_cli\n\"\"\"\nPerformance Monitoring CLI for PraisonAI\n\nCommand-line interface for accessing performance monitoring features.\nProvides easy access to function performance, API call tracking, and flow analysis.\n\nUsage:\n    python -m praisonaiagents.telemetry.performance_cli [command] [options]\n    \nOr import and use programmatically:\n    from praisonaiagents.telemetry.performance_cli import PerformanceCLI\n    cli = PerformanceCLI()\n    cli.show_performance_report()\n\"\"\"\n\nimport argparse\nimport json\nimport sys\nfrom typing import Optional\nimport logging",
+        "# praisonai-agents.praisonaiagents.telemetry.performance_monitor\n\"\"\"\nUser-Friendly Performance Monitoring for PraisonAI\n\nThis module provides easy-to-use tools for monitoring function performance,\nanalyzing execution flow, and tracking API calls. Built on top of the existing\ncomprehensive telemetry infrastructure.\n\nFeatures:\n- Function performance evaluation with timing and statistics\n- Function flow analysis and visualization\n- API call tracking and performance monitoring\n- Real-time performance reporting\n- Easy integration with existing agents and workflows\n\"\"\"\n\nimport os\nimport time\nimport json\nimport threading\nimport functools",
+        "# praisonai-agents.praisonaiagents.telemetry.performance_utils\n\"\"\"\nPerformance Analysis Utilities for PraisonAI\n\nThis module provides advanced analysis tools for function flow visualization,\nperformance bottleneck identification, and comprehensive reporting.\n\nFeatures:\n- Function flow analysis and visualization (opt-in via PRAISONAI_FLOW_ANALYSIS_ENABLED)\n- Performance bottleneck detection\n- Execution path mapping\n- Performance trend analysis\n- Advanced reporting utilities\n\"\"\"\n\nimport os\nimport json\nfrom collections import defaultdict\nfrom typing import Dict, Any, List, Optional\nfrom datetime import datetime\nimport logging",
+        "# praisonai-agents.praisonaiagents.telemetry.telemetry\n\"\"\"\nMinimal telemetry implementation for PraisonAI Agents.\n\nThis module provides anonymous usage tracking with privacy-first design.\nAll telemetry is opt-out via environment variables.\n\"\"\"\n\nimport os\nimport time\nimport platform\nimport hashlib\nimport threading\nfrom typing import Dict, Any, Optional\nfrom datetime import datetime\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom concurrent.futures import ThreadPoolExecutor\n\n# Lazy imports - only import when needed\n_POSTHOG_AVAILABLE = None"
+      ]
+    },
+    {
+      "id": "907934e958",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/integrations/base.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.integrations.base"
+        },
+        {
+          "file": "src/praisonai/praisonai/integrations/claude_code.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.integrations.claude_code"
+        },
+        {
+          "file": "src/praisonai/praisonai/integrations/codex_cli.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.integrations.codex_cli"
+        },
+        {
+          "file": "src/praisonai/praisonai/integrations/cursor_cli.py",
+          "line_start": 1,
+          "line_end": 192,
+          "module": "praisonai.integrations.cursor_cli"
+        },
+        {
+          "file": "src/praisonai/praisonai/integrations/gemini_cli.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.integrations.gemini_cli"
+        },
+        {
+          "file": "src/praisonai/praisonai/integrations/registry.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.integrations.registry"
+        }
+      ],
+      "subject": "Dependency cycle across 6 modules: base \u2192 claude_code \u2192 codex_cli \u2192 cursor_cli\u2026",
+      "evidence": {
+        "scc_members": [
+          "praisonai.integrations.base",
+          "praisonai.integrations.claude_code",
+          "praisonai.integrations.codex_cli",
+          "praisonai.integrations.cursor_cli",
+          "praisonai.integrations.gemini_cli",
+          "praisonai.integrations.registry"
+        ],
+        "scc_size": 6,
+        "cycle_edges": [
+          [
+            "praisonai.integrations.registry",
+            "praisonai.integrations.claude_code"
+          ],
+          [
+            "praisonai.integrations.claude_code",
+            "praisonai.integrations.base"
+          ],
+          [
+            "praisonai.integrations.base",
+            "praisonai.integrations.registry"
+          ]
+        ],
+        "total_internal_edges_within_scc": 14
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.6,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.integrations.base\n\"\"\"\nBase class for external CLI tool integrations.\n\nProvides a consistent interface for integrating with AI coding CLI tools\nlike Claude Code, Gemini CLI, Codex CLI, and Cursor CLI.\n\nFeatures:\n- Lazy availability checking with caching\n- Async subprocess execution\n- Tool wrapper for agent integration\n- Timeout handling\n\"\"\"\n\nfrom abc import ABC, abstractmethod\nfrom typing import AsyncIterator, Optional, Dict, Any, Tuple, List\nimport asyncio\nimport shutil\nimport os\nimport threading\n",
+        "# praisonai.integrations.claude_code\n\"\"\"\nClaude Code CLI Integration.\n\nProvides integration with Claude Code CLI for AI-powered coding tasks.\n\nFeatures:\n- Headless mode execution with JSON output\n- Session continuation support\n- System prompt customization\n- Tool restrictions\n- Optional SDK integration (when claude-agent-sdk is installed)\n\nUsage:\n    from praisonai.integrations import ClaudeCodeIntegration\n    \n    # Create integration\n    claude = ClaudeCodeIntegration(workspace=\"/path/to/project\")\n    \n    # Execute a coding task\n    result = await claude.execute(\"Refactor the auth module\")",
+        "# praisonai.integrations.codex_cli\n\"\"\"\nOpenAI Codex CLI Integration.\n\nProvides integration with OpenAI's Codex CLI for AI-powered coding tasks.\n\nFeatures:\n- Non-interactive execution with `codex exec`\n- Full auto mode for file modifications\n- Sandbox modes for security\n- JSON streaming output\n- Structured output with schemas\n\nUsage:\n    from praisonai.integrations import CodexCLIIntegration\n    \n    # Create integration\n    codex = CodexCLIIntegration(workspace=\"/path/to/project\")\n    \n    # Execute a coding task\n    result = await codex.execute(\"Fix the authentication bug\")",
+        "# praisonai.integrations.cursor_cli\n\"\"\"\nCursor CLI Integration.\n\nProvides integration with Cursor's CLI (cursor-agent) for AI-powered coding tasks.\n\nFeatures:\n- Headless mode execution with JSON output\n- Force mode for file modifications\n- Model selection\n- Session resume support\n- Streaming output with partial deltas\n\nUsage:\n    from praisonai.integrations import CursorCLIIntegration\n    \n    # Create integration\n    cursor = CursorCLIIntegration(workspace=\"/path/to/project\")\n    \n    # Execute a coding task\n    result = await cursor.execute(\"Fix the authentication bug\")",
+        "# praisonai.integrations.gemini_cli\n\"\"\"\nGemini CLI Integration.\n\nProvides integration with Google's Gemini CLI for AI-powered coding tasks.\n\nFeatures:\n- Headless mode execution with JSON output\n- Model selection (gemini-2.5-pro, gemini-2.5-flash, etc.)\n- Multi-directory context support\n- Google Search grounding\n- Usage statistics\n\nUsage:\n    from praisonai.integrations import GeminiCLIIntegration\n    \n    # Create integration\n    gemini = GeminiCLIIntegration(workspace=\"/path/to/project\")\n    \n    # Execute a coding task\n    result = await gemini.execute(\"Analyze this codebase\")",
+        "# praisonai.integrations.registry\n\"\"\"\nExternal Agent Registry for PraisonAI.\n\nProvides a registry pattern for managing external CLI integrations,\nallowing dynamic registration and discovery of external agents.\n\nFeatures:\n- Dynamic registration of custom integrations\n- Availability checking for all registered integrations\n- Factory pattern for creating integrations\n- Backward compatibility with existing get_available_integrations()\n\nUsage:\n    from praisonai.integrations.registry import get_default_registry\n    \n    # Get default registry (or inject custom for multi-tenant)\n    registry = get_default_registry()\n    \n    # Register custom integration\n    registry.register('my-agent', MyCustomIntegration)"
+      ]
+    },
+    {
+      "id": "88947f68e5",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/auth/subscription/__init__.py",
+          "line_start": 1,
+          "line_end": 35,
+          "module": "praisonai-agents.praisonaiagents.auth.subscription"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/auth/subscription/claude_code.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.auth.subscription.claude_code"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/auth/subscription/codex.py",
+          "line_start": 1,
+          "line_end": 69,
+          "module": "praisonai-agents.praisonaiagents.auth.subscription.codex"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/auth/subscription/gemini_cli.py",
+          "line_start": 1,
+          "line_end": 51,
+          "module": "praisonai-agents.praisonaiagents.auth.subscription.gemini_cli"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/auth/subscription/qwen_cli.py",
+          "line_start": 1,
+          "line_end": 58,
+          "module": "praisonai-agents.praisonaiagents.auth.subscription.qwen_cli"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/auth/subscription/registry.py",
+          "line_start": 1,
+          "line_end": 64,
+          "module": "praisonai-agents.praisonaiagents.auth.subscription.registry"
+        }
+      ],
+      "subject": "Dependency cycle across 6 modules: subscription \u2192 claude_code \u2192 codex \u2192 gemini_cli\u2026",
+      "evidence": {
+        "scc_members": [
+          "praisonai-agents.praisonaiagents.auth.subscription",
+          "praisonai-agents.praisonaiagents.auth.subscription.claude_code",
+          "praisonai-agents.praisonaiagents.auth.subscription.codex",
+          "praisonai-agents.praisonaiagents.auth.subscription.gemini_cli",
+          "praisonai-agents.praisonaiagents.auth.subscription.qwen_cli",
+          "praisonai-agents.praisonaiagents.auth.subscription.registry"
+        ],
+        "scc_size": 6,
+        "cycle_edges": [
+          [
+            "praisonai-agents.praisonaiagents.auth.subscription.qwen_cli",
+            "praisonai-agents.praisonaiagents.auth.subscription.registry"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.auth.subscription.registry",
+            "praisonai-agents.praisonaiagents.auth.subscription.qwen_cli"
+          ]
+        ],
+        "total_internal_edges_within_scc": 10
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.6,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.praisonaiagents.auth.subscription\n\"\"\"Subscription / OAuth auth for LLM providers.\n\nOpt-in, zero-overhead. Lazy-loaded via __getattr__ so importing\npraisonaiagents stays fast.\n\"\"\"\nfrom __future__ import annotations\n\n__all__ = [\n    \"SubscriptionAuthProtocol\",\n    \"SubscriptionCredentials\",\n    \"register_subscription_provider\",\n    \"list_subscription_providers\",\n    \"resolve_subscription_credentials\",\n    \"get_subscription_provider\",\n]\n\n\ndef __getattr__(name):\n    if name in (\"SubscriptionAuthProtocol\", \"SubscriptionCredentials\"):\n        from .protocols import SubscriptionAuthProtocol, SubscriptionCredentials",
+        "# praisonai-agents.praisonaiagents.auth.subscription.claude_code\n\"\"\"Claude Code OAuth \u2014 read ~/.claude/.credentials.json or macOS Keychain.\"\"\"\nfrom __future__ import annotations\n\nimport json\nimport os\nimport re\nimport subprocess\nimport sys\nimport time\nimport urllib.parse\nimport urllib.request\nfrom pathlib import Path\nfrom typing import Any, Dict, Optional\n\nfrom .protocols import AuthError, SubscriptionAuthProtocol, SubscriptionCredentials\nfrom .registry import register_subscription_provider\n\n_OAUTH_CLIENT_ID = \"9d1c250a-e61b-44d9-88ed-5944d1962f5e\"\n_TOKEN_ENDPOINTS = (\n    \"https://platform.claude.com/v1/oauth/token\",",
+        "# praisonai-agents.praisonaiagents.auth.subscription.codex\n\"\"\"Codex / ChatGPT subscription \u2014 read ~/.codex/auth.json (or CODEX_HOME).\"\"\"\nfrom __future__ import annotations\n\nimport json\nimport os\nimport time\nfrom pathlib import Path\nfrom typing import Any, Dict, Optional\n\nfrom .protocols import AuthError, SubscriptionCredentials\nfrom .registry import register_subscription_provider\n\n\n_CODEX_BASE_URL = \"https://chatgpt.com/backend-api/codex\"\n\n\ndef _read_codex_tokens() -> Optional[Dict[str, Any]]:\n    home = os.environ.get(\"CODEX_HOME\", \"\").strip() or str(Path.home() / \".codex\")\n    auth_path = Path(home).expanduser() / \"auth.json\"\n    if not auth_path.is_file():",
+        "# praisonai-agents.praisonaiagents.auth.subscription.gemini_cli\n\"\"\"Gemini CLI OAuth \u2014 read ~/.gemini/oauth_creds.json.\"\"\"\nfrom __future__ import annotations\n\nimport json\nimport os\nfrom pathlib import Path\nfrom typing import Any, Dict, Optional\n\nfrom .protocols import AuthError, SubscriptionCredentials\nfrom .registry import register_subscription_provider\n\n\n_GEMINI_BASE_URL = \"https://cloudcode-pa.googleapis.com/v1internal\"\n\n\ndef _read_gemini_tokens() -> Optional[Dict[str, Any]]:\n    \"\"\"Read Gemini CLI OAuth credentials.\"\"\"\n    auth_path = Path.home() / \".gemini\" / \"oauth_creds.json\"\n    if not auth_path.is_file():\n        return None",
+        "# praisonai-agents.praisonaiagents.auth.subscription.qwen_cli\n\"\"\"Qwen CLI OAuth \u2014 read ~/.qwen/oauth_creds.json.\"\"\"\nfrom __future__ import annotations\n\nimport json\nimport os\nfrom pathlib import Path\nfrom typing import Any, Dict, Optional\n\nfrom .protocols import AuthError, SubscriptionCredentials\nfrom .registry import register_subscription_provider\n\n\n_QWEN_BASE_URL = \"https://portal.qwen.ai/v1\"\n\n\ndef _read_qwen_tokens() -> Optional[Dict[str, Any]]:\n    \"\"\"Read Qwen CLI OAuth credentials.\"\"\"\n    auth_path = Path.home() / \".qwen\" / \"oauth_creds.json\"\n    if not auth_path.is_file():\n        return None",
+        "# praisonai-agents.praisonaiagents.auth.subscription.registry\n\"\"\"Thread-safe provider registry for subscription auth.\"\"\"\nfrom __future__ import annotations\n\nimport threading\nfrom typing import Callable, Dict, List, Optional\n\nfrom .protocols import AuthError, SubscriptionAuthProtocol, SubscriptionCredentials\n\n_REGISTRY: Dict[str, Callable[[], SubscriptionAuthProtocol]] = {}\n_LOCK = threading.RLock()\n_BUILTIN_REGISTERED = False\n\n\ndef register_subscription_provider(\n    provider_id: str,\n    factory: Callable[[], SubscriptionAuthProtocol],\n) -> None:\n    \"\"\"Register a new subscription-auth provider.\n\n    Args:"
+      ]
+    },
+    {
+      "id": "e60a56d47c",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/deploy/providers/aws.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.deploy.providers.aws"
+        },
+        {
+          "file": "src/praisonai/praisonai/deploy/providers/azure.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.deploy.providers.azure"
+        },
+        {
+          "file": "src/praisonai/praisonai/deploy/providers/base.py",
+          "line_start": 1,
+          "line_end": 101,
+          "module": "praisonai.deploy.providers.base"
+        },
+        {
+          "file": "src/praisonai/praisonai/deploy/providers/gcp.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.deploy.providers.gcp"
+        }
+      ],
+      "subject": "Dependency cycle across 4 modules: aws \u2192 azure \u2192 base \u2192 gcp",
+      "evidence": {
+        "scc_members": [
+          "praisonai.deploy.providers.aws",
+          "praisonai.deploy.providers.azure",
+          "praisonai.deploy.providers.base",
+          "praisonai.deploy.providers.gcp"
+        ],
+        "scc_size": 4,
+        "cycle_edges": [
+          [
+            "praisonai.deploy.providers.gcp",
+            "praisonai.deploy.providers.base"
+          ],
+          [
+            "praisonai.deploy.providers.base",
+            "praisonai.deploy.providers.gcp"
+          ]
+        ],
+        "total_internal_edges_within_scc": 6
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.4,
+        "principle_severity": 0.8,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.deploy.providers.aws\n\"\"\"\nAWS provider for cloud deployment (ECS Fargate).\n\"\"\"\nimport subprocess\nimport json\nfrom typing import Dict, Any\nfrom .base import BaseProvider\nfrom ..models import CloudConfig, DeployResult, DeployStatus, DestroyResult, ServiceState\nfrom ..doctor import DoctorReport, DoctorCheckResult, check_aws_cli\n\n\nclass AWSProvider(BaseProvider):\n    \"\"\"AWS deployment provider using ECS Fargate.\"\"\"\n    \n    def doctor(self) -> DoctorReport:\n        \"\"\"Run AWS-specific health checks.\"\"\"\n        checks = [check_aws_cli()]\n        \n        # Check if region is configured\n        try:",
+        "# praisonai.deploy.providers.azure\n\"\"\"\nAzure provider for cloud deployment (Container Apps).\n\"\"\"\nimport subprocess\nimport json\nfrom typing import Dict, Any\nfrom .base import BaseProvider\nfrom ..models import DeployResult, DeployStatus, DestroyResult, ServiceState\nfrom ..doctor import DoctorReport, DoctorCheckResult, check_azure_cli\n\n\nclass AzureProvider(BaseProvider):\n    \"\"\"Azure deployment provider using Container Apps.\"\"\"\n    \n    def doctor(self) -> DoctorReport:\n        \"\"\"Run Azure-specific health checks.\"\"\"\n        checks = [check_azure_cli()]\n        \n        # Check if resource group exists\n        if self.config.resource_group:",
+        "# praisonai.deploy.providers.base\n\"\"\"\nBase provider interface for cloud deployments.\n\"\"\"\nfrom abc import ABC, abstractmethod\nfrom typing import Dict, Any\nfrom ..models import CloudConfig, DeployResult, DeployStatus, DestroyResult\nfrom ..doctor import DoctorReport\n\n\nclass BaseProvider(ABC):\n    \"\"\"Abstract base class for cloud providers.\"\"\"\n    \n    def __init__(self, config: CloudConfig):\n        \"\"\"\n        Initialize provider with configuration.\n        \n        Args:\n            config: Cloud configuration\n        \"\"\"\n        self.config = config",
+        "# praisonai.deploy.providers.gcp\n\"\"\"\nGCP provider for cloud deployment (Cloud Run).\n\"\"\"\nimport subprocess\nimport json\nfrom typing import Dict, Any\nfrom .base import BaseProvider\nfrom ..models import DeployResult, DeployStatus, DestroyResult, ServiceState\nfrom ..doctor import DoctorReport, DoctorCheckResult, check_gcp_cli\n\n\nclass GCPProvider(BaseProvider):\n    \"\"\"GCP deployment provider using Cloud Run.\"\"\"\n    \n    def doctor(self) -> DoctorReport:\n        \"\"\"Run GCP-specific health checks.\"\"\"\n        checks = [check_gcp_cli()]\n        \n        # Check if Cloud Run API is enabled\n        if self.config.project_id:"
+      ]
+    },
+    {
+      "id": "79f811e334",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/cli/features/tui/__init__.py",
+          "line_start": 1,
+          "line_end": 83,
+          "module": "praisonai.cli.features.tui"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/tui/app.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.tui.app"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/tui/screens/main.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.tui.screens.main"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/tui/widgets/file_popup.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.tui.widgets.file_popup"
+        }
+      ],
+      "subject": "Dependency cycle across 4 modules: tui \u2192 app \u2192 main \u2192 file_popup",
+      "evidence": {
+        "scc_members": [
+          "praisonai.cli.features.tui",
+          "praisonai.cli.features.tui.app",
+          "praisonai.cli.features.tui.screens.main",
+          "praisonai.cli.features.tui.widgets.file_popup"
+        ],
+        "scc_size": 4,
+        "cycle_edges": [
+          [
+            "praisonai.cli.features.tui.screens.main",
+            "praisonai.cli.features.tui.widgets.file_popup"
+          ],
+          [
+            "praisonai.cli.features.tui.widgets.file_popup",
+            "praisonai.cli.features.tui"
+          ],
+          [
+            "praisonai.cli.features.tui",
+            "praisonai.cli.features.tui.app"
+          ],
+          [
+            "praisonai.cli.features.tui.app",
+            "praisonai.cli.features.tui.screens.main"
+          ]
+        ],
+        "total_internal_edges_within_scc": 4
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.4,
+        "principle_severity": 0.8,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.cli.features.tui\n\"\"\"\nTUI (Terminal User Interface) for PraisonAI.\n\nProvides an app-like interactive experience with:\n- Event-loop driven async UI\n- Multi-pane layout (chat, tools, queue, status)\n- Streaming output\n- Queue management\n- Session persistence\n- Headless simulation mode for CI/testing\n\nRequires the [tui] extra: pip install praisonai[tui]\n\"\"\"\n\nfrom typing import TYPE_CHECKING\n\nif TYPE_CHECKING:\n    from .app import TUIApp\n    from .events import TUIEvent, TUIEventType\n    from .orchestrator import TuiOrchestrator, UIStateModel, SimulationRunner",
+        "# praisonai.cli.features.tui.app\n\"\"\"\nMain TUI Application for PraisonAI.\n\nEvent-loop driven async TUI with multi-pane layout.\n\"\"\"\n\nimport asyncio\nimport logging\nimport os\nimport time\nimport uuid\nfrom typing import Any, Dict, List, Optional\n\ntry:\n    from textual.app import App, ComposeResult\n    from textual.binding import Binding\n    from textual import work\n    TEXTUAL_AVAILABLE = True\nexcept ImportError:\n    TEXTUAL_AVAILABLE = False",
+        "# praisonai.cli.features.tui.screens.main\n\"\"\"\nMain Screen for PraisonAI TUI.\n\nThe primary chat interface screen.\n\"\"\"\n\nimport asyncio\nfrom typing import Optional\n\ntry:\n    from textual.screen import Screen\n    from textual.containers import Horizontal, Vertical, Container\n    from textual.widgets import Static, Footer, Header\n    from textual.binding import Binding\n    from textual.message import Message\n    TEXTUAL_AVAILABLE = True\nexcept ImportError:\n    TEXTUAL_AVAILABLE = False\n    Screen = object\n    Message = object",
+        "# praisonai.cli.features.tui.widgets.file_popup\n\"\"\"\nFile Autocomplete Popup Widget for PraisonAI TUI.\n\nShows file/directory suggestions when user types @.\nReuses FileSearchService from at_mentions.py.\n\"\"\"\n\nfrom typing import List, Optional\nfrom dataclasses import dataclass\nimport os\n\ntry:\n    from textual.widget import Widget\n    from textual.widgets import Static, Input, OptionList\n    from textual.widgets.option_list import Option\n    from textual.containers import Container\n    from textual.reactive import reactive\n    from textual.message import Message\n    from textual import events\n    from rich.text import Text"
+      ]
+    },
+    {
+      "id": "b3af513385",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/mcp_server/server.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.mcp_server.server"
+        },
+        {
+          "file": "src/praisonai/praisonai/mcp_server/transports/http_stream.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.mcp_server.transports.http_stream"
+        },
+        {
+          "file": "src/praisonai/praisonai/mcp_server/transports/stdio.py",
+          "line_start": 1,
+          "line_end": 132,
+          "module": "praisonai.mcp_server.transports.stdio"
+        }
+      ],
+      "subject": "Dependency cycle across 3 modules: server \u2192 http_stream \u2192 stdio",
+      "evidence": {
+        "scc_members": [
+          "praisonai.mcp_server.server",
+          "praisonai.mcp_server.transports.http_stream",
+          "praisonai.mcp_server.transports.stdio"
+        ],
+        "scc_size": 3,
+        "cycle_edges": [
+          [
+            "praisonai.mcp_server.server",
+            "praisonai.mcp_server.transports.stdio"
+          ],
+          [
+            "praisonai.mcp_server.transports.stdio",
+            "praisonai.mcp_server.server"
+          ]
+        ],
+        "total_internal_edges_within_scc": 4
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.3,
+        "principle_severity": 0.7000000000000001,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.mcp_server.server\n\"\"\"\nMCP Server Implementation\n\nCore MCP server that handles JSON-RPC messages and routes them to appropriate handlers.\nSupports both STDIO and HTTP Stream transports.\n\"\"\"\n\nimport asyncio\nimport json\nimport logging\nfrom typing import Any, Callable, Dict, Optional, Set\n\nfrom .registry import (\n    get_tool_registry,\n    get_resource_registry,\n    get_prompt_registry,\n    MCPToolRegistry,\n    MCPResourceRegistry,\n    MCPPromptRegistry,\n)",
+        "# praisonai.mcp_server.transports.http_stream\n\"\"\"\nHTTP Stream Transport for MCP Server\n\nImplements the MCP Streamable HTTP transport (MCP 2025-11-25 spec):\n- Single endpoint for all MCP communication\n- POST for client\u2192server messages\n- GET for server\u2192client SSE stream (optional)\n- Session management via MCP-Session-Id header\n- Supports batch (JSON) and stream (SSE) response modes\n- Origin header validation for security\n- MCP-Protocol-Version header support\n\"\"\"\n\nimport asyncio\nimport json\nimport logging\nimport time\nimport uuid\nfrom typing import TYPE_CHECKING, Any, Dict, Optional\n",
+        "# praisonai.mcp_server.transports.stdio\n\"\"\"\nSTDIO Transport for MCP Server\n\nImplements the MCP STDIO transport protocol:\n- JSON-RPC 2.0 messages over stdin/stdout\n- Messages delimited by newlines\n- Logs go to stderr only\n\"\"\"\n\nimport asyncio\nimport json\nimport logging\nimport sys\nfrom typing import TYPE_CHECKING\n\nif TYPE_CHECKING:\n    from ..server import MCPServer\n\nlogger = logging.getLogger(__name__)\n"
+      ]
+    },
+    {
+      "id": "f485743c90",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/integrations/managed_agents.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.integrations.managed_agents"
+        },
+        {
+          "file": "src/praisonai/praisonai/integrations/managed_local.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.integrations.managed_local"
+        }
+      ],
+      "subject": "Dependency cycle across 2 modules: managed_agents \u2192 managed_local",
+      "evidence": {
+        "scc_members": [
+          "praisonai.integrations.managed_agents",
+          "praisonai.integrations.managed_local"
+        ],
+        "scc_size": 2,
+        "cycle_edges": [
+          [
+            "praisonai.integrations.managed_agents",
+            "praisonai.integrations.managed_local"
+          ],
+          [
+            "praisonai.integrations.managed_local",
+            "praisonai.integrations.managed_agents"
+          ]
+        ],
+        "total_internal_edges_within_scc": 2
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.6000000000000001,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.integrations.managed_agents\n\"\"\"\nExternal Managed Agent Backends Integration.\n\nProvides integration with Anthropic's Managed Agents API as an execution backend\nfor PraisonAI Agents. Uses the official Anthropic Python SDK (v0.94+) which handles\nbeta headers, authentication, and SSE streaming natively.\n\nImplements ``ManagedBackendProtocol`` from the Core SDK.\n\nUsage::\n\n    from praisonai.integrations.managed_agents import ManagedAgent, ManagedConfig\n    from praisonaiagents import Agent\n\n    # Create managed backend\n    managed = ManagedAgent(\n        config=ManagedConfig(\n            model=\"claude-sonnet-4-6\",\n            system=\"You are a coding assistant.\",\n            tools=[{\"type\": \"agent_toolset_20260401\"}],",
+        "# praisonai.integrations.managed_local\n\"\"\"\nLocal Managed Agent Backend \u2014 provider-agnostic self-hosted managed agents.\n\nReplicates the Anthropic Managed Agents experience using any LLM provider\n(OpenAI, Gemini, Ollama, local) with local sandbox execution.\n\nImplements ``ManagedBackendProtocol`` from the Core SDK.\n\nUsage::\n\n    from praisonai.integrations.managed_local import LocalManagedAgent, LocalManagedConfig\n    from praisonaiagents import Agent\n\n    managed = LocalManagedAgent(\n        config=LocalManagedConfig(\n            model=\"gpt-4o\",\n            system=\"You are a coding assistant.\",\n        )\n    )\n    agent = Agent(name=\"coder\", backend=managed)"
+      ]
+    },
+    {
+      "id": "d821fa1e43",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/cli/features/queue/manager.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.queue.manager"
+        },
+        {
+          "file": "src/praisonai/praisonai/cli/features/queue/worker.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai.cli.features.queue.worker"
+        }
+      ],
+      "subject": "Dependency cycle across 2 modules: manager \u2192 worker",
+      "evidence": {
+        "scc_members": [
+          "praisonai.cli.features.queue.manager",
+          "praisonai.cli.features.queue.worker"
+        ],
+        "scc_size": 2,
+        "cycle_edges": [
+          [
+            "praisonai.cli.features.queue.worker",
+            "praisonai.cli.features.queue.manager"
+          ],
+          [
+            "praisonai.cli.features.queue.manager",
+            "praisonai.cli.features.queue.worker"
+          ]
+        ],
+        "total_internal_edges_within_scc": 2
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.6000000000000001,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.cli.features.queue.manager\n\"\"\"\nQueue Manager for PraisonAI.\n\nHigh-level interface that coordinates scheduler, workers, and persistence.\n\"\"\"\n\nimport asyncio\nimport logging\nimport os\nimport time\nfrom typing import Any, Callable, Coroutine, Dict, List, Optional\n\nfrom .models import QueuedRun, RunState, RunPriority, QueueConfig, QueueStats, QueueEvent\nfrom .scheduler import QueueScheduler, QueueFullError\nfrom .worker import WorkerPool\nfrom .persistence import QueuePersistence\n\nlogger = logging.getLogger(__name__)\n\n",
+        "# praisonai.cli.features.queue.worker\n\"\"\"\nWorker Pool for PraisonAI Queue System.\n\nManages async workers that execute queued runs.\n\"\"\"\n\nimport asyncio\nimport logging\nimport time\nfrom collections import deque\nfrom typing import Any, Callable, Coroutine, Dict, List, Optional, Set\n\nfrom .models import QueuedRun, RunState, StreamChunk, QueueEvent\nfrom .scheduler import QueueScheduler\n\nlogger = logging.getLogger(__name__)\n\n\nclass StreamBuffer:\n    \"\"\"Bounded buffer with backpressure for streaming output.\"\"\""
+      ]
+    },
+    {
+      "id": "f3e9bae864",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/plugins/discovery.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.plugins.discovery"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/tools/registry.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.tools.registry"
+        }
+      ],
+      "subject": "Dependency cycle across 2 modules: discovery \u2192 registry",
+      "evidence": {
+        "scc_members": [
+          "praisonai-agents.praisonaiagents.plugins.discovery",
+          "praisonai-agents.praisonaiagents.tools.registry"
+        ],
+        "scc_size": 2,
+        "cycle_edges": [
+          [
+            "praisonai-agents.praisonaiagents.tools.registry",
+            "praisonai-agents.praisonaiagents.plugins.discovery"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.plugins.discovery",
+            "praisonai-agents.praisonaiagents.tools.registry"
+          ]
+        ],
+        "total_internal_edges_within_scc": 2
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.6000000000000001,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.praisonaiagents.plugins.discovery\n\"\"\"\nPlugin Discovery for Single-File Plugins.\n\nDiscovers and loads plugins from directories.\nPlugins are simple Python files with WordPress-style docstring headers.\n\nDefault plugin directories (in precedence order):\n1. Project: ./.praisonai/plugins/\n2. User: ~/.praisonai/plugins/\n\nUsage:\n    from praisonaiagents.plugins.discovery import discover_plugins, load_plugin\n    \n    # Discover all plugins\n    plugins = discover_plugins()\n    \n    # Load a specific plugin\n    plugin = load_plugin(\"/path/to/my_plugin.py\")\n\"\"\"\n",
+        "# praisonai-agents.praisonaiagents.tools.registry\n\"\"\"Tool registry for managing and discovering tools.\n\nThis module provides centralized tool management with support for:\n- Manual registration\n- Auto-discovery via entry_points\n- Tool lookup by name\n- Thread-safe operations for multi-agent scenarios\n\nUsage:\n    from praisonaiagents.tools.registry import get_registry\n    \n    registry = get_registry()\n    registry.register(my_tool)\n    tool = registry.get(\"my_tool\")\n\"\"\"\n\nimport logging\nimport threading\nfrom typing import Any, Callable, Dict, List, Optional, Union\n"
+      ]
+    },
+    {
+      "id": "abf5801d24",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/tools/__init__.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.tools"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/tools/decorator.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.tools.decorator"
+        }
+      ],
+      "subject": "Dependency cycle across 2 modules: tools \u2192 decorator",
+      "evidence": {
+        "scc_members": [
+          "praisonai-agents.praisonaiagents.tools",
+          "praisonai-agents.praisonaiagents.tools.decorator"
+        ],
+        "scc_size": 2,
+        "cycle_edges": [
+          [
+            "praisonai-agents.praisonaiagents.tools",
+            "praisonai-agents.praisonaiagents.tools.decorator"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.tools.decorator",
+            "praisonai-agents.praisonaiagents.tools"
+          ]
+        ],
+        "total_internal_edges_within_scc": 2
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.6000000000000001,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.praisonaiagents.tools\n\"\"\"Tools package for PraisonAI Agents - uses lazy loading for performance\"\"\"\nfrom importlib import import_module\nfrom typing import Any\nimport threading\n\n# Thread-safe lazy loading cache\n_tools_lock = threading.Lock()\n_tools_lazy_cache = {}\n\n# Export core tool items for organized imports (lightweight)\nfrom .base import BaseTool, ToolResult, ToolValidationError, validate_tool\nfrom .decorator import tool, FunctionTool\nfrom .registry import get_registry, register_tool, get_tool, add_tool, has_tool, remove_tool, list_tools, list_available_tools, ToolRegistry\nfrom .tools import Tools\n\n# Export Injected type directly for easy access\nfrom .injected import Injected, AgentState\n\n# Export validation and retry protocols\nfrom .validators import (",
+        "# praisonai-agents.praisonaiagents.tools.decorator\n\"\"\"Tool decorator for converting functions into tools.\n\nThis module provides the @tool decorator for easily creating tools from functions.\n\nUsage:\n    from praisonaiagents import tool\n\n    @tool\n    def search(query: str) -> list:\n        '''Search the web for information.'''\n        return [...]\n\n    # Or with explicit parameters:\n    @tool(name=\"web_search\", description=\"Search the internet\")\n    def search(query: str, max_results: int = 5) -> list:\n        return [...]\n    \n    # With injected state:\n    from praisonaiagents.tools import Injected\n    "
+      ]
+    },
+    {
+      "id": "c2c70004b6",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/tools/call_executor.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.tools.call_executor"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/tools/path_overlap.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.tools.path_overlap"
+        }
+      ],
+      "subject": "Dependency cycle across 2 modules: call_executor \u2192 path_overlap",
+      "evidence": {
+        "scc_members": [
+          "praisonai-agents.praisonaiagents.tools.call_executor",
+          "praisonai-agents.praisonaiagents.tools.path_overlap"
+        ],
+        "scc_size": 2,
+        "cycle_edges": [
+          [
+            "praisonai-agents.praisonaiagents.tools.path_overlap",
+            "praisonai-agents.praisonaiagents.tools.call_executor"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.tools.call_executor",
+            "praisonai-agents.praisonaiagents.tools.path_overlap"
+          ]
+        ],
+        "total_internal_edges_within_scc": 2
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.6000000000000001,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.praisonaiagents.tools.call_executor\n\"\"\"\nTool Call Executor protocols for parallel and sequential tool execution.\n\nThis module implements Gap 2 from Issue #1392: enables parallel execution\nof batched LLM tool calls while maintaining backward compatibility.\n\nDesign principles:\n- Protocol-driven: ToolCallExecutor defines interface, concrete implementations provide behavior\n- Opt-in: parallel_tool_calls=False by default (zero regression risk)\n- Respects existing per-tool timeout infrastructure\n- Thread-safe with bounded workers\n\"\"\"\n\nimport concurrent.futures\nimport contextvars\nimport logging\nfrom typing import Any, Callable, Dict, List, Optional, Protocol\nfrom dataclasses import dataclass\nfrom ..trace.context_events import copy_context_to_callable\n",
+        "# praisonai-agents.praisonaiagents.tools.path_overlap\n\"\"\"\nPath Overlap Detection - Prevent write conflicts in parallel tool execution.\n\nDetects when multiple tool calls would operate on overlapping file paths\nand forces sequential execution to prevent corruption.\n\"\"\"\n\nimport pathlib\nfrom typing import List, Dict, Any, Set\nfrom .call_executor import ToolCall\n\n__all__ = [\"detect_path_conflicts\", \"extract_paths\", \"has_write_conflicts\"]\n\n\n# Tool names that perform write operations\n_WRITE_TOOLS = frozenset({\n    \"write_file\", \"skill_manage\", \"edit_file\", \"patch_file\",\n    \"create_file\", \"save_file\", \"update_file\", \"delete_file\",\n    \"file_write\", \"file_edit\", \"file_create\", \"file_delete\",\n    \"mkdir\", \"rmdir\", \"move_file\", \"copy_file\""
+      ]
+    },
+    {
+      "id": "b7469270fe",
+      "principle": "P1",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/workflows/workflows.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.workflows.workflows"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/workflows/yaml_parser.py",
+          "line_start": 1,
+          "line_end": 200,
+          "module": "praisonai-agents.praisonaiagents.workflows.yaml_parser"
+        }
+      ],
+      "subject": "Dependency cycle across 2 modules: workflows \u2192 yaml_parser",
+      "evidence": {
+        "scc_members": [
+          "praisonai-agents.praisonaiagents.workflows.workflows",
+          "praisonai-agents.praisonaiagents.workflows.yaml_parser"
+        ],
+        "scc_size": 2,
+        "cycle_edges": [
+          [
+            "praisonai-agents.praisonaiagents.workflows.yaml_parser",
+            "praisonai-agents.praisonaiagents.workflows.workflows"
+          ],
+          [
+            "praisonai-agents.praisonaiagents.workflows.workflows",
+            "praisonai-agents.praisonaiagents.workflows.yaml_parser"
+          ]
+        ],
+        "total_internal_edges_within_scc": 2
+      },
+      "alternatives": [
+        "Extract a shared interface into a lower-level module both can depend on.",
+        "Move the coupling concern into one of the modules and have the other depend one-way.",
+        "Use dependency inversion: introduce an abstraction and inject it at composition time."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 0.6000000000000001,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.praisonaiagents.workflows.workflows\n\"\"\"\nWorkflows System for PraisonAI Agents.\n\nProvides reusable multi-step workflows similar to Windsurf's Workflows,\nallowing users to define and execute complex task sequences.\n\nFeatures:\n- YAML/Markdown workflow definitions\n- Auto-discovery from .praisonai/workflows/\n- Step-by-step execution with context passing\n- Variable substitution\n- Conditional steps\n- Lazy loading for performance\n\nStorage Structure:\n    .praisonai/workflows/\n    \u251c\u2500\u2500 deploy.md           # Deployment workflow\n    \u251c\u2500\u2500 test.md             # Testing workflow\n    \u2514\u2500\u2500 review.md           # Code review workflow\n\"\"\"",
+        "# praisonai-agents.praisonaiagents.workflows.yaml_parser\n\"\"\"\nYAML Workflow Parser for PraisonAI Agents.\n\nParses YAML workflow files into Workflow objects with support for:\n- Agent definitions with planning, reasoning, tools\n- Workflow patterns: route(), parallel(), loop(), repeat()\n- Variables and template substitution\n- Callbacks and guardrails\n- Memory configuration\n\"\"\"\n\nimport yaml\nfrom typing import Any, Callable, Dict, List, Optional, Union\nfrom pathlib import Path\n\nfrom ..agent.agent import Agent\nfrom .workflows import Workflow, route, parallel, loop, repeat, Include, include\nfrom ..task.task import Task\n\n"
+      ]
+    },
+    {
+      "id": "f971778b7c",
+      "principle": "P2",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/telemetry/telemetry.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai-agents.praisonaiagents.telemetry.telemetry"
+        },
+        {
+          "file": "src/praisonai-agents/praisonaiagents/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai-agents.praisonaiagents"
+        }
+      ],
+      "subject": "Stable module praisonai-agents.praisonaiagents.telemetry.telemetry depends on unstable module praisonai-agents.praisonaiagents (SDP violation)",
+      "evidence": {
+        "source": "praisonai-agents.praisonaiagents.telemetry.telemetry",
+        "target": "praisonai-agents.praisonaiagents",
+        "source_I": 0.143,
+        "target_I": 0.778,
+        "source_Ca": 6,
+        "source_Ce": 1,
+        "target_Ca": 2,
+        "target_Ce": 7
+      },
+      "alternatives": [
+        "Invert the dependency: extract an interface in praisonai-agents.praisonaiagents.telemetry.telemetry and have praisonai-agents.praisonaiagents depend on it.",
+        "Move the concern shared between praisonai-agents.praisonaiagents.telemetry.telemetry and praisonai-agents.praisonaiagents into a third, more stable module.",
+        "Accept the violation if praisonai-agents.praisonaiagents's churn is bounded and document why."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.6,
+        "principle_severity": 0.6349206349206349,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.praisonaiagents.telemetry.telemetry\n\"\"\"\nMinimal telemetry implementation for PraisonAI Agents.\n\nThis module provides anonymous usage tracking with privacy-first design.\nAll telemetry is opt-out via environment variables.\n\"\"\"\n\nimport os\nimport time\nimport platform\nimport hashlib\nimport threading\nfrom typing import Dict, Any, Optional\nfrom datetime import datetime\nimport logging\nfrom praisonaiagents._logging import get_logger\nfrom concurrent.futures import ThreadPoolExecutor\n\n# Lazy imports - only import when needed\n_POSTHOG_AVAILABLE = None",
+        "# praisonai-agents.praisonaiagents\n\"\"\"\nPraison AI Agents - A package for hierarchical AI agent task execution\n\nThis module uses lazy loading to minimize import time and memory usage.\nHeavy dependencies like litellm are only loaded when actually needed.\n\"\"\"\n\n# =============================================================================\n# NAMING CONVENTION GUIDE (Simplified patterns for consistency)\n# =============================================================================\n# | Pattern       | When to Use             | Examples                        |\n# |---------------|-------------------------|----------------------------------|\n# | add_X         | Register something      | add_hook, add_tool, add_profile |\n# | get_X         | Retrieve something      | get_tool, get_profile           |\n# | remove_X      | Unregister something    | remove_hook, remove_tool        |\n# | has_X         | Check existence         | has_hook, has_tool              |\n# | list_X        | List all items          | list_tools, list_profiles       |\n# | enable_X      | Turn on feature         | enable_telemetry                |\n# | disable_X     | Turn off feature        | disable_telemetry               |\n# | XConfig       | Configuration class     | MemoryConfig, HooksConfig       |"
+      ]
+    },
+    {
+      "id": "97fd72119f",
+      "principle": "P2",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/cli/features/approval.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai.cli.features.approval"
+        },
+        {
+          "file": "src/praisonai/praisonai/bots/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai.bots"
+        }
+      ],
+      "subject": "Stable module praisonai.cli.features.approval depends on unstable module praisonai.bots (SDP violation)",
+      "evidence": {
+        "source": "praisonai.cli.features.approval",
+        "target": "praisonai.bots",
+        "source_I": 0.2,
+        "target_I": 0.773,
+        "source_Ca": 4,
+        "source_Ce": 1,
+        "target_Ca": 5,
+        "target_Ce": 17
+      },
+      "alternatives": [
+        "Invert the dependency: extract an interface in praisonai.cli.features.approval and have praisonai.bots depend on it.",
+        "Move the concern shared between praisonai.cli.features.approval and praisonai.bots into a third, more stable module.",
+        "Accept the violation if praisonai.bots's churn is bounded and document why."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.4,
+        "principle_severity": 0.5727272727272728,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.5,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.cli.features.approval\n\"\"\"\nApproval backend resolver for PraisonAI CLI.\n\nMaps CLI --approval flag values to approval backend instances.\nUsed by run, chat, and main CLI commands for DRY approval wiring.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport logging\nfrom typing import Any, Optional\n\nlogger = logging.getLogger(__name__)\n\n# Valid backend names for CLI help text\nVALID_BACKENDS = [\"console\", \"slack\", \"telegram\", \"discord\", \"webhook\", \"http\", \"agent\", \"auto\", \"none\"]\n\n\ndef resolve_approval_backend(value: Optional[str]) -> Optional[Any]:\n    \"\"\"Resolve a CLI --approval flag value to an approval backend instance.",
+        "# praisonai.bots\n\"\"\"\nBot implementations for PraisonAI.\n\nProvides messaging bot runtimes for Telegram, Discord, Slack, and WhatsApp,\nplus the user-friendly Bot and BotOS orchestrator classes.\n\"\"\"\n\nfrom typing import TYPE_CHECKING\n\nif TYPE_CHECKING:\n    from .telegram import TelegramBot\n    from .discord import DiscordBot\n    from .slack import SlackBot\n    from .whatsapp import WhatsAppBot\n    from .linear import LinearBot\n    from .email import EmailBot\n    from .agentmail import AgentMailBot\n    from .bot import Bot\n    from .botos import BotOS\n    from ._session import BotSessionManager"
+      ]
+    },
+    {
+      "id": "32ad2cc050",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/llm/llm.py",
+          "line_start": 1817,
+          "line_end": 3334,
+          "module": "praisonai-agents.praisonaiagents.llm.llm"
+        }
+      ],
+      "subject": "Function praisonai-agents.praisonaiagents.llm.llm.get_response has cyclomatic complexity 287",
+      "evidence": {
+        "function": "get_response",
+        "module": "praisonai-agents.praisonaiagents.llm.llm",
+        "complexity": 287,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.574,
+        "principle_severity": 0.9066666666666666,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def get_response(\n        self,\n        prompt: Union[str, List[Dict]],\n        system_prompt: Optional[str] = None,\n        chat_history: Optional[List[Dict]] = None,\n        temperature: float = 1.0,\n        tools: Optional[List[Any]] = None,\n        output_json: Optional[BaseModel] = None,\n        output_pydantic: Optional[BaseModel] = None,\n        verbose: bool = True,\n        markdown: bool = True,\n        self_reflect: bool = False,\n        max_reflect: int = 3,\n        min_reflect: int = 1,\n        console: Optional['Console'] = None,\n        agent_name: Optional[str] = None,\n        agent_role: Optional[str] = None,\n        agent_tools: Optional[List[str]] = None,\n        task_name: Optional[str] = None,\n        task_description: Optional[str] = None,\n        task_id: Optional[str] = None,\n        execute_tool_fn: Optional[Callable] = None,\n        parallel_tool_calls: bool = False,  # Gap 2: Enable parallel tool execution\n        stream: bool = True,\n        stream_callback: Optional[Callable] = None,\n        emit_events: bool = False,\n        return_token_usage: bool = False,\n        **kwargs\n    ) -> Union[str, tuple[str, TokenUsage]]:\n        \"\"\"Enhanced get_response with all OpenAI-like features\"\"\"\n        logging.debug(f\"Getting response from {self.model}\")\n        \n        # Variable to store final response for token usage extraction\n        _final_llm_response = None\n\n        # Helper closure to return appropriate format based on return_token_usage\n        def _prepare_return_value(text: str) -> Union[str, tuple]:\n            if not return_token_usage:\n                return text\n            token_usage = self._extract_token_usage(_final_llm_response) if _final_llm_response else None\n            if token_usage is None:\n                token_usage = TokenUsage()\n            return text, token_usage\n\n        # Log all self values when in debug mode\n        self._log_llm_config(\n            'LLM instance',\n            model=self.model,\n            timeout=self.timeout,\n            temperature=self.temperature,"
+      ]
+    },
+    {
+      "id": "8a7e492d13",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/agent/agent.py",
+          "line_start": 509,
+          "line_end": 1948,
+          "module": "praisonai-agents.praisonaiagents.agent.agent"
+        }
+      ],
+      "subject": "Function praisonai-agents.praisonaiagents.agent.agent.__init__ has cyclomatic complexity 277",
+      "evidence": {
+        "function": "__init__",
+        "module": "praisonai-agents.praisonaiagents.agent.agent",
+        "complexity": 277,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.554,
+        "principle_severity": 0.8733333333333333,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def __init__(\n        self,\n        # Core identity\n        name: Optional[str] = None,\n        role: Optional[str] = None,\n        goal: Optional[str] = None,\n        backstory: Optional[str] = None,\n        instructions: Optional[str] = None,\n        # LLM configuration\n        llm: Optional[Union[str, Any]] = None,\n        model: Optional[Union[str, Any]] = None,  # Alias for llm=\n        base_url: Optional[str] = None,  # Kept separate (connection/auth)\n        api_key: Optional[str] = None,  # Kept separate (connection/auth)\n        auth: Optional[str] = None,  # Subscription auth provider: \"claude-code\", \"codex\", etc.\n        # Tools\n        tools: Optional[List[Any]] = None,\n        allow_delegation: bool = False,  # Deprecated: use handoffs= instead\n        allow_code_execution: Optional[bool] = False,  # Deprecated: use execution=ExecutionConfig(code_execution=True)\n        code_execution_mode: Literal[\"safe\", \"unsafe\"] = \"safe\",  # Deprecated: use execution=ExecutionConfig(code_mode=\"safe\")\n        handoffs: Optional[List[Union['Agent', 'Handoff']]] = None,\n        # Session management (deprecated standalone params - use config objects)\n        auto_save: Optional[str] = None,  # Deprecated: use memory=MemoryConfig(auto_save=\"name\")\n        rate_limiter: Optional[Any] = None,  # Deprecated: use execution=ExecutionConfig(rate_limiter=obj)\n        # ============================================================\n        # CONSOLIDATED FEATURE PARAMS (agent-centric API)\n        # Each follows: False=disabled, True=defaults, Config=custom\n        # ============================================================\n        memory: Optional[Union[bool, str, 'MemoryConfig', Any]] = None,\n        knowledge: Optional[Union[bool, str, List[str], 'KnowledgeConfig', 'Knowledge']] = None,\n        planning: Optional[Union[bool, str, 'PlanningConfig']] = False,\n        reflection: Optional[Union[bool, str, 'ReflectionConfig']] = None,\n        guardrails: Optional[Union[bool, str, Callable, 'GuardrailConfig']] = None,\n        web: Optional[Union[bool, str, 'WebConfig']] = None,\n        context: Optional[Union[bool, str, Dict[str, Any], 'ContextConfig', 'ContextManager']] = None,\n        autonomy: Optional[Union[bool, str, Dict[str, Any], 'AutonomyConfig']] = None,\n        verification_hooks: Optional[List[Any]] = None,  # Deprecated: use autonomy=AutonomyConfig(verification_hooks=[...])\n        output: Optional[Union[bool, str, Dict[str, Any], 'OutputConfig']] = None,\n        execution: Optional[Union[bool, str, Dict[str, Any], 'ExecutionConfig']] = None,\n        templates: Optional[Union[Dict[str, Any], 'TemplateConfig']] = None,\n        caching: Optional[Union[bool, str, Dict[str, Any], 'CachingConfig']] = None,\n        hooks: Optional[Union[List[Any], Dict[str, Any], 'HooksConfig']] = None,\n        skills: Optional[Union[List[str], str, Dict[str, Any], 'SkillsConfig']] = None,\n        approval: Optional[Union[bool, str, Dict[str, Any], 'ApprovalConfig', 'ApprovalProtocol']] = None,\n        tool_timeout: Optional[int] = None,  # P8/G11: Timeout in seconds for each tool call\n        parallel_tool_calls: bool = False,  # Gap 2: Enable parallel execution of batched LLM tool calls\n        learn: Optional[Union[bool, str, Dict[str, Any], 'LearnConfig']] = None,  # Continuous learning (peer to memory)\n        backend: Optional[Any] = None,  # External managed agent backend (e.g., ManagedAgentIntegration)\n        cli_backend: Optional[Union[str, Any]] = None,  # CLI backend for delegating turns (e.g., \"claude-code\")\n        interrupt_controller: Optional['InterruptController'] = None,  # G2: Cooperative cancellation\n    ):"
+      ]
+    },
+    {
+      "id": "85a46fa011",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/cli/main.py",
+          "line_start": 883,
+          "line_end": 1924,
+          "module": "praisonai.cli.main"
+        }
+      ],
+      "subject": "Function praisonai.cli.main.parse_args has cyclomatic complexity 199",
+      "evidence": {
+        "function": "parse_args",
+        "module": "praisonai.cli.main",
+        "complexity": 199,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.398,
+        "principle_severity": 0.6133333333333333,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def parse_args(self):\n        \"\"\"\n        Parse the command-line arguments for the PraisonAI CLI.\n        \"\"\"\n        # Check if we're running in a test environment\n        in_test_env = (\n            'pytest' in sys.argv[0] or \n            'unittest' in sys.argv[0] or\n            any(arg.startswith('tests.') or arg.startswith('tests/') for arg in sys.argv[1:3]) or  # Check for test module paths\n            'PYTEST_CURRENT_TEST' in os.environ\n        )\n        \n        # Check if we're being used as a library (not from praisonai CLI)\n        # Skip CLI parsing to avoid conflicts with applications like Fabric\n        is_library_usage = (\n            'praisonai' not in sys.argv[0] and\n            not in_test_env\n        )\n        \n        if is_library_usage:\n            # Return default args when used as library to prevent CLI conflicts\n            default_args = argparse.Namespace()\n            default_args.framework = None\n            default_args.ui = None\n            default_args.auto = None\n            default_args.init = None\n            default_args.command = None\n            default_args.deploy = False\n            default_args.schedule = None\n            default_args.schedule_config = None\n            default_args.provider = \"gcp\"\n            default_args.max_retries = 3\n            default_args.model = None\n            default_args.llm = None\n            default_args.hf = None\n            default_args.ollama = None\n            default_args.dataset = \"yahma/alpaca-cleaned\"\n            default_args.realtime = False\n            default_args.call = False\n            default_args.public = False\n            default_args.chat_mode = False\n            return default_args\n        \n        # Define special commands\n        special_commands = ['chat', 'code', 'call', 'realtime', 'train', 'ui', 'context', 'research', 'memory', 'rules', 'workflow', 'hooks', 'knowledge', 'session', 'tools', 'todo', 'docs', 'mcp', 'commit', 'serve', 'schedule', 'skills', 'profile', 'eval', 'agents', 'run', 'thinking', 'compaction', 'output', 'deploy', 'templates', 'recipe', 'endpoints', 'audio', 'embed', 'embedding', 'images', 'moderate', 'files', 'batches', 'vector-stores', 'rerank', 'ocr', 'assistants', 'fine-tuning', 'completions', 'messages', 'guardrails', 'rag', 'videos', 'a2a', 'containers', 'passthrough', 'responses', 'search', 'realtime-api', 'doctor', 'registry', 'package', 'install', 'uninstall', 'acp', 'debug', 'lsp', 'diag', 'browser', 'replay', 'bot', 'gateway', 'sandbox', 'wizard', 'migrate', 'security', 'persistence', 'paths', 'claw', 'github', 'managed', 'flow', 'dashboard', 'backends']\n        \n        parser = argparse.ArgumentParser(prog=\"praisonai\", description=\"praisonAI command-line interface\")\n        parser.add_argument(\"--framework\", choices=[\"crewai\", \"autogen\", \"praisonai\"], help=\"Specify the framework\")\n        parser.add_argument(\"--ui\", choices=[\"chainlit\", \"gradio\"], help=\"Specify the UI framework (gradio or chainlit).\")\n        parser.add_argument(\"--auto\", nargs=argparse.REMAINDER, help=\"Enable auto mode and pass arguments for it\")"
+      ]
+    },
+    {
+      "id": "40568efb67",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/process/process.py",
+          "line_start": 966,
+          "line_end": 1524,
+          "module": "praisonai-agents.praisonaiagents.process.process"
+        }
+      ],
+      "subject": "Function praisonai-agents.praisonaiagents.process.process.workflow has cyclomatic complexity 191",
+      "evidence": {
+        "function": "workflow",
+        "module": "praisonai-agents.praisonaiagents.process.process",
+        "complexity": 191,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.382,
+        "principle_severity": 0.5866666666666667,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def workflow(self):\n        \"\"\"Synchronous version of workflow method.\n        \n        DEPRECATED: This method is deprecated. Use the Workflow class instead:\n        \n        ```python\n        from praisonaiagents import Workflow, StepResult\n        from praisonaiagents.workflows import route, parallel, loop, repeat\n        \n        workflow = Workflow(steps=[step1, step2])\n        result = workflow.start(\"input\")\n        ```\n        \n        The Workflow class provides a simpler API with more features:\n        - route() for decision-based branching\n        - parallel() for concurrent execution\n        - loop() for iteration over lists/CSV\n        - repeat() for evaluator-optimizer patterns\n        - Callbacks (on_step_start, on_step_complete, etc.)\n        - Guardrails with validation feedback\n        - Status tracking\n        \"\"\"\n        from ..utils.deprecation import warn_deprecated_param\n        warn_deprecated_param(\n            \"process='workflow'\",\n            since=\"1.0.0\",\n            removal=\"2.0.0\", \n            alternative=\"use the Workflow class instead: from praisonaiagents import Workflow; workflow = Workflow(steps=[...]); workflow.start()\",\n            stacklevel=3\n        )\n        current_iter = 0  # Track how many times we've looped\n        workflow_start = time.monotonic()  # For timeout enforcement\n        # Build workflow relationships first\n        for task in self.tasks.values():\n            if task.next_tasks:\n                for next_task_name in task.next_tasks:\n                    next_task = next((t for t in self.tasks.values() if t.name == next_task_name), None)\n                    if next_task:\n                        next_task.previous_tasks.append(task.name)\n\n        # Find start task\n        start_task = None\n        for task_id, task in self.tasks.items():\n            if task.is_start:\n                start_task = task\n                break\n\n        if not start_task:\n            start_task = list(self.tasks.values())[0]\n            logging.info(\"No start task marked, using first task\")"
+      ]
+    },
+    {
+      "id": "cb00beb08b",
+      "principle": "P3",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/llm/llm.py",
+          "line_start": 3655,
+          "line_end": 4456,
+          "module": "praisonai-agents.praisonaiagents.llm.llm"
+        }
+      ],
+      "subject": "Function praisonai-agents.praisonaiagents.llm.llm.get_response_async has cyclomatic complexity 179",
+      "evidence": {
+        "function": "get_response_async",
+        "module": "praisonai-agents.praisonaiagents.llm.llm",
+        "complexity": 179,
+        "threshold": 15,
+        "analyzer": "radon"
+      },
+      "alternatives": [
+        "Extract helper functions to reduce branching.",
+        "Replace nested conditionals with dispatch (table, polymorphism, or strategy).",
+        "Accept the complexity if the function is a parser/dispatcher where it's inherent."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.358,
+        "principle_severity": 0.5466666666666666,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    async def get_response_async(\n        self,\n        prompt: Union[str, List[Dict]],\n        system_prompt: Optional[str] = None,\n        chat_history: Optional[List[Dict]] = None,\n        temperature: float = 1.0,\n        tools: Optional[List[Any]] = None,\n        output_json: Optional[BaseModel] = None,\n        output_pydantic: Optional[BaseModel] = None,\n        verbose: bool = True,\n        markdown: bool = True,\n        self_reflect: bool = False,\n        max_reflect: int = 3,\n        min_reflect: int = 1,\n        console: Optional['Console'] = None,\n        agent_name: Optional[str] = None,\n        agent_role: Optional[str] = None,\n        agent_tools: Optional[List[str]] = None,\n        task_name: Optional[str] = None,\n        task_description: Optional[str] = None,\n        task_id: Optional[str] = None,\n        execute_tool_fn: Optional[Callable] = None,\n        stream: bool = True,\n        **kwargs\n    ) -> str:\n        \"\"\"Async version of get_response with identical functionality.\"\"\"\n        try:\n            import litellm\n            logging.debug(f\"Getting async response from {self.model}\")\n            # Log all self values when in debug mode\n            self._log_llm_config(\n                'get_response_async',\n                model=self.model,\n                timeout=self.timeout,\n                temperature=self.temperature,\n                top_p=self.top_p,\n                n=self.n,\n                max_tokens=self.max_tokens,\n                presence_penalty=self.presence_penalty,\n                frequency_penalty=self.frequency_penalty,\n                logit_bias=self.logit_bias,\n                response_format=self.response_format,\n                seed=self.seed,\n                logprobs=self.logprobs,\n                top_logprobs=self.top_logprobs,\n                api_version=self.api_version,\n                stop_phrases=self.stop_phrases,\n                api_key=self.api_key,\n                base_url=self.base_url,\n                verbose=self.verbose,"
+      ]
+    },
+    {
+      "id": "3d339e09df",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/templates/resolver.py",
+          "line_start": 66,
+          "line_end": 206,
+          "module": "praisonai.templates.resolver"
+        }
+      ],
+      "subject": "Class praisonai.templates.resolver.TemplateResolver has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "TemplateResolver",
+        "module": "praisonai.templates.resolver",
+        "lcom": 1.0,
+        "num_methods": 4,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class TemplateResolver:\n    \"\"\"\n    Resolves template URIs to their source locations.\n    \n    Supported URI formats:\n    - Local path: ./my-template, /absolute/path/template, ~/templates/my-template\n    - Package ref: package:agent_recipes/transcript-generator\n    - GitHub ref: github:owner/repo/template-name[@ref]\n    - HTTP URL: https://example.com/template.yaml\n    \n    Legacy formats (also supported):\n    - praison://local/./path\n    - praison://package/name/template\n    - praison://github/owner/repo/template@ref\n    \"\"\"\n    \n    # URI patterns\n    GITHUB_PATTERN = re.compile(\n        r'^(?:github:|praison://github/)([^/]+)/([^/]+)/([^@]+)(?:@(.+))?$'\n    )\n    PACKAGE_PATTERN = re.compile(\n        r'^(?:package:|praison://package/)([^/]+)/(.+)$'\n    )\n    HTTP_PATTERN = re.compile(\n        r'^(?:https?://|praison://https?/).+'\n    )\n    LOCAL_PATTERN = re.compile(\n        r'^(?:praison://local/)?([.~]?/.+|/.+|[a-zA-Z]:\\\\.+)$'\n    )\n    \n    @classmethod"
+      ]
+    },
+    {
+      "id": "52162945b8",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/standardise/templates.py",
+          "line_start": 15,
+          "line_end": 401,
+          "module": "praisonai.standardise.templates"
+        }
+      ],
+      "subject": "Class praisonai.standardise.templates.TemplateGenerator has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "TemplateGenerator",
+        "module": "praisonai.standardise.templates",
+        "lcom": 1.0,
+        "num_methods": 8,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.4,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class TemplateGenerator:\n    \"\"\"Generates template files for features.\"\"\"\n    \n    def generate(self, slug: FeatureSlug, artifact_type: ArtifactType,\n                 output_path: Optional[Path] = None) -> str:\n        \"\"\"Generate template content for an artifact type.\"\"\"\n        if artifact_type == ArtifactType.EXAMPLE_BASIC:\n            return self._generate_basic_example(slug)\n        elif artifact_type == ArtifactType.EXAMPLE_ADVANCED:\n            return self._generate_advanced_example(slug)\n        elif artifact_type == ArtifactType.DOCS_CONCEPT:\n            return self._generate_concept_doc(slug)\n        elif artifact_type == ArtifactType.DOCS_FEATURE:\n            return self._generate_feature_doc(slug)\n        elif artifact_type == ArtifactType.DOCS_CLI:\n            return self._generate_cli_doc(slug)\n        elif artifact_type == ArtifactType.DOCS_SDK:\n            return self._generate_sdk_doc(slug)\n        else:\n            raise ValueError(f\"Unknown artifact type: {artifact_type}\")\n    \n    def _generate_basic_example(self, slug: FeatureSlug) -> str:\n        \"\"\"Generate a basic example template.\"\"\"\n        name = slug.normalised.replace(\"-\", \" \").title()\n        slug_str = slug.normalised\n        \n        return f'''\"\"\"\n{name} - Basic Example\n\nDemonstrates minimal usage of {slug_str} with a single agent.\n"
+      ]
+    },
+    {
+      "id": "42d1d20f6e",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/standardise/reports.py",
+          "line_start": 16,
+          "line_end": 176,
+          "module": "praisonai.standardise.reports"
+        }
+      ],
+      "subject": "Class praisonai.standardise.reports.ReportGenerator has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "ReportGenerator",
+        "module": "praisonai.standardise.reports",
+        "lcom": 1.0,
+        "num_methods": 6,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.3,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class ReportGenerator:\n    \"\"\"Generates standardisation reports in various formats.\"\"\"\n    \n    def generate(self, report: StandardiseReport, format: str = \"text\") -> str:\n        \"\"\"Generate a report in the specified format.\"\"\"\n        if format == \"text\":\n            return self._generate_text(report)\n        elif format == \"json\":\n            return self._generate_json(report)\n        elif format == \"markdown\":\n            return self._generate_markdown(report)\n        else:\n            raise ValueError(f\"Unknown format: {format}\")\n    \n    def _generate_text(self, report: StandardiseReport) -> str:\n        \"\"\"Generate a text report for terminal output.\"\"\"\n        lines = []\n        \n        # Header\n        lines.append(\"\")\n        lines.append(\"\ud83d\udd0d PraisonAI Standardisation Check\")\n        lines.append(\"\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\")\n        lines.append(\"\")\n        \n        # Summary\n        lines.append(\"\ud83d\udcca Summary\")\n        lines.append(\"\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\")\n        lines.append(f\"Features scanned:     {report.features_scanned}\")\n        lines.append(f\"Docs pages:          {report.docs_pages}\")\n        lines.append(f\"Examples:              {report.examples_count}\")\n        lines.append(\"\")"
+      ]
+    },
+    {
+      "id": "ee38416031",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/standardise/ai_generator.py",
+          "line_start": 35,
+          "line_end": 163,
+          "module": "praisonai.standardise.ai_generator"
+        }
+      ],
+      "subject": "Class praisonai.standardise.ai_generator.SourceAnalyzer has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "SourceAnalyzer",
+        "module": "praisonai.standardise.ai_generator",
+        "lcom": 1.0,
+        "num_methods": 5,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.25,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class SourceAnalyzer:\n    \"\"\"Analyze Python source files to extract class parameters and methods.\"\"\"\n    \n    @staticmethod\n    def extract_class_info(file_path: Path, class_name: str = None) -> Dict[str, Any]:\n        \"\"\"Extract class information including all parameters and methods.\"\"\"\n        try:\n            source = file_path.read_text(encoding=\"utf-8\")\n            tree = ast.parse(source)\n            \n            result = {\n                \"classes\": [],\n                \"functions\": [],\n                \"constants\": [],\n                \"source_preview\": source[:3000],\n            }\n            \n            for node in ast.walk(tree):\n                if isinstance(node, ast.ClassDef):\n                    if class_name and node.name != class_name:\n                        continue\n                    class_info = SourceAnalyzer._extract_class_details(node, source)\n                    result[\"classes\"].append(class_info)\n                elif isinstance(node, ast.FunctionDef) and not isinstance(node, ast.AsyncFunctionDef):\n                    if node.col_offset == 0:  # Top-level function\n                        func_info = SourceAnalyzer._extract_function_details(node, source)\n                        result[\"functions\"].append(func_info)\n                elif isinstance(node, ast.Assign):\n                    for target in node.targets:\n                        if isinstance(target, ast.Name) and target.id.isupper():\n                            result[\"constants\"].append(target.id)"
+      ]
+    },
+    {
+      "id": "8be0a9309b",
+      "principle": "P4",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/standardise/ai_generator.py",
+          "line_start": 1223,
+          "line_end": 1307,
+          "module": "praisonai.standardise.ai_generator"
+        }
+      ],
+      "subject": "Class praisonai.standardise.ai_generator.SDKDocGenerator has low cohesion (LCOM \u2248 1.00)",
+      "evidence": {
+        "class": "SDKDocGenerator",
+        "module": "praisonai.standardise.ai_generator",
+        "lcom": 1.0,
+        "num_methods": 5,
+        "threshold": 0.7
+      },
+      "alternatives": [
+        "Split the class into two or more classes grouped by attribute usage.",
+        "Move methods that don't touch self into module-level functions.",
+        "Accept the score if the class is a coherent value object with deliberately partial method sets."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.25,
+        "principle_severity": 1.0,
+        "pattern_violation": 1.0,
+        "advocate_absence": 0.3,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "class SDKDocGenerator:\n    \"\"\"Auto-generate SDK documentation from code.\"\"\"\n    \n    def __init__(self, sdk_root: Path):\n        self.sdk_root = sdk_root\n    \n    def generate_from_module(self, module_path: Path) -> str:\n        \"\"\"Generate SDK docs from a module's source code.\"\"\"\n        import ast\n        self._ast = ast\n        \n        content_parts = []\n        \n        # Read module files\n        for py_file in module_path.glob(\"*.py\"):\n            if py_file.name.startswith(\"_\") and py_file.name != \"__init__.py\":\n                continue\n            \n            try:\n                source = py_file.read_text(encoding=\"utf-8\")\n                tree = ast.parse(source)\n                \n                for node in ast.walk(tree):\n                    if isinstance(node, ast.ClassDef):\n                        class_doc = self._extract_class_doc(node, source)\n                        if class_doc:\n                            content_parts.append(class_doc)\n                    elif isinstance(node, ast.FunctionDef):\n                        if not node.name.startswith(\"_\"):\n                            func_doc = self._extract_function_doc(node, source)\n                            if func_doc:"
+      ]
+    },
+    {
+      "id": "51ba08895d",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/config/protocols.py",
+          "line_start": 225,
+          "line_end": 225,
+          "module": "praisonai-agents.praisonaiagents.config.protocols"
+        }
+      ],
+      "subject": "Unreachable variable 'invalid_value' in praisonai-agents.praisonaiagents.config.protocols",
+      "evidence": {
+        "name": "invalid_value",
+        "type": "variable",
+        "module": "praisonai-agents.praisonaiagents.config.protocols",
+        "confidence": 100,
+        "first_line": 225,
+        "last_line": 225,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def suggest_corrections(self, field_name: str, invalid_value: Any) -> List[str]:"
+      ]
+    },
+    {
+      "id": "b875c55066",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/config/protocols.py",
+          "line_start": 262,
+          "line_end": 262,
+          "module": "praisonai-agents.praisonaiagents.config.protocols"
+        }
+      ],
+      "subject": "Unreachable variable 'precedence_chain' in praisonai-agents.praisonaiagents.config.protocols",
+      "evidence": {
+        "name": "precedence_chain",
+        "type": "variable",
+        "module": "praisonai-agents.praisonaiagents.config.protocols",
+        "confidence": 100,
+        "first_line": 262,
+        "last_line": 262,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "        precedence_chain: List[str]"
+      ]
+    },
+    {
+      "id": "ddc3ebe19c",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/db/protocol.py",
+          "line_start": 398,
+          "line_end": 398,
+          "module": "praisonai-agents.praisonaiagents.db.protocol"
+        }
+      ],
+      "subject": "Unreachable variable 'from_version' in praisonai-agents.praisonaiagents.db.protocol",
+      "evidence": {
+        "name": "from_version",
+        "type": "variable",
+        "module": "praisonai-agents.praisonaiagents.db.protocol",
+        "confidence": 100,
+        "first_line": 398,
+        "last_line": 398,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "        from_version: str,"
+      ]
+    },
+    {
+      "id": "165874ea89",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/db/protocol.py",
+          "line_start": 399,
+          "line_end": 399,
+          "module": "praisonai-agents.praisonaiagents.db.protocol"
+        }
+      ],
+      "subject": "Unreachable variable 'to_version' in praisonai-agents.praisonaiagents.db.protocol",
+      "evidence": {
+        "name": "to_version",
+        "type": "variable",
+        "module": "praisonai-agents.praisonaiagents.db.protocol",
+        "confidence": 100,
+        "first_line": 399,
+        "last_line": 399,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "        to_version: str,"
+      ]
+    },
+    {
+      "id": "33d467af7f",
+      "principle": "P5",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/praisonaiagents/gateway/protocols.py",
+          "line_start": 888,
+          "line_end": 888,
+          "module": "praisonai-agents.praisonaiagents.gateway.protocols"
+        }
+      ],
+      "subject": "Unreachable variable 'principal' in praisonai-agents.praisonaiagents.gateway.protocols",
+      "evidence": {
+        "name": "principal",
+        "type": "variable",
+        "module": "praisonai-agents.praisonaiagents.gateway.protocols",
+        "confidence": 100,
+        "first_line": 888,
+        "last_line": 888,
+        "analyzer": "vulture"
+      },
+      "alternatives": [
+        "Delete the symbol if truly unreachable.",
+        "Add a whitelist entry if it's part of an external/public API used outside this repo.",
+        "Add a test that exercises the path to prove reachability."
+      ],
+      "measured_impact": {
+        "blast_radius": 0.2,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.7,
+        "advocate_absence": 0.6,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "    def bind(self, session_id: str, principal: Dict[str, Any]) -> None:"
+      ]
+    },
+    {
+      "id": "f86502ba65",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/cli/features/ollama.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai.cli.features.ollama"
+        },
+        {
+          "file": "src/praisonai/praisonai/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai"
+        }
+      ],
+      "subject": "Layering violation: praisonai.cli.features.ollama (layer 10) imports praisonai (layer 0)",
+      "evidence": {
+        "source": "praisonai.cli.features.ollama",
+        "target": "praisonai",
+        "source_layer": 10,
+        "target_layer": 0,
+        "layer_drop": 10,
+        "entry_points": [
+          "praisonai_platform",
+          "praisonai",
+          "praisonai-agents"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from praisonai into a lower layer that praisonai.cli.features.ollama can depend on.",
+        "Invert the dependency: have praisonai accept what it needs as an argument from praisonai.cli.features.ollama.",
+        "Accept the violation if praisonai is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.cli.features.ollama\n\"\"\"\nOllama CLI Handler\n\nCLI support for Ollama provider and Weak-Model-Proof execution.\n\"\"\"\n\nimport logging\nimport os\nfrom typing import Any, Dict, List, Optional\n\nlogger = logging.getLogger(__name__)\n\n\nclass OllamaHandler:\n    \"\"\"\n    Handler for Ollama CLI commands.\n    \n    Supports:\n    - --provider ollama\n    - --weak-model-proof / --wmp",
+        "# praisonai\nimport threading\n\n# Version is lightweight, import directly\nfrom .version import __version__\n\n# Define __all__ for lazy loading\n__all__ = [\n    'PraisonAI',\n    '__version__',\n    'Deploy',\n    'DeployConfig',\n    'DeployType',\n    'CloudProvider',\n    'AgentOS',  # Production deployment platform (v0.14.16+)\n    'AgentApp',  # Silent alias for AgentOS (backward compat)\n    'Agent',  # Wrapper Agent with CLI backend string resolution\n    'recipe',\n    'embed',\n    'embedding',\n    'DB',  # Short alias for PraisonAIDB \u2014 recommended for simplicity"
+      ]
+    },
+    {
+      "id": "28d6db490b",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/cli/features/profiling.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai.cli.features.profiling"
+        },
+        {
+          "file": "src/praisonai/praisonai/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai"
+        }
+      ],
+      "subject": "Layering violation: praisonai.cli.features.profiling (layer 10) imports praisonai (layer 0)",
+      "evidence": {
+        "source": "praisonai.cli.features.profiling",
+        "target": "praisonai",
+        "source_layer": 10,
+        "target_layer": 0,
+        "layer_drop": 10,
+        "entry_points": [
+          "praisonai_platform",
+          "praisonai",
+          "praisonai-agents"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from praisonai into a lower layer that praisonai.cli.features.profiling can depend on.",
+        "Invert the dependency: have praisonai accept what it needs as an argument from praisonai.cli.features.profiling.",
+        "Accept the violation if praisonai is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.cli.features.profiling\n\"\"\"\nPraisonAI CLI Profiling Commands\n\nProvides CLI commands for profiling agent execution.\n\nUsage:\n    praisonai profile run \"task\" --output report.html\n    praisonai profile report --format json\n    praisonai profile benchmark --iterations 10\n\"\"\"\n\nimport time\nimport json\nfrom typing import Optional, Dict, Any\n\n\nclass ProfilingHandler:\n    \"\"\"\n    Handler for CLI profiling commands.\n    ",
+        "# praisonai\nimport threading\n\n# Version is lightweight, import directly\nfrom .version import __version__\n\n# Define __all__ for lazy loading\n__all__ = [\n    'PraisonAI',\n    '__version__',\n    'Deploy',\n    'DeployConfig',\n    'DeployType',\n    'CloudProvider',\n    'AgentOS',  # Production deployment platform (v0.14.16+)\n    'AgentApp',  # Silent alias for AgentOS (backward compat)\n    'Agent',  # Wrapper Agent with CLI backend string resolution\n    'recipe',\n    'embed',\n    'embedding',\n    'DB',  # Short alias for PraisonAIDB \u2014 recommended for simplicity"
+      ]
+    },
+    {
+      "id": "e37bc7975b",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/cli/commands/app.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai.cli.commands.app"
+        },
+        {
+          "file": "src/praisonai/praisonai/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai"
+        }
+      ],
+      "subject": "Layering violation: praisonai.cli.commands.app (layer 10) imports praisonai (layer 0)",
+      "evidence": {
+        "source": "praisonai.cli.commands.app",
+        "target": "praisonai",
+        "source_layer": 10,
+        "target_layer": 0,
+        "layer_drop": 10,
+        "entry_points": [
+          "praisonai_platform",
+          "praisonai",
+          "praisonai-agents"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from praisonai into a lower layer that praisonai.cli.commands.app can depend on.",
+        "Invert the dependency: have praisonai accept what it needs as an argument from praisonai.cli.commands.app.",
+        "Accept the violation if praisonai is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.cli.commands.app\n\"\"\"\nCLI command for AgentOS - production deployment of AI agents.\n\nUsage:\n    praisonai app                    # Start server with default config\n    praisonai app --port 9000        # Start on custom port\n    praisonai app --config app.yaml  # Load from config file\n    praisonai app --reload           # Enable auto-reload for development\n\"\"\"\n\nimport click\nfrom typing import Optional\n\n\n@click.command(\"app\")\n@click.option(\"--port\", \"-p\", type=int, default=8000, help=\"Port to listen on\")\n@click.option(\"--host\", \"-h\", type=str, default=\"0.0.0.0\", help=\"Host to bind to\")\n@click.option(\"--config\", \"-c\", type=click.Path(exists=True), help=\"Path to config file (YAML)\")\n@click.option(\"--reload\", \"-r\", is_flag=True, help=\"Enable auto-reload for development\")\n@click.option(\"--debug\", \"-d\", is_flag=True, help=\"Enable debug mode\")",
+        "# praisonai\nimport threading\n\n# Version is lightweight, import directly\nfrom .version import __version__\n\n# Define __all__ for lazy loading\n__all__ = [\n    'PraisonAI',\n    '__version__',\n    'Deploy',\n    'DeployConfig',\n    'DeployType',\n    'CloudProvider',\n    'AgentOS',  # Production deployment platform (v0.14.16+)\n    'AgentApp',  # Silent alias for AgentOS (backward compat)\n    'Agent',  # Wrapper Agent with CLI backend string resolution\n    'recipe',\n    'embed',\n    'embedding',\n    'DB',  # Short alias for PraisonAIDB \u2014 recommended for simplicity"
+      ]
+    },
+    {
+      "id": "ee9a7e90c8",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "src/praisonai/praisonai/jobs/executor.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai.jobs.executor"
+        },
+        {
+          "file": "src/praisonai/praisonai/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai"
+        }
+      ],
+      "subject": "Layering violation: praisonai.jobs.executor (layer 10) imports praisonai (layer 0)",
+      "evidence": {
+        "source": "praisonai.jobs.executor",
+        "target": "praisonai",
+        "source_layer": 10,
+        "target_layer": 0,
+        "layer_drop": 10,
+        "entry_points": [
+          "praisonai_platform",
+          "praisonai",
+          "praisonai-agents"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from praisonai into a lower layer that praisonai.jobs.executor can depend on.",
+        "Invert the dependency: have praisonai accept what it needs as an argument from praisonai.jobs.executor.",
+        "Accept the violation if praisonai is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai.jobs.executor\n\"\"\"\nJob Executor for PraisonAI Async Jobs API.\n\nHandles background execution of agent jobs.\n\"\"\"\n\nimport asyncio\nimport logging\nimport os\nfrom typing import Optional, Callable, Any, Dict\n\nfrom .models import Job, JobStatus\nfrom .store import JobStore\n\nlogger = logging.getLogger(__name__)\n\n\nclass JobExecutor:\n    \"\"\"\n    Executes jobs in the background using asyncio.",
+        "# praisonai\nimport threading\n\n# Version is lightweight, import directly\nfrom .version import __version__\n\n# Define __all__ for lazy loading\n__all__ = [\n    'PraisonAI',\n    '__version__',\n    'Deploy',\n    'DeployConfig',\n    'DeployType',\n    'CloudProvider',\n    'AgentOS',  # Production deployment platform (v0.14.16+)\n    'AgentApp',  # Silent alias for AgentOS (backward compat)\n    'Agent',  # Wrapper Agent with CLI backend string resolution\n    'recipe',\n    'embed',\n    'embedding',\n    'DB',  # Short alias for PraisonAIDB \u2014 recommended for simplicity"
+      ]
+    },
+    {
+      "id": "b9407dc2a2",
+      "principle": "P6",
+      "locations": [
+        {
+          "file": "src/praisonai-agents/test_issue_950.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai-agents.test_issue_950"
+        },
+        {
+          "file": "src/praisonai/praisonai/__init__.py",
+          "line_start": 1,
+          "line_end": 40,
+          "module": "praisonai"
+        }
+      ],
+      "subject": "Layering violation: praisonai-agents.test_issue_950 (layer 10) imports praisonai (layer 0)",
+      "evidence": {
+        "source": "praisonai-agents.test_issue_950",
+        "target": "praisonai",
+        "source_layer": 10,
+        "target_layer": 0,
+        "layer_drop": 10,
+        "entry_points": [
+          "praisonai_platform",
+          "praisonai",
+          "praisonai-agents"
+        ]
+      },
+      "alternatives": [
+        "Move the shared concern from praisonai into a lower layer that praisonai-agents.test_issue_950 can depend on.",
+        "Invert the dependency: have praisonai accept what it needs as an argument from praisonai-agents.test_issue_950.",
+        "Accept the violation if praisonai is genuinely a cross-cutting utility."
+      ],
+      "measured_impact": {
+        "blast_radius": 1.0,
+        "principle_severity": 1.0,
+        "pattern_violation": 0.8,
+        "advocate_absence": 0.4,
+        "recency": 0.0
+      },
+      "code_snippets": [
+        "# praisonai-agents.test_issue_950\n#!/usr/bin/env python3\n\"\"\"\nTest for issue #950: Convert praisonaiagents to praisonai imports\nThe goal is to enable: from PraisonAI import Agent instead of from Agents import Agent\n\"\"\"\n\nimport sys\nimport os\n\n# Add the src directory to the path\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))\n# Add the praisonai-agents directory to the path\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src', 'praisonai-agents'))\n\ndef test_issue_950_goal():\n    \"\"\"Test the specific goal stated in issue #950\"\"\"\n    print(\"Testing issue #950 goal: from PraisonAI import Agent\")\n    \n    try:\n        # This is what the issue wants to achieve",
+        "# praisonai\nimport threading\n\n# Version is lightweight, import directly\nfrom .version import __version__\n\n# Define __all__ for lazy loading\n__all__ = [\n    'PraisonAI',\n    '__version__',\n    'Deploy',\n    'DeployConfig',\n    'DeployType',\n    'CloudProvider',\n    'AgentOS',  # Production deployment platform (v0.14.16+)\n    'AgentApp',  # Silent alias for AgentOS (backward compat)\n    'Agent',  # Wrapper Agent with CLI backend string resolution\n    'recipe',\n    'embed',\n    'embedding',\n    'DB',  # Short alias for PraisonAIDB \u2014 recommended for simplicity"
+      ]
+    }
+  ],
+  "graph_summary": {
+    "num_modules": 1448,
+    "num_edges": 2323,
+    "num_packages": 3
+  },
+  "git_summary": {
+    "commit_sha": "92644518c068182a27e6cd4975920ae5119f276e",
+    "branch": "main",
+    "recent_commits": 1
+  }
+}

@@ -16,14 +16,17 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Awaitable, Callable
-
 from typing import TYPE_CHECKING
 
 from .. import events as fevents
 from ..cache.prompt_cache import HAIKU, PromptCache
 from ..types import CellVote, DecisionPoint, TribunalResult
-from .aggregate import confidence_weighted, should_stop
+from .aggregate import (
+    STOP_MIN_AVG_CONFIDENCE,
+    STOP_MIN_SAME_SIDE,
+    confidence_weighted,
+    should_stop,
+)
 from .pairings import cell_temperature, pairings
 from .single_cell import run_cell
 
@@ -42,8 +45,8 @@ async def run_tribunal_speculative(
     model: str = HAIKU,
     pc: "PromptCache | WaferCache | None" = None,
     max_turn_tokens: int = 600,
-    min_same_side: int = 15,
-    min_avg_confidence: float = 1.0,
+    min_same_side: int | None = None,
+    min_avg_confidence: float | None = None,
     max_concurrent_cells: int = 3,
 ) -> TribunalResult:
     """Run up to `num_cells` cells; stop early once the verdict is clear.
@@ -59,6 +62,13 @@ async def run_tribunal_speculative(
     """
     if num_cells < 1 or num_cells > 36:
         raise ValueError("num_cells must be in [1, 36]")
+    # Default to the module-level stopping floor so early-stop actually fires.
+    # Previous defaults (15/1.0) effectively disabled the feature unless the
+    # caller passed explicit overrides.
+    if min_same_side is None:
+        min_same_side = STOP_MIN_SAME_SIDE
+    if min_avg_confidence is None:
+        min_avg_confidence = STOP_MIN_AVG_CONFIDENCE
     pc = pc or PromptCache(model=model)
     pair_list = pairings(num_cells)
     sem = asyncio.Semaphore(max(1, max_concurrent_cells))
@@ -258,7 +268,7 @@ def _cli() -> None:
     if args.stub:
         dp = _stub_decision_point()
     elif args.evidence:
-        data = json.loads(args.evidence.read_text())
+        data = json.loads(args.evidence.read_text(encoding="utf-8"))
         dps = data["decision_points"]
         if args.dp_id:
             dps = [d for d in dps if d["id"] == args.dp_id]

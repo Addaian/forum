@@ -44,7 +44,15 @@ def confidence_weighted(cells: Sequence[CellVote]) -> dict:
             "method": "confidence_weighted",
         }
 
-    winner = "debt" if score_debt > score_just else "justified"
+    # Three outcomes, not two: ties are "contested" so the judge can see
+    # the panel split rather than silently inheriting whichever label this
+    # comparison happened to favour.
+    if score_debt > score_just:
+        winner = "debt"
+    elif score_just > score_debt:
+        winner = "justified"
+    else:
+        winner = "contested"
     margin = abs(score_debt - score_just) / total
     return {
         "winner": winner,
