@@ -132,6 +132,21 @@ def audit(repo: Path | None, values_path: Path | None,
     console.print(f"[green]Layer 1[/]: {len(bundle.decision_points)} decision points "
                   f"across {len({d.principle for d in bundle.decision_points})} principles")
 
+    # Pre-flight: if Layer 1 found nothing, abort BEFORE spending on jury +
+    # report. Spares the user a useless ~$0.40 on a repo Forum can't see.
+    num_modules = (bundle.graph_summary or {}).get("num_modules", 0)
+    if len(bundle.decision_points) == 0 or num_modules == 0:
+        console.print(
+            f"[red]Layer 1 found nothing to audit[/] — "
+            f"{num_modules} modules indexed, {len(bundle.decision_points)} findings."
+        )
+        console.print(
+            "[dim]Common causes: non-Python/non-C repo, or all source under a "
+            "skipped directory (tests/, docs/, scripts/, examples/, build/, vendor/, …). "
+            "Aborting without spending on jury or report.[/]"
+        )
+        sys.exit(3)  # distinct exit code so the server can recognize empty-audit
+
     # --- Layer 1.5 ---
     from .prioritize.score import rank, write_prioritized
     from .values.loader import load_affinities, load_values

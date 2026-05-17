@@ -198,6 +198,59 @@ async def get_manifest() -> dict:
     return json.loads(MANIFEST.read_text())
 
 
+# Slug shape validation — must match the slug rules used by submit_audit so
+# someone can't pass ".." or absolute paths through and delete arbitrary disk.
+_SAFE_SLUG = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
+
+
+@app.delete("/api/audits/{slug}", dependencies=[Depends(require_token)])
+async def delete_audit(slug: str) -> dict:
+    """Remove docs/data/<slug>/ + drop the entry from manifest.json.
+
+    Refuses to delete if a job for this slug is currently running, to keep
+    the runner from writing into a dir we just removed.
+    """
+    if not _SAFE_SLUG.match(slug):
+        raise HTTPException(status_code=400, detail=f"bad slug: {slug!r}")
+
+    # Block if a live job is mid-write into this slug's dir.
+    for job in _JOBS.values():
+        if job.slug == slug and job.status in ("queued", "running"):
+            raise HTTPException(
+                status_code=409,
+                detail=f"audit job {job.id} is still {job.status} on slug {slug!r}",
+            )
+
+    target = DATA / slug
+    # Final safety: target must live UNDER DATA (no symlink escape).
+    try:
+        target.resolve().relative_to(DATA.resolve())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="slug resolves outside data dir")
+
+    removed_dir = False
+    if target.exists() and target.is_dir():
+        shutil.rmtree(target)
+        removed_dir = True
+
+    # Drop from manifest. Idempotent — safe to call on already-deleted slug.
+    manifest = json.loads(MANIFEST.read_text())
+    before = len(manifest.get("audits", []))
+    manifest["audits"] = [a for a in manifest.get("audits", []) if a.get("slug") != slug]
+    removed_entry = (len(manifest["audits"]) != before)
+    # If the deleted slug was the default, fall back to whatever's left.
+    if manifest.get("default") == slug:
+        manifest["default"] = manifest["audits"][0]["slug"] if manifest["audits"] else None
+    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n")
+
+    return {
+        "slug": slug,
+        "removed_dir": removed_dir,
+        "removed_manifest_entry": removed_entry,
+        "remaining": [a["slug"] for a in manifest["audits"]],
+    }
+
+
 # Static mount last so /api/* routes win.
 app.mount("/", StaticFiles(directory=str(DOCS), html=True), name="docs")
 
