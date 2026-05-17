@@ -8,49 +8,112 @@
 */
 
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 /* Scrollbar — match the dark UI */
-*::-webkit-scrollbar { width: 6px; height: 6px; }
-*::-webkit-scrollbar-track { background: #1c1b1b; }
-*::-webkit-scrollbar-thumb { background: #46464a; border-radius: 3px; }
-*::-webkit-scrollbar-thumb:hover { background: #5f5e5f; }
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: #1c1b1b;
+}
+*::-webkit-scrollbar-thumb {
+  background: #46464a;
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #5f5e5f;
+}
 
 /* Terminal cursor blink */
 .terminal-cursor::after {
-  content: '_';
+  content: "_";
   animation: blink 1s step-end infinite;
 }
 @keyframes blink {
-  from, to { opacity: 1; }
-  50% { opacity: 0; }
+  from,
+  to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* ----- Verdict color tokens (Tailwind doesn't ship these) ----- */
-.verdict-HEALTHY              { color: #4ade80; border-color: #4ade80; }
-.verdict-JUSTIFIED-VIOLATION  { color: #facc15; border-color: #facc15; }
-.verdict-STRUCTURAL-DEBT      { color: #fb923c; border-color: #fb923c; }
-.verdict-CRITICAL             { color: #ef4444; border-color: #ef4444; }
-.verdict-DRIFTED              { color: #c084fc; border-color: #c084fc; }
-.verdict-CONTESTED            { color: #67e8f9; border-color: #67e8f9; }
+.verdict-HEALTHY {
+  color: #4ade80;
+  border-color: #4ade80;
+}
+.verdict-JUSTIFIED-VIOLATION {
+  color: #facc15;
+  border-color: #facc15;
+}
+.verdict-STRUCTURAL-DEBT {
+  color: #fb923c;
+  border-color: #fb923c;
+}
+.verdict-CRITICAL {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+.verdict-DRIFTED {
+  color: #c084fc;
+  border-color: #c084fc;
+}
+.verdict-CONTESTED {
+  color: #67e8f9;
+  border-color: #67e8f9;
+}
 
-.verdict-bg-HEALTHY              { background-color: rgba(74, 222, 128, 0.10); }
-.verdict-bg-JUSTIFIED-VIOLATION  { background-color: rgba(250, 204, 21, 0.10); }
-.verdict-bg-STRUCTURAL-DEBT      { background-color: rgba(251, 146, 60, 0.10); }
-.verdict-bg-CRITICAL             { background-color: rgba(239, 68, 68, 0.10); }
-.verdict-bg-DRIFTED              { background-color: rgba(192, 132, 252, 0.10); }
-.verdict-bg-CONTESTED            { background-color: rgba(103, 232, 249, 0.10); }
+.verdict-bg-HEALTHY {
+  background-color: rgba(74, 222, 128, 0.1);
+}
+.verdict-bg-JUSTIFIED-VIOLATION {
+  background-color: rgba(250, 204, 21, 0.1);
+}
+.verdict-bg-STRUCTURAL-DEBT {
+  background-color: rgba(251, 146, 60, 0.1);
+}
+.verdict-bg-CRITICAL {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+.verdict-bg-DRIFTED {
+  background-color: rgba(192, 132, 252, 0.1);
+}
+.verdict-bg-CONTESTED {
+  background-color: rgba(103, 232, 249, 0.1);
+}
 
-.verdict-stripe-HEALTHY              { background-color: #4ade80; }
-.verdict-stripe-JUSTIFIED-VIOLATION  { background-color: #facc15; }
-.verdict-stripe-STRUCTURAL-DEBT      { background-color: #fb923c; }
-.verdict-stripe-CRITICAL             { background-color: #ef4444; }
-.verdict-stripe-DRIFTED              { background-color: #c084fc; }
-.verdict-stripe-CONTESTED            { background-color: #67e8f9; }
+.verdict-stripe-HEALTHY {
+  background-color: #4ade80;
+}
+.verdict-stripe-JUSTIFIED-VIOLATION {
+  background-color: #facc15;
+}
+.verdict-stripe-STRUCTURAL-DEBT {
+  background-color: #fb923c;
+}
+.verdict-stripe-CRITICAL {
+  background-color: #ef4444;
+}
+.verdict-stripe-DRIFTED {
+  background-color: #c084fc;
+}
+.verdict-stripe-CONTESTED {
+  background-color: #67e8f9;
+}
 
 /* ----- View switch helper ----- */
-.view.hidden { display: none; }
+.view.hidden {
+  display: none;
+}
 
 /* ----- Nav active state ----- */
 .nav-item.active {
@@ -73,11 +136,18 @@
   background: #1c1b1b;
   cursor: pointer;
   transition: all 0.15s;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
 }
-.audit-pill:hover { border-color: #c8c6c7; color: #e5e2e1; }
-.audit-pill.active { background: #0a0a0b; border-color: #c8c6c7; color: #c8c6c7; }
+.audit-pill:hover {
+  border-color: #c8c6c7;
+  color: #e5e2e1;
+}
+.audit-pill.active {
+  background: #0a0a0b;
+  border-color: #c8c6c7;
+  color: #c8c6c7;
+}
 .audit-pill .lang {
   font-size: 9px;
   padding: 1px 4px;
@@ -85,21 +155,30 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-.audit-pill .lang.lang-python { background: rgba(93, 214, 255, 0.15); color: #5dd6ff; }
-.audit-pill .lang.lang-c      { background: rgba(251, 146, 60, 0.18); color: #fb923c; }
+.audit-pill .lang.lang-python {
+  background: rgba(93, 214, 255, 0.15);
+  color: #5dd6ff;
+}
+.audit-pill .lang.lang-c {
+  background: rgba(251, 146, 60, 0.18);
+  color: #fb923c;
+}
 
 .audit-pill-new {
   border-style: dashed;
   background: transparent;
   color: #c7c6ca;
 }
-.audit-pill-new:hover { background: #1c1b1b; color: #c8c6c7; }
+.audit-pill-new:hover {
+  background: #1c1b1b;
+  color: #c8c6c7;
+}
 
 /* ----- Tone preset buttons ----- */
 .tone-btn {
   flex: 1;
   padding: 8px 12px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -110,7 +189,9 @@
   cursor: pointer;
   transition: all 0.15s;
 }
-.tone-btn:hover { color: #c8c6c7; }
+.tone-btn:hover {
+  color: #c8c6c7;
+}
 .tone-btn.active {
   background: #474649;
   color: #c8c6c7;
@@ -120,19 +201,44 @@
 
 /* ----- Markdown body (Opus briefing) ----- */
 .markdown-body {
-  font-family: 'Geist', system-ui, sans-serif;
+  font-family: "Geist", system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.7;
   color: #e5e2e1;
 }
-.markdown-body h1 { font-size: 26px; font-weight: 700; color: #c8c6c7; margin: 0 0 12px; }
-.markdown-body h2 { font-size: 19px; font-weight: 600; color: #e5e2e1; margin: 28px 0 10px; padding-top: 16px; border-top: 1px solid #46464a; }
-.markdown-body h3 { font-size: 16px; font-weight: 600; color: #cac6c2; margin: 20px 0 8px; }
-.markdown-body p  { margin: 10px 0 16px; }
-.markdown-body ul, .markdown-body ol { padding-left: 22px; margin: 8px 0 14px; }
-.markdown-body li { margin: 4px 0; }
+.markdown-body h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #c8c6c7;
+  margin: 0 0 12px;
+}
+.markdown-body h2 {
+  font-size: 19px;
+  font-weight: 600;
+  color: #e5e2e1;
+  margin: 28px 0 10px;
+  padding-top: 16px;
+  border-top: 1px solid #46464a;
+}
+.markdown-body h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #cac6c2;
+  margin: 20px 0 8px;
+}
+.markdown-body p {
+  margin: 10px 0 16px;
+}
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 22px;
+  margin: 8px 0 14px;
+}
+.markdown-body li {
+  margin: 4px 0;
+}
 .markdown-body code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 13px;
   background: #353434;
   color: #c8c6c7;
@@ -147,8 +253,15 @@
   overflow-x: auto;
   margin: 12px 0;
 }
-.markdown-body pre code { background: none; color: #e5e2e1; padding: 0; }
-.markdown-body strong { color: #e5e2e1; font-weight: 600; }
+.markdown-body pre code {
+  background: none;
+  color: #e5e2e1;
+  padding: 0;
+}
+.markdown-body strong {
+  color: #e5e2e1;
+  font-weight: 600;
+}
 .markdown-body blockquote {
   border-left: 3px solid #c8c6c7;
   padding-left: 14px;
@@ -162,7 +275,7 @@
   display: inline-block;
   padding: 2px 10px;
   border-radius: 2px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -170,8 +283,23 @@
   vertical-align: 1px;
 }
 
-/* ----- Sigma graph container ----- */
-#ev-graph-wrap { min-height: 480px; }
-#ev-graph-wrap canvas { display: block; }
-#ev-graph-wrap .sigma-mouse { cursor: grab; }
-#ev-graph-wrap .sigma-mouse:active { cursor: grabbing; }
+/* ----- 3D graph container ----- */
+#ev-graph-wrap {
+  position: absolute;
+  inset: 0;
+  top: 49px; /* below the header bar */
+}
+#ev-graph-wrap canvas {
+  display: block;
+}
+#ev-graph-wrap > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+#ev-graph-wrap .scene-tooltip {
+  font-family: "JetBrains Mono", monospace !important;
+  background: #201f1f !important;
+  border: 1px solid #46464a !important;
+  padding: 4px 8px !important;
+  border-radius: 2px !important;
+}
