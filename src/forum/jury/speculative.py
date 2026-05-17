@@ -42,8 +42,8 @@ async def run_tribunal_speculative(
     model: str = HAIKU,
     pc: "PromptCache | WaferCache | None" = None,
     max_turn_tokens: int = 600,
-    min_same_side: int = 6,
-    min_avg_confidence: float = 0.7,
+    min_same_side: int = 15,
+    min_avg_confidence: float = 1.0,
     max_concurrent_cells: int = 3,
 ) -> TribunalResult:
     """Run up to `num_cells` cells; stop early once the verdict is clear.
@@ -83,21 +83,27 @@ async def run_tribunal_speculative(
         })
         fevents.emit("cell_start")
         async with sem:
-            try:
-                vote = await run_cell(
-                    cell_id=i,
-                    decision_point=decision_point,
-                    red_persona_id=red,
-                    blue_persona_id=blue,
-                    temperature=temp,
-                    codebase_summary=codebase_summary,
-                    git_summary=git_summary,
-                    pc=pc,
-                    max_turn_tokens=max_turn_tokens,
-                )
-            except BaseException as exc:  # pragma: no cover - signaling only
-                fevents.emit("cell_failed", error=repr(exc))
-                raise
+            for attempt in range(3):
+                try:
+                    vote = await run_cell(
+                        cell_id=i,
+                        decision_point=decision_point,
+                        red_persona_id=red,
+                        blue_persona_id=blue,
+                        temperature=temp,
+                        codebase_summary=codebase_summary,
+                        git_summary=git_summary,
+                        pc=pc,
+                        max_turn_tokens=max_turn_tokens,
+                    )
+                    break
+                except BaseException as exc:
+                    if attempt < 2:
+                        log.warning("cell %d attempt %d failed, retrying: %r", i, attempt + 1, exc)
+                        await asyncio.sleep(1 * (attempt + 1))
+                    else:
+                        fevents.emit("cell_failed", error=repr(exc))
+                        raise
             fevents.emit("cell_voted", position=vote.position, confidence=vote.confidence)
             return vote
 

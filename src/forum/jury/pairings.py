@@ -37,7 +37,7 @@ PAIRINGS: tuple[tuple[str, str], ...] = (
     ("maintainer",  "scaler"),      # careful layering vs extract-for-scale
     ("adapter",     "scaler"),      # swappable seams vs performance headroom
     ("adapter",     "shipper"),     # configurability vs ship-now
-    ("verifier",    "scaler"),      # correctness guarantees vs scale extraction
+    ("simplifier",  "verifier"),    # minimalism vs correctness guarantees
 )
 
 
