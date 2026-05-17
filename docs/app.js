@@ -96,12 +96,13 @@ const AFFINITIES = {
 // is shown in the UI; the labels themselves are jargon the judge writes
 // verbatim and can't be changed at the source.
 const VERDICT_PLAIN = {
-  "HEALTHY":              "No problem found — don't touch it.",
-  "JUSTIFIED VIOLATION":  "Yes there's a textbook issue, but it's defensible. Leave it alone.",
-  "STRUCTURAL DEBT":      "Real problem, real cost. Worth refactoring.",
-  "CRITICAL":             "Real problem actively hurting you. Refactor urgently.",
-  "DRIFTED":              "Original design was sound; code wandered away. Restore the design.",
-  "CONTESTED":            "Panel split too badly — a human architect should weigh in.",
+  HEALTHY: "No problem found — don't touch it.",
+  "JUSTIFIED VIOLATION":
+    "Yes there's a textbook issue, but it's defensible. Leave it alone.",
+  "STRUCTURAL DEBT": "Real problem, real cost. Worth refactoring.",
+  CRITICAL: "Real problem actively hurting you. Refactor urgently.",
+  DRIFTED: "Original design was sound; code wandered away. Restore the design.",
+  CONTESTED: "Panel split too badly — a human architect should weigh in.",
 };
 
 // User-friendly names + a one-line "what this means" subtitle for each check.
@@ -453,6 +454,19 @@ function wireButtons() {
   document
     .getElementById("btn-reset")
     .addEventListener("click", () => applyPreset("baseline"));
+  // Copy report markdown to clipboard for pasting into an agent
+  document.getElementById("btn-copy-agent").addEventListener("click", () => {
+    const md = state.reportMd;
+    if (!md) return;
+    navigator.clipboard.writeText(md).then(() => {
+      const btn = document.getElementById("btn-copy-agent");
+      const orig = btn.innerHTML;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check</span> COPIED`;
+      setTimeout(() => {
+        btn.innerHTML = orig;
+      }, 2000);
+    });
+  });
 }
 
 function downloadReport() {
@@ -805,6 +819,27 @@ function renderDependencyGraph() {
   graph.d3Force("charge").strength(-120).distanceMax(300);
   graph.d3Force("link").distance(40);
 
+  // Once the layout stabilises, pin every node so physics stops moving them.
+  let initialPinDone = false;
+  graph.onEngineStop(() => {
+    if (!initialPinDone) {
+      initialPinDone = true;
+      nodes.forEach((n) => {
+        n.fx = n.x;
+        n.fy = n.y;
+        n.fz = n.z;
+      });
+    }
+  });
+
+  // Reduce orbit sensitivity and add damping for smoother camera movement.
+  const controls = graph.controls();
+  controls.rotateSpeed = 0.4;
+  controls.zoomSpeed = 0.6;
+  controls.panSpeed = 0.4;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.15;
+
   state.forceGraph = graph;
 
   // Wire close button for findings panel.
@@ -1089,7 +1124,8 @@ function renderJury() {
     if (judge.override) overrides += 1;
 
     // ---- Finding header ----
-    const principleName = PRINCIPLE_LABELS[dp?.principle] || dp?.principle || "?";
+    const principleName =
+      PRINCIPLE_LABELS[dp?.principle] || dp?.principle || "?";
     const header = document.createElement("div");
     header.className = "mb-3 mt-8 first:mt-0";
     header.innerHTML = `
@@ -1109,19 +1145,19 @@ function renderJury() {
 
     // ---- Cells grid: majority first, then a divider, then dissenters ----
     // Group by vote so the user can see at a glance who pushed back.
-    const nDebt = cells.filter(c => c.position === "debt").length;
-    const nJust = cells.filter(c => c.position === "justified").length;
+    const nDebt = cells.filter((c) => c.position === "debt").length;
+    const nJust = cells.filter((c) => c.position === "justified").length;
     const majority = nDebt >= nJust ? "debt" : "justified";
-    const majCells = cells.filter(c => c.position === majority);
-    const disCells = cells.filter(c => c.position !== majority);
+    const majCells = cells.filter((c) => c.position === majority);
+    const disCells = cells.filter((c) => c.position !== majority);
     // Within each group, sort by confidence descending — strongest argument first.
     majCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
     disCells.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
 
     const majorityLabel = majority === "debt" ? "PROBLEM" : "FINE";
-    const dissentLabel  = majority === "debt" ? "FINE"    : "PROBLEM";
+    const dissentLabel = majority === "debt" ? "FINE" : "PROBLEM";
     const majorityColor = majority === "debt" ? "#fb923c" : "#4ade80";
-    const dissentColor  = majority === "debt" ? "#4ade80" : "#fb923c";
+    const dissentColor = majority === "debt" ? "#4ade80" : "#fb923c";
 
     // Section: majority group
     const majHeader = document.createElement("div");
@@ -1136,7 +1172,9 @@ function renderJury() {
     const majGrid = document.createElement("div");
     majGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-2";
     majGrid.dataset.tribunalId = trib.decision_point_id;
-    majCells.forEach((c) => majGrid.appendChild(renderCellCard(c, { isDissent: false })));
+    majCells.forEach((c) =>
+      majGrid.appendChild(renderCellCard(c, { isDissent: false })),
+    );
     root.appendChild(majGrid);
 
     // Section: dissenters
@@ -1153,7 +1191,9 @@ function renderJury() {
       const disGrid = document.createElement("div");
       disGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-3 mb-2";
       disGrid.dataset.tribunalId = trib.decision_point_id;
-      disCells.forEach((c) => disGrid.appendChild(renderCellCard(c, { isDissent: true })));
+      disCells.forEach((c) =>
+        disGrid.appendChild(renderCellCard(c, { isDissent: true })),
+      );
       root.appendChild(disGrid);
     }
 
@@ -1181,12 +1221,16 @@ function renderJury() {
 // Persona display = the value it cares about, full stop. The persona ID
 // (simplifier / shipper / etc.) stays for code/data compatibility.
 const PERSONA_INFO = {
-  simplifier: { name: "Simplicity",      value: "simplicity",      color: "#a78bfa" },
-  shipper:    { name: "Velocity",        value: "velocity",        color: "#fb923c" },
-  maintainer: { name: "Maintainability", value: "maintainability", color: "#5dd6ff" },
-  verifier:   { name: "Correctness",     value: "correctness",     color: "#4ade80" },
-  scaler:     { name: "Scalability",     value: "scalability",     color: "#f472b6" },
-  adapter:    { name: "Flexibility",     value: "flexibility",     color: "#facc15" },
+  simplifier: { name: "Simplicity", value: "simplicity", color: "#a78bfa" },
+  shipper: { name: "Velocity", value: "velocity", color: "#fb923c" },
+  maintainer: {
+    name: "Maintainability",
+    value: "maintainability",
+    color: "#5dd6ff",
+  },
+  verifier: { name: "Correctness", value: "correctness", color: "#4ade80" },
+  scaler: { name: "Scalability", value: "scalability", color: "#f472b6" },
+  adapter: { name: "Flexibility", value: "flexibility", color: "#facc15" },
 };
 
 function personaPill(personaId) {
@@ -1225,7 +1269,9 @@ function renderCellCard(c, opts = {}) {
   const salient = ratio >= SALIENCE_BUMP;
   const ratioStr = ratio >= INFINITY_SENTINEL ? "∞" : `${ratio.toFixed(2)}×`;
 
-  const voteShort = voteIsDebt ? "real problem, worth fixing" : "fine as-is, defensible";
+  const voteShort = voteIsDebt
+    ? "real problem, worth fixing"
+    : "fine as-is, defensible";
   const voteExplainer = voteIsDebt
     ? "Cell concluded: this is real debt — the personas' reading converged on harm."
     : "Cell concluded: this is justified — the personas' reading converged on serving / defensible.";
@@ -1239,16 +1285,26 @@ function renderCellCard(c, opts = {}) {
   const dissentRing = isDissent ? ` ring-2 ring-offset-0` : "";
   card.className =
     "bg-surface-container border border-outline-variant relative" +
-    (salient ? " ring-1 ring-yellow-400/40" : "") + dissentRing;
+    (salient ? " ring-1 ring-yellow-400/40" : "") +
+    dissentRing;
   if (isDissent) {
     card.style.boxShadow = `0 0 0 1px ${voteColor}55`;
   }
   // Use the persona pair as the headline. Each persona's display name IS
   // the value it cares about (e.g. "Simplicity vs Velocity") — paired with
   // a colored dot for instant visual recognition.
-  const aInfo = PERSONA_INFO[personaAId] || { name: personaAId, value: "?", color: "#919094" };
-  const bInfo = PERSONA_INFO[personaBId] || { name: personaBId, value: "?", color: "#919094" };
-  const dot   = (color) => `<span class="inline-block w-2.5 h-2.5 rounded-full align-middle" style="background:${color}"></span>`;
+  const aInfo = PERSONA_INFO[personaAId] || {
+    name: personaAId,
+    value: "?",
+    color: "#919094",
+  };
+  const bInfo = PERSONA_INFO[personaBId] || {
+    name: personaBId,
+    value: "?",
+    color: "#919094",
+  };
+  const dot = (color) =>
+    `<span class="inline-block w-2.5 h-2.5 rounded-full align-middle" style="background:${color}"></span>`;
 
   const dissentRibbon = isDissent
     ? `<div class="absolute top-0 right-0 font-label-caps text-[8px] px-1.5 py-0.5 tracking-widest"
@@ -1346,8 +1402,11 @@ function renderJuryAggregates() {
     const dCount = orig.n_debt ?? 0;
     const jCount = orig.n_justified ?? 0;
     const projShort =
-      proj.winner === "debt"      ? "would lean PROBLEM" :
-      proj.winner === "justified" ? "would lean FINE"    : "—";
+      proj.winner === "debt"
+        ? "would lean PROBLEM"
+        : proj.winner === "justified"
+          ? "would lean FINE"
+          : "—";
     line.innerHTML = `
       <div class="bg-surface-container-low border border-outline-variant/40 p-3 rounded">
         <div class="mb-1">
@@ -1359,9 +1418,11 @@ function renderJuryAggregates() {
         <div>
           <span class="text-on-surface-variant">If we re-counted using your priority sliders:</span>
           <b style="color:${proj.winner === "debt" ? "#fb923c" : "#4ade80"}">${projShort}</b>
-          ${wouldFlip
-            ? `<span class="ml-2 text-yellow-400 font-bold">— the majority side would flip</span>`
-            : `<span class="ml-2 opacity-60">— same majority as actual (the judge's verdict label never changes either way)</span>`}
+          ${
+            wouldFlip
+              ? `<span class="ml-2 text-yellow-400 font-bold">— the majority side would flip</span>`
+              : `<span class="ml-2 opacity-60">— same majority as actual (the judge's verdict label never changes either way)</span>`
+          }
         </div>
       </div>
     `;
@@ -1508,14 +1569,14 @@ function renderBriefingVerbatims() {
     block.className = "bg-surface-container-low p-6 my-4";
     block.style.borderLeft = "4px solid";
     block.style.borderLeftColor =
-      ({
+      {
         HEALTHY: "#4ade80",
         "JUSTIFIED VIOLATION": "#facc15",
         "STRUCTURAL DEBT": "#fb923c",
         CRITICAL: "#ef4444",
         DRIFTED: "#c084fc",
         CONTESTED: "#67e8f9",
-      })[v] || "#c8c6c7";
+      }[v] || "#c8c6c7";
     const plain = VERDICT_PLAIN[v] || "";
     block.innerHTML = `
       <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -1755,8 +1816,11 @@ function wireAuditModal() {
     // missing element, the modal still appears so the user sees *something*
     // happen and we get a console error pinpointing the bad reference.
     modal.classList.remove("hidden");
-    try { reset(); }
-    catch (e) { console.error("audit-modal reset failed:", e); }
+    try {
+      reset();
+    } catch (e) {
+      console.error("audit-modal reset failed:", e);
+    }
   });
   closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
   modal.addEventListener("click", (e) => {

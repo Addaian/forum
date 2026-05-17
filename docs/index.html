@@ -359,7 +359,7 @@
         >
           <div class="flex flex-1 overflow-hidden">
             <div
-              class="flex flex-col flex-1 p-gutter gap-gutter overflow-y-auto"
+              class="flex flex-col flex-1 p-gutter gap-gutter overflow-hidden"
             >
               <!-- View intro explainer -->
               <div
@@ -405,9 +405,11 @@
                 </div>
               </section>
 
-              <div class="grid grid-cols-12 gap-gutter flex-grow">
+              <div class="grid grid-cols-12 gap-gutter flex-grow min-h-0">
                 <!-- Layer 1 metric cards -->
-                <div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+                <div
+                  class="col-span-12 lg:col-span-4 flex flex-col gap-gutter overflow-y-auto"
+                >
                   <div
                     class="bg-surface-container border border-outline-variant flex flex-col"
                   >
@@ -451,7 +453,7 @@
 
                 <!-- Dep graph view -->
                 <div
-                  class="col-span-12 lg:col-span-8 bg-surface-container-low border border-outline-variant relative flex flex-col min-h-[500px]"
+                  class="col-span-12 lg:col-span-8 bg-surface-container-low border border-outline-variant relative flex flex-col min-h-0"
                 >
                   <div
                     class="p-4 flex justify-between items-center border-b border-outline-variant"
@@ -680,23 +682,23 @@
                 <li>
                   Six debaters, each named after the one value they care about
                   and indifferent to the other five:
-                  <span style="color:#a78bfa">●&nbsp;Simplicity</span>
+                  <span style="color: #a78bfa">●&nbsp;Simplicity</span>
                   ·
-                  <span style="color:#fb923c">●&nbsp;Velocity</span>
+                  <span style="color: #fb923c">●&nbsp;Velocity</span>
                   ·
-                  <span style="color:#5dd6ff">●&nbsp;Maintainability</span>
+                  <span style="color: #5dd6ff">●&nbsp;Maintainability</span>
                   ·
-                  <span style="color:#4ade80">●&nbsp;Correctness</span>
+                  <span style="color: #4ade80">●&nbsp;Correctness</span>
                   ·
-                  <span style="color:#f472b6">●&nbsp;Scalability</span>
+                  <span style="color: #f472b6">●&nbsp;Scalability</span>
                   ·
-                  <span style="color:#facc15">●&nbsp;Flexibility</span>
+                  <span style="color: #facc15">●&nbsp;Flexibility</span>
                 </li>
                 <li>
                   10 pairs per finding, picked deliberately for value tension
-                  (Simplicity vs Velocity, Correctness vs Velocity, etc.).
-                  Each pair has a brief 2-turn exchange; a neutral observer
-                  then records what the pair concluded.
+                  (Simplicity vs Velocity, Correctness vs Velocity, etc.). Each
+                  pair has a brief 2-turn exchange; a neutral observer then
+                  records what the pair concluded.
                 </li>
                 <li>
                   Each persona argues whatever its value reads in the evidence —
@@ -804,7 +806,7 @@
           data-view="briefing"
         >
           <div class="flex-1 overflow-y-auto bg-background">
-            <div class="max-w-5xl mx-auto py-12 px-margin-desktop">
+            <div class="mx-auto py-12 px-margin-desktop">
               <!-- Intro explainer -->
               <div
                 class="mb-8 bg-surface-container-low border-l-2 border-primary px-5 py-4 text-[13px] text-on-surface-variant leading-relaxed"
@@ -875,18 +877,30 @@
                       Executive Briefing
                     </h2>
                   </div>
-                  <div class="text-right">
-                    <div
-                      class="font-label-caps text-label-caps text-primary mb-1"
-                      id="brief-words"
+                  <div class="flex items-center gap-4">
+                    <button
+                      id="btn-copy-agent"
+                      class="flex items-center gap-2 px-4 py-2 border border-primary text-primary text-[12px] font-label-caps hover:bg-primary/10 transition-colors"
+                      title="Copy the full report markdown to clipboard — paste it straight into your agent"
                     >
-                      — WORDS
-                    </div>
-                    <div
-                      class="font-code-sm text-on-surface-variant opacity-60"
-                      id="brief-stamp"
-                    >
-                      —
+                      <span class="material-symbols-outlined text-[16px]"
+                        >content_copy</span
+                      >
+                      COPY FOR AGENT
+                    </button>
+                    <div class="text-right">
+                      <div
+                        class="font-label-caps text-label-caps text-primary mb-1"
+                        id="brief-words"
+                      >
+                        — WORDS
+                      </div>
+                      <div
+                        class="font-code-sm text-on-surface-variant opacity-60"
+                        id="brief-stamp"
+                      >
+                        —
+                      </div>
                     </div>
                   </div>
                 </div>
