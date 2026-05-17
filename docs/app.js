@@ -128,7 +128,10 @@ function compositeScore(dp, weights) {
 
 async function init() {
   try {
-    const res = await fetch("data/manifest.json");
+    // cache:"no-store" — when the live-audit backend appends a new entry,
+    // the browser's default HTTP cache otherwise serves the stale version
+    // on the next page load and the new audit silently disappears.
+    const res = await fetch("data/manifest.json", { cache: "no-store" });
     if (!res.ok) throw new Error(`manifest.json ${res.status}`);
     state.manifest = await res.json();
   } catch (e) {
@@ -257,17 +260,22 @@ function markAuditActive(slug) {
 }
 
 function renderFooterStatus(entry) {
+  // Footer was removed; null-guard so we don't blow up if the element ever
+  // returns. Layer-status summary now derivable from view headers instead.
+  const el = document.getElementById("footer-layers");
+  if (!el) return;
   const numDps = state.evidence.decision_points.length;
   const numTrib = state.verdicts.length;
   const reportWords = state.reportMd ? state.reportMd.trim().split(/\s+/).length : 0;
-  document.getElementById("footer-layers").textContent =
+  el.textContent =
     `${numDps} findings · top ${state.prioritized.items.length} ranked · ${numTrib} debate${numTrib === 1 ? "" : "s"} · ${reportWords.toLocaleString()}-word report`;
 }
 
 function wireClock() {
+  const el = document.getElementById("footer-clock");
+  if (!el) return;
   const tick = () => {
-    const t = new Date().toISOString().slice(11, 19) + " UTC";
-    document.getElementById("footer-clock").textContent = t;
+    el.textContent = new Date().toISOString().slice(11, 19) + " UTC";
   };
   tick();
   setInterval(tick, 1000);
@@ -296,8 +304,8 @@ function wireButtons() {
   document.getElementById("btn-download").addEventListener("click", downloadReport);
   // Sidebar EXPORT REPORT
   document.getElementById("btn-export").addEventListener("click", downloadReport);
-  // Footer DOWNLOAD_BUNDLE
-  document.getElementById("btn-bundle").addEventListener("click", downloadBundle);
+  // Footer DOWNLOAD_BUNDLE — element removed with the footer; guard.
+  document.getElementById("btn-bundle")?.addEventListener("click", downloadBundle);
   // Jury jump-to-action
   document.getElementById("btn-scroll-action").addEventListener("click", () => {
     switchView("briefing");

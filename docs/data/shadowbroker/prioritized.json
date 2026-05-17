@@ -1,0 +1,57 @@
+{
+  "values": {
+    "maintainability": 1.0,
+    "correctness": 1.0,
+    "simplicity": 1.0,
+    "flexibility": 1.0,
+    "scalability": 1.0,
+    "velocity": 1.0
+  },
+  "items": [
+    {
+      "decision_point_id": "14c4e82594",
+      "principle": "P3",
+      "subject": "Function services.openclaw_channel._dispatch_command has cyclomatic complexity 331",
+      "structural_score": 0.6124,
+      "value_affinity_score": 0.6,
+      "composite_score": 0.7961,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "a2a501462c",
+      "principle": "P4",
+      "subject": "Class services.sigint_bridge.MeshtasticBridge has low cohesion (LCOM \u2248 0.91)",
+      "structural_score": 0.6427,
+      "value_affinity_score": 0.4167,
+      "composite_score": 0.7766,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "2318a2f829",
+      "principle": "P4",
+      "subject": "Class services.mesh.mesh_rns.RNSBridge has low cohesion (LCOM \u2248 0.91)",
+      "structural_score": 0.6425,
+      "value_affinity_score": 0.4167,
+      "composite_score": 0.7764,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "238121ca02",
+      "principle": "P1",
+      "subject": "Dependency cycle across 7 modules: mesh_dm_relay \u2192 mesh_wormhole_contacts \u2192 mesh_wormhole_dead_drop \u2192 mesh_wormhole_identity\u2026",
+      "structural_score": 0.64,
+      "value_affinity_score": 0.3333,
+      "composite_score": 0.7467,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "df3e64dcfa",
+      "principle": "P1",
+      "subject": "Dependency cycle across 5 modules: ai_intel \u2192 openclaw_channel \u2192 openclaw_watchdog \u2192 privacy_core_attestation\u2026",
+      "structural_score": 0.58,
+      "value_affinity_score": 0.3333,
+      "composite_score": 0.6767,
+      "rank": 5
+    }
+  ]
+}

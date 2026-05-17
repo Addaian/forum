@@ -344,7 +344,7 @@ tailwind.config = {
           <p class="font-code-sm text-on-surface-variant mt-1 uppercase tracking-tighter">How each top finding got its verdict</p>
           <ul class="text-[12px] text-on-surface-variant mt-3 space-y-1 list-disc list-inside leading-relaxed">
             <li>Six monomaniacal personas — <span class="text-primary">Simplifier · Shipper · Maintainer · Verifier · Scaler · Adapter</span> — each cares about exactly one value and is indifferent to the other five.</li>
-            <li>10 cells per finding, each pitting two personas with naturally opposing values (Simplifier vs Shipper, Verifier vs Adapter, etc.). 4-turn debate, then a structured vote.</li>
+            <li>10 cells per finding, each pitting two personas with naturally opposing values (Simplifier vs Shipper, Verifier vs Adapter, etc.). 2-turn exchange — one opening from each persona — then a neutral observer renders the vote.</li>
             <li>Each persona argues whatever its value reads in the evidence — debt OR justified. Convergence is a strong signal; divergence gets resolved by the vote-extractor.</li>
             <li>The <span class="text-primary">judge</span> reads all 10 debates and renders one verdict. May override the majority when the evidence supports it.</li>
           </ul>
@@ -463,24 +463,6 @@ tailwind.config = {
 
   </main>
 </div>
-
-<!-- =========================== REPLAY FOOTER =========================== -->
-<footer class="fixed bottom-0 left-0 right-0 h-12 border-t border-outline-variant bg-surface-container-lowest px-margin-desktop flex items-center justify-between font-code-sm text-[10px] text-on-surface-variant z-50">
-  <div class="flex items-center gap-6">
-    <div class="flex items-center gap-2">
-      <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-      <span>Static demo — no AI calls, no cost</span>
-    </div>
-    <span id="footer-layers">—</span>
-  </div>
-  <div class="flex items-center gap-6">
-    <button class="px-4 py-1 border border-outline-variant font-label-caps text-[10px] hover:border-primary hover:text-primary transition-all"
-            id="btn-bundle" title="Download all audit artifacts (evidence, ranking, debates, report, graph) as a zip.">
-      DOWNLOAD ALL
-    </button>
-    <span class="text-primary font-bold" id="footer-clock">—</span>
-  </div>
-</footer>
 
 <!-- =========================== NEW-AUDIT MODAL (live mode) =========================== -->
 <div id="audit-modal" class="hidden fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4">
