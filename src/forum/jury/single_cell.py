@@ -42,6 +42,7 @@ from typing import Any
 
 from typing import TYPE_CHECKING
 
+from .. import events as fevents
 from ..cache.prompt_cache import HAIKU, PromptCache
 from ..personas.loader import Persona, get
 from ..types import CellVote, CodeLocation, DecisionPoint
@@ -579,6 +580,8 @@ async def run_cell(
     transcript: list[dict] = []
 
     # --- Turn 1: Red opens ---
+    fevents.TURN_CTX.set({"turn": 0, "speaker": f"red:{red.id}", "label": "open"})
+    fevents.emit("turn_start")
     msg = await pc.call_multiturn(
         system_cached=system_cached,
         user_cached_prefix=user_cached,
@@ -587,6 +590,7 @@ async def run_cell(
         max_tokens=max_turn_tokens,
     )
     red_open = pc.extract_text(msg)
+    fevents.emit("turn_end", text=red_open)
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Red persona opening prompt]"})
     transcript.append({"role": "assistant", "speaker": f"red:{red.id}", "text": red_open})
 
@@ -596,6 +600,8 @@ async def run_cell(
         {"role": "assistant", "text": red_open},
         {"role": "user", "text": blue_intro},
     ]
+    fevents.TURN_CTX.set({"turn": 1, "speaker": f"blue:{blue.id}", "label": "open"})
+    fevents.emit("turn_start")
     msg = await pc.call_multiturn(
         system_cached=system_cached,
         user_cached_prefix=user_cached,
@@ -604,6 +610,7 @@ async def run_cell(
         max_tokens=max_turn_tokens,
     )
     blue_open = pc.extract_text(msg)
+    fevents.emit("turn_end", text=blue_open)
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Blue persona response prompt]"})
     transcript.append({"role": "assistant", "speaker": f"blue:{blue.id}", "text": blue_open})
 
@@ -618,6 +625,8 @@ async def run_cell(
         {"role": "assistant", "text": blue_open},
         {"role": "user", "text": red_rebut_prompt},
     ]
+    fevents.TURN_CTX.set({"turn": 2, "speaker": f"red:{red.id}", "label": "rebut"})
+    fevents.emit("turn_start")
     msg = await pc.call_multiturn(
         system_cached=system_cached,
         user_cached_prefix=user_cached,
@@ -626,6 +635,7 @@ async def run_cell(
         max_tokens=max_turn_tokens,
     )
     red_rebut = pc.extract_text(msg)
+    fevents.emit("turn_end", text=red_rebut)
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Red rebuttal prompt]"})
     transcript.append({"role": "assistant", "speaker": f"red:{red.id}", "text": red_rebut})
 
@@ -640,6 +650,8 @@ async def run_cell(
         {"role": "assistant", "text": red_rebut},
         {"role": "user", "text": blue_close_prompt},
     ]
+    fevents.TURN_CTX.set({"turn": 3, "speaker": f"blue:{blue.id}", "label": "close"})
+    fevents.emit("turn_start")
     msg = await pc.call_multiturn(
         system_cached=system_cached,
         user_cached_prefix=user_cached,
@@ -648,6 +660,7 @@ async def run_cell(
         max_tokens=max_turn_tokens,
     )
     blue_close = pc.extract_text(msg)
+    fevents.emit("turn_end", text=blue_close)
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Blue closing prompt]"})
     transcript.append({"role": "assistant", "speaker": f"blue:{blue.id}", "text": blue_close})
 
@@ -668,6 +681,8 @@ async def run_cell(
         {"role": "assistant", "text": blue_close},
         {"role": "user", "text": vote_prompt},
     ]
+    fevents.TURN_CTX.set({"turn": 4, "speaker": "vote", "label": "vote"})
+    fevents.emit("turn_start")
     vote_msg = await pc.call_multiturn(
         system_cached=system_cached,
         user_cached_prefix=user_cached,
@@ -681,6 +696,7 @@ async def run_cell(
         tool_choice={"type": "tool", "name": "submit_vote"},
     )
     vote_data = pc.extract_tool_input(vote_msg, "submit_vote")
+    fevents.emit("turn_end", text="")
     transcript.append({"role": "user", "speaker": "moderator", "text": "[Vote extraction prompt]"})
     transcript.append({"role": "assistant", "speaker": "vote", "text": json.dumps(vote_data)})
 

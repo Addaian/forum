@@ -21,6 +21,12 @@ dependencies = [
     "python-dotenv>=1.0",
 ]
 
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+]
+
 [project.scripts]
 forum = "forum.cli:main"
 

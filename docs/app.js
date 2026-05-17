@@ -11,10 +11,9 @@
  * esm.sh — see imports below.
  */
 
-import Sigma                  from "https://esm.sh/sigma@3.0.2";
-import Graph                  from "https://esm.sh/graphology@0.26.0";
-import forceAtlas2            from "https://esm.sh/graphology-layout-forceatlas2@0.10.1";
-import { EdgeCurvedArrowProgram } from "https://esm.sh/@sigma/edge-curve@3.1.0";
+import Sigma         from "https://esm.sh/sigma@3.0.2";
+import Graph         from "https://esm.sh/graphology@0.26.0";
+import forceAtlas2   from "https://esm.sh/graphology-layout-forceatlas2@0.10.1";
 
 const VALUES = ["scalability","maintainability","velocity","correctness","simplicity","flexibility"];
 const SALIENCE_BUMP = 1.10;
@@ -142,6 +141,9 @@ async function init() {
   wireNav();
   wireButtons();
   wireClock();
+  wireSettingsModal();
+  await detectLiveMode();
+  wireAuditModal();
 
   // Honor #hash for deep links to a specific view.
   const fromHash = (location.hash || "#evidence").replace(/^#/, "");
@@ -481,7 +483,6 @@ function renderDependencyGraph() {
       graph.addEdge(e.source, e.target, {
         size: 0.6,
         color: "rgba(199,198,202,0.25)",
-        type: "curved",
       });
     }
   }
@@ -500,8 +501,7 @@ function renderDependencyGraph() {
     labelSize: 11,
     labelFont: "JetBrains Mono",
     labelWeight: "400",
-    defaultEdgeType: "curved",
-    edgeProgramClasses: { curved: EdgeCurvedArrowProgram },
+    defaultEdgeType: "arrow",
     minCameraRatio: 0.1,
     maxCameraRatio: 6,
     labelRenderedSizeThreshold: 6,
@@ -1051,6 +1051,335 @@ function escapeHtml(s) {
   return String(s ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+// Strip ANSI color codes — even with NO_COLOR=1 set, Rich still emits a few.
+const ANSI_RE = /\x1B\[[0-9;?]*[ -/]*[@-~]/g;
+function stripAnsi(s) { return s.replace(ANSI_RE, ""); }
+
+// =====================================================================
+// Live mode (FastAPI backend at /api/*)
+// =====================================================================
+
+// ----- API base + token (settings persisted in localStorage) -----
+// Same-origin uses "" (relative paths) so localhost dev keeps working
+// untouched. Cross-origin (Pages → laptop tunnel) needs the absolute URL.
+function getApiBase()  { return (localStorage.getItem("forumApiBase")  || "").replace(/\/+$/, ""); }
+function getApiToken() { return localStorage.getItem("forumApiToken") || ""; }
+function setApiConfig(base, token) {
+  if (base) localStorage.setItem("forumApiBase", base.replace(/\/+$/, ""));
+  else      localStorage.removeItem("forumApiBase");
+  if (token) localStorage.setItem("forumApiToken", token);
+  else       localStorage.removeItem("forumApiToken");
+}
+
+function apiUrl(path) {
+  // path always starts with /api/...
+  return getApiBase() + path;
+}
+
+async function apiFetch(path, opts = {}) {
+  const headers = new Headers(opts.headers || {});
+  const tok = getApiToken();
+  if (tok) headers.set("Authorization", `Bearer ${tok}`);
+  return fetch(apiUrl(path), { ...opts, headers });
+}
+
+function apiEventSource(path) {
+  // EventSource can't set headers, so fall back to a ?token= query param.
+  // The backend accepts both ways (see require_token in server.py).
+  const tok = getApiToken();
+  const sep = path.includes("?") ? "&" : "?";
+  const url = apiUrl(path) + (tok ? `${sep}token=${encodeURIComponent(tok)}` : "");
+  return new EventSource(url);
+}
+
+async function detectLiveMode() {
+  // Probe the configured backend. On vanilla GitHub Pages with no settings
+  // saved, getApiBase() is "" so we hit /api/manifest on the Pages origin —
+  // gets a 404 and gracefully returns to static mode.
+  try {
+    const res = await apiFetch("/api/manifest", { method: "GET" });
+    if (!res.ok) return;
+    const ct = res.headers.get("content-type") || "";
+    if (!ct.includes("json")) return;
+    await res.json();
+    state.liveMode = true;
+    document.getElementById("btn-new-audit").classList.remove("hidden");
+  } catch { /* unreachable backend — leave button hidden */ }
+}
+
+function wireSettingsModal() {
+  const modal = document.getElementById("settings-modal");
+  const openBtn = document.getElementById("btn-settings");
+  const closeBtn = document.getElementById("settings-modal-close");
+  const form = document.getElementById("settings-form");
+  const testBtn = document.getElementById("settings-test");
+  const result = document.getElementById("settings-result");
+  const statusDot = document.getElementById("settings-status-dot");
+  if (!modal || !openBtn) return;
+
+  const refreshStatusDot = (ok) => {
+    statusDot.className = "ml-auto w-2 h-2 rounded-full " +
+      (ok ? "bg-emerald-500" : (getApiBase() || getApiToken()) ? "bg-red-500" : "bg-outline-variant");
+    statusDot.title = ok ? "Connected" :
+      (getApiBase() || getApiToken()) ? "Configured but unreachable" : "Disconnected";
+  };
+
+  const probe = async () => {
+    try {
+      const res = await apiFetch("/api/manifest");
+      const ok = res.ok && (res.headers.get("content-type") || "").includes("json");
+      refreshStatusDot(ok);
+      return { ok, status: res.status };
+    } catch (err) {
+      refreshStatusDot(false);
+      return { ok: false, status: 0, err: err.message };
+    }
+  };
+
+  openBtn.addEventListener("click", () => {
+    form.elements.api_base.value  = getApiBase();
+    form.elements.api_token.value = getApiToken();
+    result.textContent = "";
+    modal.classList.remove("hidden");
+  });
+  closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+  modal.addEventListener("click", e => { if (e.target === modal) modal.classList.add("hidden"); });
+
+  testBtn.addEventListener("click", async () => {
+    const prevBase = getApiBase(), prevTok = getApiToken();
+    setApiConfig(form.elements.api_base.value.trim(), form.elements.api_token.value);
+    const { ok, status, err } = await probe();
+    setApiConfig(prevBase, prevTok);  // probe only — don't persist on test
+    result.textContent = ok ? "✓ reachable" :
+      err ? `✗ ${err}` : `✗ HTTP ${status}${status === 401 ? " — bad token" : ""}`;
+    result.style.color = ok ? "#4ade80" : "#ef4444";
+  });
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    setApiConfig(form.elements.api_base.value.trim(), form.elements.api_token.value);
+    const { ok, status, err } = await probe();
+    result.textContent = ok ? "✓ saved + reachable — closing…" :
+      err ? `saved but unreachable: ${err}` : `saved but HTTP ${status}`;
+    result.style.color = ok ? "#4ade80" : "#facc15";
+    // Reflect into the rest of the UI immediately.
+    const newAuditBtn = document.getElementById("btn-new-audit");
+    if (ok) {
+      state.liveMode = true;
+      newAuditBtn?.classList.remove("hidden");
+      setTimeout(() => modal.classList.add("hidden"), 800);
+    } else {
+      state.liveMode = false;
+      newAuditBtn?.classList.add("hidden");
+    }
+  });
+
+  // Initial dot color reflects whatever's in localStorage.
+  probe();
+}
+
+function wireAuditModal() {
+  const modal = document.getElementById("audit-modal");
+  const modalInner = document.getElementById("audit-modal-inner");
+  const openBtn = document.getElementById("btn-new-audit");
+  const closeBtn = document.getElementById("audit-modal-close");
+  const form = document.getElementById("audit-form");
+  const logWrap = document.getElementById("audit-log-wrap");
+  const logEl = document.getElementById("audit-log");
+  const liveWrap = document.getElementById("audit-live-wrap");
+  const liveText = document.getElementById("audit-live-text");
+  const liveSpeaker = document.getElementById("audit-live-speaker");
+  const liveTurnLabel = document.getElementById("audit-live-turn-label");
+  const liveCellTag = document.getElementById("audit-live-cell-tag");
+  const liveDp = document.getElementById("audit-live-dp");
+  const liveSidePill = document.getElementById("audit-live-side-pill");
+  const cellsStrip = document.getElementById("audit-cells-strip");
+  const statusDot = document.getElementById("audit-status-dot");
+  const statusLabel = document.getElementById("audit-status-label");
+  const activeMeta = document.getElementById("audit-active-meta");
+  if (!openBtn || !modal) return;
+
+  // Per-audit live state — reset on each open.
+  const live = { activeDp: null, cells: new Map() };
+
+  const reset = () => {
+    form.classList.remove("hidden");
+    logWrap.classList.add("hidden");
+    liveWrap.classList.add("hidden");
+    modalInner.classList.remove("max-w-4xl");
+    modalInner.classList.add("max-w-2xl");
+    logEl.textContent = "";
+    liveText.textContent = "";
+    liveSpeaker.textContent = "—";
+    liveTurnLabel.textContent = "OPEN";
+    liveCellTag.textContent = "—";
+    liveDp.textContent = "";
+    cellsStrip.innerHTML = "";
+    activeMeta.textContent = "";
+    statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+    statusLabel.textContent = "RUNNING";
+    live.activeDp = null;
+    live.cells.clear();
+  };
+
+  openBtn.addEventListener("click", () => { reset(); modal.classList.remove("hidden"); });
+  closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+  modal.addEventListener("click", e => { if (e.target === modal) modal.classList.add("hidden"); });
+
+  const ensureLivePanel = () => {
+    if (liveWrap.classList.contains("hidden")) {
+      liveWrap.classList.remove("hidden");
+      // Modal widens so the streaming text has room to breathe.
+      modalInner.classList.remove("max-w-2xl");
+      modalInner.classList.add("max-w-4xl");
+    }
+  };
+
+  const renderCellsStrip = (dpId) => {
+    cellsStrip.innerHTML = "";
+    const cells = [...live.cells.values()].filter(c => c.dpId === dpId)
+      .sort((a, b) => a.cellId - b.cellId);
+    for (const c of cells) {
+      const tone = c.status === "voted"
+        ? (c.position === "debt" ? "bg-[#ef4444]/30 border-[#ef4444]" : "bg-[#4ade80]/30 border-[#4ade80]")
+        : c.status === "active" ? "bg-primary/40 border-primary animate-pulse"
+        : c.status === "failed" ? "bg-error/30 border-error"
+        : "bg-surface-container border-outline-variant";
+      const dot = document.createElement("span");
+      dot.className = `w-5 h-5 border ${tone} font-code-sm text-[9px] flex items-center justify-center text-on-surface`;
+      dot.textContent = String(c.cellId);
+      dot.title = `Cell ${c.cellId} · ${c.red || ""} vs ${c.blue || ""} · ${c.status}${c.position ? ` (${c.position})` : ""}`;
+      cellsStrip.appendChild(dot);
+    }
+  };
+
+  const handleEvent = (ev) => {
+    const cell = ev.cell || {};
+    const turn = ev.turn || {};
+    const dpId = cell.dp_id;
+    const cellId = cell.cell_id;
+
+    if (!dpId || cellId == null) {
+      // Some events (judge, report) won't carry cell context — just log.
+      return;
+    }
+
+    const key = `${dpId}#${cellId}`;
+    let entry = live.cells.get(key);
+    if (!entry) {
+      entry = { dpId, cellId, red: cell.red, blue: cell.blue, status: "queued", position: null };
+      live.cells.set(key, entry);
+    }
+
+    switch (ev.t) {
+      case "cell_start":
+        entry.status = "active";
+        live.activeDp = dpId;
+        liveDp.textContent = `${cell.principle || ""} · ${dpId}`;
+        liveCellTag.textContent = `cell ${cellId} · ${cell.red} vs ${cell.blue}`;
+        activeMeta.textContent = `${cell.principle || ""} · cell ${cellId}/10`;
+        ensureLivePanel();
+        renderCellsStrip(dpId);
+        break;
+
+      case "turn_start":
+        // Switch the visible text area to the new speaker. Tokens for the
+        // previous turn stay in entry.transcript[label] for posterity.
+        liveText.textContent = "";
+        const speaker = turn.speaker || "";
+        liveSpeaker.textContent = speaker;
+        liveTurnLabel.textContent = (turn.label || "").toUpperCase();
+        const isRed = speaker.startsWith("red");
+        const isVote = speaker === "vote";
+        liveSidePill.textContent = isVote ? "VOTE" : (isRed ? "RED" : "BLUE");
+        liveSidePill.style.color = isVote ? "#c8c6c7" : (isRed ? "#ef4444" : "#4ade80");
+        liveSidePill.style.borderColor = liveSidePill.style.color;
+        break;
+
+      case "token":
+        if (ev.text) {
+          liveText.textContent += ev.text;
+          liveText.scrollTop = liveText.scrollHeight;
+        }
+        break;
+
+      case "turn_end":
+        // Leave the text on screen so the user can read it before the next
+        // turn clears the panel.
+        break;
+
+      case "cell_voted":
+        entry.status = "voted";
+        entry.position = ev.position;
+        renderCellsStrip(dpId);
+        break;
+
+      case "cell_failed":
+        entry.status = "failed";
+        renderCellsStrip(dpId);
+        break;
+    }
+  };
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const body = {
+      repo_url: fd.get("repo_url"),
+      slug:     fd.get("slug")?.trim() || undefined,
+      language: fd.get("language") || "auto",
+    };
+
+    let res;
+    try {
+      res = await apiFetch("/api/audits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch (err) {
+      alert(`Couldn't reach the backend: ${err.message}`);
+      return;
+    }
+    if (!res.ok) {
+      const msg = (await res.json().catch(() => ({}))).detail || res.statusText;
+      alert(`Audit refused: ${msg}`);
+      return;
+    }
+    const { job_id, slug } = await res.json();
+
+    form.classList.add("hidden");
+    logWrap.classList.remove("hidden");
+
+    const sse = apiEventSource(`/api/audits/${job_id}/stream`);
+    sse.addEventListener("log", e => {
+      logEl.textContent += stripAnsi(e.data) + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+    });
+    sse.addEventListener("event", e => {
+      try { handleEvent(JSON.parse(e.data)); } catch { /* malformed — skip */ }
+    });
+    sse.addEventListener("done", async e => {
+      const info = JSON.parse(e.data);
+      sse.close();
+      const ok = info.status === "completed";
+      statusDot.className = `w-2 h-2 rounded-full ${ok ? "bg-emerald-500" : "bg-red-500"}`;
+      statusLabel.textContent = ok ? `COMPLETED — switching to "${slug}"` : `FAILED${info.error ? ": " + info.error : ""}`;
+      if (ok) {
+        const mres = await fetch("data/manifest.json", { cache: "no-store" });
+        state.manifest = await mres.json();
+        renderAuditSwitcher();
+        await loadAudit(slug);
+        setTimeout(() => modal.classList.add("hidden"), 2000);
+      }
+    });
+    sse.onerror = () => {
+      statusDot.className = "w-2 h-2 rounded-full bg-red-500";
+      statusLabel.textContent = "DISCONNECTED";
+    };
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);

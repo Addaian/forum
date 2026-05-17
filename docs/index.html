@@ -135,6 +135,13 @@ tailwind.config = {
         Each one is a different repo Forum audited.
       </div>
       <div class="space-y-1" id="audit-switcher"></div>
+      <button id="btn-new-audit" class="hidden mt-2 w-full text-left audit-pill audit-pill-new" title="Submit a repo URL — only works when the local FastAPI server is running.">
+        <span class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[14px]">add</span>
+          <span>NEW AUDIT</span>
+        </span>
+        <span class="lang lang-python">live</span>
+      </button>
     </div>
 
     <nav class="flex-1 space-y-1" id="nav">
@@ -181,6 +188,11 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[18px]">help_outline</span>
           <span class="font-label-caps text-label-caps">Issues</span>
         </a>
+        <button id="btn-settings" class="w-full text-left text-on-surface-variant px-2 py-2 flex items-center gap-3 hover:text-primary transition-all" title="Connect to a live Forum backend (your laptop via a tunnel)">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span class="font-label-caps text-label-caps">Live backend</span>
+          <span id="settings-status-dot" class="ml-auto w-2 h-2 rounded-full bg-outline-variant" title="Disconnected"></span>
+        </button>
       </div>
     </div>
   </aside>
@@ -469,6 +481,139 @@ tailwind.config = {
     <span class="text-primary font-bold" id="footer-clock">—</span>
   </div>
 </footer>
+
+<!-- =========================== NEW-AUDIT MODAL (live mode) =========================== -->
+<div id="audit-modal" class="hidden fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4">
+  <div id="audit-modal-inner" class="bg-surface-container border border-outline-variant w-full max-w-2xl max-h-[85vh] flex flex-col transition-all">
+    <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+      <div>
+        <h3 class="font-headline-sm text-headline-sm text-primary" id="audit-modal-title">New audit</h3>
+        <p class="text-[11px] text-on-surface-variant opacity-70 mt-0.5" id="audit-modal-sub">Submit a public git URL. Runs locally on this laptop.</p>
+      </div>
+      <button id="audit-modal-close" class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">close</button>
+    </div>
+
+    <!-- Form (visible before submit) -->
+    <form id="audit-form" class="p-4 space-y-4">
+      <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">REPO URL</label>
+        <input type="text" name="repo_url" required placeholder="https://github.com/foo/bar"
+               class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">SLUG (optional)</label>
+          <input type="text" name="slug" placeholder="auto from URL" pattern="[a-z0-9][a-z0-9-]{0,40}"
+                 class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">LANGUAGE</label>
+          <select name="language" class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+            <option value="auto">auto-detect</option>
+            <option value="python">python</option>
+            <option value="c">c</option>
+          </select>
+        </div>
+      </div>
+      <p class="text-[10px] text-on-surface-variant opacity-70 leading-snug">
+        Requires <code>ANTHROPIC_API_KEY</code> in the server's env. Each audit takes minutes and costs real money — usually $0.50–$2.
+      </p>
+      <button type="submit" class="w-full py-2 bg-primary text-on-primary font-label-caps text-label-caps font-bold hover:opacity-90">
+        START AUDIT
+      </button>
+    </form>
+
+    <!-- Live audit panel (visible after submit) -->
+    <div id="audit-log-wrap" class="hidden flex-1 flex flex-col overflow-hidden">
+      <div class="p-2 border-b border-outline-variant flex items-center gap-3 bg-surface-container-low">
+        <div id="audit-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span id="audit-status-label" class="font-label-caps text-[10px] text-on-surface-variant">RUNNING</span>
+        <span id="audit-active-meta" class="ml-auto font-code-sm text-[10px] text-on-surface-variant opacity-70 truncate"></span>
+      </div>
+
+      <!-- Streaming debate cell -->
+      <div id="audit-live-wrap" class="hidden flex flex-col flex-1 overflow-hidden border-b border-outline-variant">
+        <div class="p-3 border-b border-outline-variant bg-surface-container">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span id="audit-live-side-pill" class="font-label-caps text-[10px] px-2 py-0.5 border" style="border-color:currentColor;color:#ef4444">RED</span>
+              <span id="audit-live-speaker" class="font-code-sm text-[11px] text-primary">—</span>
+              <span id="audit-live-turn-label" class="font-label-caps text-[9px] text-on-surface-variant opacity-70">OPEN</span>
+            </div>
+            <div id="audit-live-cell-tag" class="font-code-sm text-[10px] text-on-surface-variant opacity-70">—</div>
+          </div>
+          <div id="audit-live-dp" class="text-[10px] text-on-surface-variant opacity-60 mt-1 truncate"></div>
+        </div>
+        <pre id="audit-live-text" class="flex-1 overflow-y-auto bg-surface-container-lowest text-on-surface font-body-md text-[14px] leading-relaxed p-4 m-0 whitespace-pre-wrap"></pre>
+        <div class="px-3 py-2 border-t border-outline-variant bg-surface-container-low">
+          <div class="flex items-center gap-1 flex-wrap" id="audit-cells-strip"></div>
+        </div>
+      </div>
+
+      <!-- Plain log (always visible, smaller after debate starts) -->
+      <pre id="audit-log" class="flex-shrink-0 max-h-[150px] overflow-y-auto bg-surface-container-lowest text-on-surface-variant font-code-sm text-[10px] p-3 m-0 whitespace-pre-wrap leading-snug opacity-80"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- =========================== SETTINGS MODAL (live backend config) =========================== -->
+<div id="settings-modal" class="hidden fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4">
+  <div class="bg-surface-container border border-outline-variant w-full max-w-xl flex flex-col">
+    <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+      <div>
+        <h3 class="font-headline-sm text-headline-sm text-primary">Live backend</h3>
+        <p class="text-[11px] text-on-surface-variant opacity-70 mt-0.5">Point this page at a running <code>forum</code> server so you can submit new audits.</p>
+      </div>
+      <button id="settings-modal-close" class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">close</button>
+    </div>
+
+    <form id="settings-form" class="p-4 space-y-4">
+      <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">BACKEND URL</label>
+        <input type="text" name="api_base" placeholder="https://abc123.trycloudflare.com" autocomplete="off"
+               class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+        <p class="text-[10px] text-on-surface-variant opacity-70 mt-1 leading-snug">
+          The tunnel URL of the laptop running <code>uvicorn server:app</code>.
+          Leave blank if you're hitting the server same-origin (localhost).
+        </p>
+      </div>
+      <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-1">ACCESS TOKEN</label>
+        <input type="password" name="api_token" placeholder="shared secret" autocomplete="off"
+               class="w-full bg-surface-container-lowest border border-outline-variant px-3 py-2 font-code-md text-code-md text-on-surface focus:border-primary focus:outline-none">
+        <p class="text-[10px] text-on-surface-variant opacity-70 mt-1 leading-snug">
+          Whatever the owner set as <code>FORUM_API_TOKEN</code> in the server env. If they didn't set one, leave blank.
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" id="settings-test" class="flex-1 py-2 bg-secondary-container text-on-secondary-container font-label-caps text-label-caps border border-outline-variant hover:bg-on-surface hover:text-surface">TEST</button>
+        <button type="submit" class="flex-1 py-2 bg-primary text-on-primary font-label-caps text-label-caps font-bold hover:opacity-90">SAVE</button>
+      </div>
+      <div id="settings-result" class="text-[11px] font-code-sm leading-snug min-h-[14px]"></div>
+
+      <details class="pt-2 border-t border-outline-variant">
+        <summary class="cursor-pointer text-[10px] text-on-surface-variant opacity-70 hover:opacity-100">How do I run the server?</summary>
+        <pre class="mt-2 p-3 bg-surface-container-lowest border border-outline-variant text-[10px] font-code-sm text-on-surface-variant whitespace-pre-wrap leading-relaxed">
+# 1. install (one time)
+uv pip install -e ".[server]"
+
+# 2. set secrets
+export ANTHROPIC_API_KEY=sk-...
+export FORUM_API_TOKEN=$(openssl rand -hex 16)   # share this with your friends
+
+# 3. boot
+uv run uvicorn server:app --port 8001
+
+# 4. expose to the internet (pick one)
+cloudflared tunnel --url http://localhost:8001   # zero account, random URL
+ngrok http 8001                                  # stable URL with free account
+
+# 5. paste the tunnel URL + token into this dialog
+</pre>
+      </details>
+    </form>
+  </div>
+</div>
 
 <script type="module" src="app.js"></script>
 </body>

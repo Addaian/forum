@@ -47,6 +47,10 @@ def _commit_sha(repo_path: Path) -> str:
 def main() -> None:
     """Forum — an AI architectural audit for Python codebases."""
     load_dotenv()
+    # Activates per-token streaming via stdout-prefixed JSON when the FastAPI
+    # server (or any caller) sets FORUM_EVENTS=1. No-op otherwise.
+    from . import events as fevents
+    fevents.install_stdout_emitter_if_requested()
 
 
 @main.command()

@@ -20,6 +20,7 @@ from typing import Awaitable, Callable
 
 from typing import TYPE_CHECKING
 
+from .. import events as fevents
 from ..cache.prompt_cache import HAIKU, PromptCache
 from ..types import CellVote, DecisionPoint, TribunalResult
 from .aggregate import confidence_weighted, should_stop
@@ -69,18 +70,36 @@ async def run_tribunal_speculative(
         red, blue = pair_list[i]
         temp = cell_temperature(i, num_cells=num_cells)
         log.debug("cell %d: red=%s blue=%s T=%.2f", i, red, blue, temp)
+        # Set per-cell context so cache-layer token events carry which cell
+        # they belong to. Tasks snapshot the current ContextVar values at
+        # create-task time, so this isolates per-cell metadata cleanly.
+        fevents.CELL_CTX.set({
+            "dp_id": decision_point.id,
+            "principle": decision_point.principle,
+            "cell_id": i,
+            "red": red,
+            "blue": blue,
+            "temperature": temp,
+        })
+        fevents.emit("cell_start")
         async with sem:
-            return await run_cell(
-                cell_id=i,
-                decision_point=decision_point,
-                red_persona_id=red,
-                blue_persona_id=blue,
-                temperature=temp,
-                codebase_summary=codebase_summary,
-                git_summary=git_summary,
-                pc=pc,
-                max_turn_tokens=max_turn_tokens,
-            )
+            try:
+                vote = await run_cell(
+                    cell_id=i,
+                    decision_point=decision_point,
+                    red_persona_id=red,
+                    blue_persona_id=blue,
+                    temperature=temp,
+                    codebase_summary=codebase_summary,
+                    git_summary=git_summary,
+                    pc=pc,
+                    max_turn_tokens=max_turn_tokens,
+                )
+            except BaseException as exc:  # pragma: no cover - signaling only
+                fevents.emit("cell_failed", error=repr(exc))
+                raise
+            fevents.emit("cell_voted", position=vote.position, confidence=vote.confidence)
+            return vote
 
     tasks: set[asyncio.Task[CellVote]] = {
         asyncio.create_task(_one(i), name=f"cell-{i}") for i in range(num_cells)

@@ -29,6 +29,8 @@ from typing import Any, Sequence
 
 from anthropic import AsyncAnthropic
 
+from .. import events as fevents
+
 log = logging.getLogger("forum.cache")
 
 # Model IDs — keep in sync with the Anthropic console.
@@ -302,7 +304,10 @@ class PromptCache:
 
     async def _send(self, kwargs: dict) -> Any:
         t0 = time.perf_counter()
-        msg = await self.client.messages.create(**kwargs)
+        if fevents.is_active():
+            msg = await self._send_streaming(kwargs)
+        else:
+            msg = await self.client.messages.create(**kwargs)
         dt = time.perf_counter() - t0
 
         u = msg.usage
@@ -320,5 +325,21 @@ class PromptCache:
             cost_usd=_compute_cost(kwargs["model"], in_t, cw_t, cr_t, out_t),
         )
         self.metrics.record(record)
+        return msg
+
+    async def _send_streaming(self, kwargs: dict) -> Any:
+        """Streaming path — emits per-token deltas via the events channel.
+
+        Prompt caching is preserved: cache_control blocks are passed identically
+        in streaming mode, and the final message's usage object still carries
+        cache_creation_input_tokens / cache_read_input_tokens.
+        """
+        fevents.emit("llm_start", model=kwargs["model"])
+        async with self.client.messages.stream(**kwargs) as stream:
+            async for text in stream.text_stream:
+                if text:
+                    fevents.emit("token", text=text)
+            msg = await stream.get_final_message()
+        fevents.emit("llm_end", stop_reason=getattr(msg, "stop_reason", None))
         return msg
 

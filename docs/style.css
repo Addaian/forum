@@ -88,6 +88,13 @@
 .audit-pill .lang.lang-python { background: rgba(93, 214, 255, 0.15); color: #5dd6ff; }
 .audit-pill .lang.lang-c      { background: rgba(251, 146, 60, 0.18); color: #fb923c; }
 
+.audit-pill-new {
+  border-style: dashed;
+  background: transparent;
+  color: #c7c6ca;
+}
+.audit-pill-new:hover { background: #1c1b1b; color: #c8c6c7; }
+
 /* ----- Tone preset buttons ----- */
 .tone-btn {
   flex: 1;
