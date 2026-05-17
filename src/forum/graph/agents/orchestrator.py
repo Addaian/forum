@@ -256,43 +256,72 @@ async def run_pipeline(
 
 async def _run_sweep(client: WaferClient, candidates: list[dict],
                      graph: KnowledgeGraph, threshold: int) -> list[SweepHit]:
-    """Run sweep on all candidates in parallel."""
+    """Run sweep on all candidates using batched prompts.
+
+    Sends multiple functions per API call to minimize round-trips.
+    With 3 concurrent calls and 15 functions per batch, 224 functions
+    = 15 batches = 5 rounds × ~7s = ~35 seconds.
+    """
+    BATCH_SIZE = 15
     hits: list[SweepHit] = []
 
-    async def _score_one(cand: dict) -> SweepHit | None:
+    # Prepare all candidates with metadata
+    prepared = []
+    for cand in candidates:
         node = cand["node"]
         code = cand["code"]
-        if len(code) > 3000:
-            code = code[:3000] + "\n... (truncated)"
-
-        callers = [c.qualname for c in graph.callers_of(cand["node_id"])[:5]]
+        if len(code) > 1500:
+            code = code[:1500] + "\n..."
+        callers = [c.qualname for c in graph.callers_of(cand["node_id"])[:3]]
         lang = node.language.value if hasattr(node, 'language') else "python"
+        prepared.append({**cand, "code_trimmed": code, "callers": callers, "lang": lang})
 
-        prompt = _format_sweep_prompt(code, node.name, node.file, callers, lang)
+    # Split into batches
+    batches = [prepared[i:i+BATCH_SIZE] for i in range(0, len(prepared), BATCH_SIZE)]
+
+    async def _score_batch(batch: list[dict]) -> list[SweepHit]:
+        """Score a batch of functions in one API call."""
+        # Build batch prompt
+        parts = []
+        for i, item in enumerate(batch):
+            parts.append(f"--- FUNCTION {i+1}: {item['node'].name} ({item['node'].file}:{item['node'].span.line_start}) ---")
+            parts.append(f"Called by: {', '.join(item['callers']) or 'unknown'}")
+            parts.append(f"```{item['lang']}")
+            parts.append(item["code_trimmed"])
+            parts.append("```")
+            parts.append("")
+
+        batch_prompt = "\n".join(parts)
+        batch_prompt += f"\n\nScore ALL {len(batch)} functions above. For EACH function respond on one line:\nFUNCTION <number>: SCORE: <1-10> CATEGORY: <PERF|SEC|MEM|RACE|LOGIC|CRYPTO|RESOURCE|NONE> REASON: <one sentence>"
 
         try:
-            response = await client.score_function(SWEEP_SYSTEM_PROMPT, prompt)
-            score, category, reason = _parse_sweep_response(response)
+            response = await client.score_function(SWEEP_SYSTEM_PROMPT, batch_prompt)
         except Exception as e:
-            log.debug("Sweep error for %s: %s", node.name, e)
-            return None
+            log.debug("Batch sweep error: %s", e)
+            return []
 
-        if score >= threshold:
-            return SweepHit(
-                node_id=cand["node_id"], name=node.name,
-                file=node.file, line=node.span.line_start,
-                code=cand["code"], score=score,
-                category=category, reason=reason,
-                language=lang, priority=cand["priority"],
-            )
-        return None
+        # Parse batch response
+        batch_hits = []
+        for i, item in enumerate(batch):
+            score, category, reason = _parse_batch_item(response, i + 1)
+            if score >= threshold:
+                node = item["node"]
+                batch_hits.append(SweepHit(
+                    node_id=item["node_id"], name=node.name,
+                    file=node.file, line=node.span.line_start,
+                    code=item["code"], score=score,
+                    category=category, reason=reason,
+                    language=item["lang"], priority=item["priority"],
+                ))
+        return batch_hits
 
-    tasks = [_score_one(c) for c in candidates]
+    # Run batches concurrently (limited by client semaphore)
+    tasks = [_score_batch(batch) for batch in batches]
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     for r in results:
-        if isinstance(r, SweepHit):
-            hits.append(r)
+        if isinstance(r, list):
+            hits.extend(r)
 
     hits.sort(key=lambda h: h.score, reverse=True)
     return hits
@@ -359,6 +388,25 @@ def _dedup_and_rank(findings: list[DeepFinding]) -> list[DeepFinding]:
     result = list(seen.values())
     result.sort(key=lambda f: (severity_rank.get(f.severity, 9), -f.confidence))
     return result
+
+
+def _parse_batch_item(response: str, func_num: int) -> tuple[int, str, str]:
+    """Parse a single function's score from a batched response."""
+    # Look for "FUNCTION N:" or just parse by position
+    pattern = rf'FUNCTION\s*{func_num}\s*:?\s*SCORE:\s*(\d+)\s*CATEGORY:\s*(\w+)\s*REASON:\s*(.+?)(?:\n|FUNCTION|$)'
+    match = re.search(pattern, response, re.IGNORECASE)
+    if match:
+        return min(10, max(1, int(match.group(1)))), match.group(2), match.group(3).strip()
+
+    # Fallback: look for any "SCORE: N" near mention of function number
+    # Split response by "FUNCTION" markers
+    sections = re.split(r'FUNCTION\s*\d+', response, flags=re.IGNORECASE)
+    if func_num < len(sections):
+        section = sections[func_num]
+        return _parse_sweep_response(section)
+
+    # Last resort: couldn't parse this function
+    return 1, "NONE", "unparsed"
 
 
 def _parse_sweep_response(text: str) -> tuple[int, str, str]:

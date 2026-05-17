@@ -3,14 +3,20 @@
 Wafer provides cheap fast inference via Qwen models:
 - Qwen3.6-35B-A3B: $0.19/M input, $1.25/M output (sweep agent)
 - Qwen3.5-397B-A17B: $0.60/M input, $3.60/M output (deep review)
+
+NOTE: Wafer's Qwen3 models use thinking mode by default. The model puts
+reasoning in 'reasoning_content' and final answer in 'content'. We need
+large max_tokens (2000+) to let the model finish thinking and produce content.
+If content is still null, we extract from reasoning_content.
 """
 from __future__ import annotations
 
 import asyncio
 import logging
 import os
+import re
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import httpx
 
@@ -19,8 +25,9 @@ log = logging.getLogger("forum.wafer")
 WAFER_BASE = "https://pass.wafer.ai/v1"
 
 # Models
-SWEEP_MODEL = "Qwen3.6-35B-A3B"
-DEEP_MODEL = "Qwen3.5-397B-A17B"
+# GLM-5.1 returns content directly (no thinking mode), best for sweep
+SWEEP_MODEL = "GLM-5.1"
+DEEP_MODEL = "GLM-5.1"
 
 
 @dataclass
@@ -38,7 +45,6 @@ class UsageStats:
         return self.latency_total / max(1, self.requests)
 
     def cost(self, model: str) -> float:
-        """Estimate cost based on model pricing."""
         if "35B" in model or "35b" in model:
             return (self.input_tokens * 0.19 / 1_000_000 +
                     self.output_tokens * 1.25 / 1_000_000 +
@@ -48,6 +54,45 @@ class UsageStats:
                     self.output_tokens * 3.60 / 1_000_000 +
                     self.cache_read_tokens * 0.06 / 1_000_000)
         return 0.0
+
+
+def _extract_content(data: dict) -> str:
+    """Extract usable text from Wafer response.
+
+    Wafer's Qwen3 models use thinking mode — reasoning goes to
+    'reasoning_content', final answer goes to 'content'. If content
+    is null (ran out of tokens while thinking), we parse reasoning.
+    """
+    msg = data["choices"][0]["message"]
+    content = msg.get("content")
+    if content:
+        return content.strip()
+
+    # Fallback: extract from reasoning_content
+    reasoning = msg.get("reasoning_content") or msg.get("reasoning") or ""
+    if reasoning:
+        # Try to find SCORE pattern in reasoning
+        score_match = re.search(r'SCORE:\s*(\d+)', reasoning)
+        cat_match = re.search(r'CATEGORY:\s*(\w+)', reasoning)
+        reason_match = re.search(r'REASON:\s*(.+?)(?:\n|$)', reasoning)
+        if score_match:
+            parts = [f"SCORE: {score_match.group(1)}"]
+            if cat_match:
+                parts.append(f"CATEGORY: {cat_match.group(1)}")
+            if reason_match:
+                parts.append(f"REASON: {reason_match.group(1)}")
+            return "\n".join(parts)
+
+        # Try to find JSON
+        json_start = reasoning.find("{")
+        json_end = reasoning.rfind("}") + 1
+        if json_start >= 0 and json_end > json_start:
+            return reasoning[json_start:json_end]
+
+        # Last resort: return tail of reasoning
+        return reasoning[-300:].strip()
+
+    return ""
 
 
 class WaferClient:
@@ -71,7 +116,7 @@ class WaferClient:
                     "Authorization": f"Bearer {self.api_key}",
                     "Content-Type": "application/json",
                 },
-                timeout=60.0,
+                timeout=120.0,
                 limits=httpx.Limits(max_connections=200, max_keepalive_connections=50),
             )
         return self._client
@@ -81,7 +126,7 @@ class WaferClient:
             await self._client.aclose()
 
     async def chat(self, model: str, messages: list[dict],
-                   max_tokens: int = 100, temperature: float = 0.1) -> dict:
+                   max_tokens: int = 2000, temperature: float = 0.1) -> dict:
         """Send a chat completion request to Wafer."""
         client = await self._get_client()
 
@@ -96,7 +141,7 @@ class WaferClient:
                 })
                 response.raise_for_status()
                 data = response.json()
-            except (httpx.HTTPError, Exception) as e:
+            except (httpx.HTTPError, Exception):
                 stats = self.sweep_stats if "35B" in model else self.deep_stats
                 stats.errors += 1
                 raise
@@ -115,30 +160,30 @@ class WaferClient:
         return data
 
     async def score_function(self, system_prompt: str, user_prompt: str) -> str:
-        """Score a function using the sweep model. Returns raw content."""
+        """Score a function using the sweep model. Returns extracted text."""
         data = await self.chat(
             model=SWEEP_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            max_tokens=60,
+            max_tokens=2000,
             temperature=0.1,
         )
-        return data["choices"][0]["message"]["content"].strip()
+        return _extract_content(data)
 
     async def deep_review(self, system_prompt: str, user_prompt: str) -> str:
-        """Deep review using the large model. Returns raw content."""
+        """Deep review using the large model. Returns extracted text."""
         data = await self.chat(
             model=DEEP_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            max_tokens=500,
+            max_tokens=4000,
             temperature=0.2,
         )
-        return data["choices"][0]["message"]["content"].strip()
+        return _extract_content(data)
 
     def summary(self) -> dict:
         """Return usage summary."""
