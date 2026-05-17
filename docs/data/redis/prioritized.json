@@ -1,0 +1,57 @@
+{
+  "values": {
+    "flexibility": 1.0,
+    "maintainability": 1.0,
+    "velocity": 1.5,
+    "scalability": 1.0,
+    "correctness": 1.0,
+    "simplicity": 1.2
+  },
+  "items": [
+    {
+      "decision_point_id": "78a213ebfe",
+      "principle": "P3",
+      "subject": "Function src.rdb.rdbLoadObject has cyclomatic complexity 300",
+      "structural_score": 0.68,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.887,
+      "rank": 1
+    },
+    {
+      "decision_point_id": "c26ec8ad2a",
+      "principle": "P3",
+      "subject": "Function src.redis-cli.parseOptions has cyclomatic complexity 218",
+      "structural_score": 0.68,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.887,
+      "rank": 2
+    },
+    {
+      "decision_point_id": "2c7f00c154",
+      "principle": "P3",
+      "subject": "Function src.debug.debugCommand has cyclomatic complexity 210",
+      "structural_score": 0.68,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.887,
+      "rank": 3
+    },
+    {
+      "decision_point_id": "a3d8e301b4",
+      "principle": "P3",
+      "subject": "Function src.quicklist.quicklistTest has cyclomatic complexity 188",
+      "structural_score": 0.68,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.887,
+      "rank": 4
+    },
+    {
+      "decision_point_id": "77f7ca318a",
+      "principle": "P3",
+      "subject": "Function src.networking.clientCommand has cyclomatic complexity 154",
+      "structural_score": 0.68,
+      "value_affinity_score": 0.609,
+      "composite_score": 0.887,
+      "rank": 5
+    }
+  ]
+}

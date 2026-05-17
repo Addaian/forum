@@ -65,6 +65,10 @@ def main() -> None:
               help="Skip Layer 3 (markdown report).")
 @click.option("--only", "only_checkers", default=None,
               help="Comma-separated principle IDs to run (e.g. P1,P3).")
+@click.option("--language", "language", default=None,
+              type=click.Choice(["python", "c", "auto"]),
+              help="Source language. 'auto' (default) picks by file extension. "
+              "P4 (LCOM) is skipped on C; P5 (dead code) requires cppcheck on C.")
 @click.option("--cell-backend", "cell_backend",
               type=click.Choice(["anthropic", "wafer"]), default="anthropic",
               help="Inference backend for Layer-2 cells. 'anthropic' uses "
@@ -78,7 +82,8 @@ def main() -> None:
 def audit(repo: Path | None, values_path: Path | None,
           value_overrides: tuple[str, ...], top_n: int, cache_dir: Path,
           skip_jury: bool, skip_report: bool, only_checkers: str | None,
-          cell_backend: str, replay_dir: Path | None, verbose: bool) -> None:
+          language: str | None, cell_backend: str,
+          replay_dir: Path | None, verbose: bool) -> None:
     """Audit a Python repository and produce a markdown briefing.
 
     With --replay, re-emits a previously-cached audit (no API calls); used
@@ -117,8 +122,9 @@ def audit(repo: Path | None, values_path: Path | None,
     want = None
     if only_checkers:
         want = {p.strip().upper() for p in only_checkers.split(",")}
+    lang_arg = None if (language in (None, "auto")) else language
     with phase(console, "Layer 1: deterministic evidence extraction"):
-        bundle = run_evidence(repo, audit_dir, run_checkers=want)
+        bundle = run_evidence(repo, audit_dir, run_checkers=want, language=lang_arg)
     console.print(f"[green]Layer 1[/]: {len(bundle.decision_points)} decision points "
                   f"across {len({d.principle for d in bundle.decision_points})} principles")
 

@@ -3,17 +3,22 @@ from __future__ import annotations
 
 import networkx as nx
 
-from .utils import RepoIndex, internal_imports, parse_imports
+from .languages import Language, get_language
+from .utils import RepoIndex
 
 
-def build_import_graph(index: RepoIndex) -> nx.DiGraph:
-    """Nodes are module qualnames; edges go from importer to imported."""
+def build_import_graph(index: RepoIndex, language: Language | None = None) -> nx.DiGraph:
+    """Nodes are module qualnames; edges go from importer to imported.
+
+    Dispatches import parsing to the Language that built the index.
+    """
+    lang = language or get_language(index.language)
     g = nx.DiGraph()
     for qn, mi in index.modules.items():
         g.add_node(qn, file=str(mi.path), package=mi.package)
     for qn, mi in index.modules.items():
-        raw = parse_imports(mi.path, qn)
-        for target in internal_imports(qn, raw, index):
+        raw = lang.parse_imports(mi.path, qn)
+        for target in lang.internal_imports(qn, raw, index):
             if target == qn:
                 continue
             g.add_edge(qn, target)

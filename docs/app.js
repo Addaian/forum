@@ -132,7 +132,10 @@ function renderSwitcher() {
     const btn = document.createElement("button");
     btn.className = "swatch";
     btn.dataset.slug = entry.slug;
-    btn.innerHTML = `${entry.label}<span class="ver">${entry.version}</span>`;
+    const langTag = entry.language
+      ? `<span class="lang lang-${entry.language}">${entry.language}</span>`
+      : "";
+    btn.innerHTML = `${langTag}${entry.label}<span class="ver">${entry.version}</span>`;
     btn.title = `${entry.source} @ ${entry.commit} — ${entry.note}`;
     btn.addEventListener("click", () => {
       if (state.activeSlug === entry.slug) return;

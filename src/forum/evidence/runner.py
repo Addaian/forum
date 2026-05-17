@@ -15,7 +15,7 @@ from . import (
     p5_reachability, p6_layering, p7_common_closure,
 )
 from .graph import build_import_graph, graph_summary
-from .utils import build_repo_index
+from .languages import Language, detect_language, get_language
 
 log = logging.getLogger("forum.evidence")
 
@@ -70,21 +70,26 @@ def _render_graph_svg(graph: nx.DiGraph, out_path: Path) -> bool:
 
 
 def run(repo_path: Path, audit_dir: Path,
-        run_checkers: set[str] | None = None) -> EvidenceBundle:
+        run_checkers: set[str] | None = None,
+        language: str | None = None) -> EvidenceBundle:
     """Build EvidenceBundle for `repo_path` and write evidence.json/graph.svg.
 
     `run_checkers` filters which principles to run (e.g., {"P1","P3"}); None = all.
+    `language` picks "python" / "c"; None auto-detects from file extensions.
     """
     repo_path = repo_path.resolve()
     audit_dir.mkdir(parents=True, exist_ok=True)
 
+    lang: Language = get_language(language) if language else detect_language(repo_path)
+    log.info("Language: %s", lang.name)
+
     log.info("Indexing repo: %s", repo_path)
-    index = build_repo_index(repo_path)
+    index = lang.build_repo_index(repo_path)
     log.info("Found %d packages, %d modules",
              len(index.packages), len(index.modules))
 
     log.info("Building import graph…")
-    graph = build_import_graph(index)
+    graph = build_import_graph(index, lang)
     log.info("Graph: %d nodes, %d edges",
              graph.number_of_nodes(), graph.number_of_edges())
 
@@ -102,19 +107,19 @@ def run(repo_path: Path, audit_dir: Path,
         all_decisions += p2_stable.check(index, graph)
     if "P3" in want:
         log.info("P3: complexity…")
-        all_decisions += p3_complexity.check(index)
+        all_decisions += p3_complexity.check(index, lang)
     if "P4" in want:
         log.info("P4: cohesion…")
-        all_decisions += p4_cohesion.check(index)
+        all_decisions += p4_cohesion.check(index, lang)
     if "P5" in want:
         log.info("P5: reachability…")
-        all_decisions += p5_reachability.check(index)
+        all_decisions += p5_reachability.check(index, lang)
     if "P6" in want:
         log.info("P6: layering…")
         all_decisions += p6_layering.check(index, graph)
     if "P7" in want:
         log.info("P7: common closure…")
-        all_decisions += p7_common_closure.check(index)
+        all_decisions += p7_common_closure.check(index, lang)
 
     git = _git_summary(repo_path)
     bundle = EvidenceBundle(

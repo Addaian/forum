@@ -13,6 +13,7 @@ dependencies = [
     "networkx>=3.2",
     "pydeps>=1.12",
     "radon>=6.0",
+    "lizard>=1.17",
     "vulture>=2.11",
     "pydriller>=2.6",
     "tree-sitter>=0.21",
